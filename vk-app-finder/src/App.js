@@ -5,13 +5,14 @@ import Tabbar from "@vkontakte/vkui/dist/components/Tabbar/Tabbar";
 import TabbarItem from "@vkontakte/vkui/dist/components/TabbarItem/TabbarItem";
 import Icon28Menu from '@vkontakte/icons/dist/28/menu';
 import {Epic, Panel, PanelHeader} from "@vkontakte/vkui";
+import MainPanel from "./panels/Main";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      activeStory: 'more'
+      activeStory: 'main'
     };
     this.onStoryChange = this.onStoryChange.bind(this);
   }
@@ -26,27 +27,21 @@ class App extends React.Component {
         <Tabbar>
           <TabbarItem
             onClick={this.onStoryChange}
-            selected={this.state.activeStory === 'feed'}
-            data-story="feed"
-            text="Нашлись"
+            selected={this.state.activeStory === 'main'}
+            data-story="main"
+            text="Главная"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
             selected={this.state.activeStory === 'discover'}
             data-story="discover"
-            text="Потерялись"
+            text="Нашлись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
             selected={this.state.activeStory === 'messages'}
             data-story="messages"
-            text="Я потерял"
-          ><Icon28Menu/></TabbarItem>
-          <TabbarItem
-            onClick={this.onStoryChange}
-            selected={this.state.activeStory === 'notifications'}
-            data-story="notifications"
-            text="Я нашел"
+            text="Потерялись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
@@ -56,9 +51,9 @@ class App extends React.Component {
           ><Icon28Menu/></TabbarItem>
         </Tabbar>
       }>
-        <View id="feed" activePanel="feed">
-          <Panel id="feed">
-            <PanelHeader>Новости</PanelHeader>
+        <View id="main" activePanel="main">
+          <Panel id="main">
+            <MainPanel/>
           </Panel>
         </View>
         <View id="discover" activePanel="discover">
@@ -69,11 +64,6 @@ class App extends React.Component {
         <View id="messages" activePanel="messages">
           <Panel id="messages">
             <PanelHeader>Сообщения</PanelHeader>
-          </Panel>
-        </View>
-        <View id="notifications" activePanel="notifications">
-          <Panel id="notifications">
-            <PanelHeader>Уведомления</PanelHeader>
           </Panel>
         </View>
         <View id="more" activePanel="more">

@@ -1,0 +1,20 @@
+.main__wrapper {
+    background-image: url(../img/main.jpg);
+    background-position: right -85px bottom 40px;
+    height: 100%;
+    width: 100%;
+}
+
+.main__welcome-text {
+    margin-top: 10pt;
+    font-size: xx-large;
+    font-weight: bold;
+    color: var(--dynamic_blue);
+}
+
+.main__button {
+    margin-top: 200pt;
+    margin-right: 10pt;
+    min-width: 120px;
+    box-shadow: 4px 4px;
+}
