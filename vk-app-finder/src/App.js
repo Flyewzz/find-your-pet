@@ -1,44 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import bridge from '@vkontakte/vk-bridge';
+import React, {useState, useEffect} from 'react';
 import View from '@vkontakte/vkui/dist/components/View/View';
-import ScreenSpinner from '@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner';
 import '@vkontakte/vkui/dist/vkui.css';
+import Tabbar from "@vkontakte/vkui/dist/components/Tabbar/Tabbar";
+import TabbarItem from "@vkontakte/vkui/dist/components/TabbarItem/TabbarItem";
+import Icon28Menu from '@vkontakte/icons/dist/28/menu';
+import {Epic, Panel, PanelHeader} from "@vkontakte/vkui";
 
-import Home from './panels/Home';
-import Persik from './panels/Persik';
+class App extends React.Component {
+  constructor(props) {
+    super(props);
 
-const App = () => {
-	const [activePanel, setActivePanel] = useState('home');
-	const [fetchedUser, setUser] = useState(null);
-	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
+    this.state = {
+      activeStory: 'more'
+    };
+    this.onStoryChange = this.onStoryChange.bind(this);
+  }
 
-	useEffect(() => {
-		bridge.subscribe(({ detail: { type, data }}) => {
-			if (type === 'VKWebAppUpdateConfig') {
-				const schemeAttribute = document.createAttribute('scheme');
-				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-				document.body.attributes.setNamedItem(schemeAttribute);
-			}
-		});
-		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
-			setUser(user);
-			setPopout(null);
-		}
-		fetchData();
-	}, []);
+  onStoryChange(e) {
+    this.setState({activeStory: e.currentTarget.dataset.story})
+  }
 
-	const go = e => {
-		setActivePanel(e.currentTarget.dataset.to);
-	};
-
-	return (
-		<View header={true} activePanel={activePanel} popout={popout}>
-			<Home id='home' fetchedUser={fetchedUser} go={go} />
-			<Persik id='persik' go={go} />
-		</View>
-	);
-};
+  render() {
+    return (
+      <Epic activeStory={this.state.activeStory} tabbar={
+        <Tabbar>
+          <TabbarItem
+            onClick={this.onStoryChange}
+            selected={this.state.activeStory === 'feed'}
+            data-story="feed"
+            text="Нашлись"
+          ><Icon28Menu/></TabbarItem>
+          <TabbarItem
+            onClick={this.onStoryChange}
+            selected={this.state.activeStory === 'discover'}
+            data-story="discover"
+            text="Потерялись"
+          ><Icon28Menu/></TabbarItem>
+          <TabbarItem
+            onClick={this.onStoryChange}
+            selected={this.state.activeStory === 'messages'}
+            data-story="messages"
+            text="Я потерял"
+          ><Icon28Menu/></TabbarItem>
+          <TabbarItem
+            onClick={this.onStoryChange}
+            selected={this.state.activeStory === 'notifications'}
+            data-story="notifications"
+            text="Я нашел"
+          ><Icon28Menu/></TabbarItem>
+          <TabbarItem
+            onClick={this.onStoryChange}
+            selected={this.state.activeStory === 'more'}
+            data-story="more"
+            text="Мои объявления"
+          ><Icon28Menu/></TabbarItem>
+        </Tabbar>
+      }>
+        <View id="feed" activePanel="feed">
+          <Panel id="feed">
+            <PanelHeader>Новости</PanelHeader>
+          </Panel>
+        </View>
+        <View id="discover" activePanel="discover">
+          <Panel id="discover">
+            <PanelHeader>Поиск</PanelHeader>
+          </Panel>
+        </View>
+        <View id="messages" activePanel="messages">
+          <Panel id="messages">
+            <PanelHeader>Сообщения</PanelHeader>
+          </Panel>
+        </View>
+        <View id="notifications" activePanel="notifications">
+          <Panel id="notifications">
+            <PanelHeader>Уведомления</PanelHeader>
+          </Panel>
+        </View>
+        <View id="more" activePanel="more">
+          <Panel id="more">
+            <PanelHeader>Ещё</PanelHeader>
+          </Panel>
+        </View>
+      </Epic>
+    );
+  }
+}
 
 export default App;
 
