@@ -13,7 +13,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      activeStory: 'main'
+      activeStory: 'lost'
     };
     this.onStoryChange = this.onStoryChange.bind(this);
   }
@@ -34,8 +34,8 @@ class App extends React.Component {
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
-            selected={this.state.activeStory === 'discover'}
-            data-story="discover"
+            selected={this.state.activeStory === 'lost'}
+            data-story="lost"
             text="Нашлись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
@@ -57,12 +57,9 @@ class App extends React.Component {
             <MainPanel/>
           </Panel>
         </View>
-        <View id="discover" activePanel="discover">
-          <Panel id="discover">
-            <PanelHeader>Поиск</PanelHeader>
-            <Panel id="discover">
-              <LostPanel/>
-            </Panel>
+        <View id="lost" activePanel="lost">
+          <Panel id="lost">
+            <LostPanel/>
           </Panel>
         </View>
         <View id="messages" activePanel="messages">
