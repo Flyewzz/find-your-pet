@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Div, PanelHeader} from "@vkontakte/vkui";
 import {FixedLayout, PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
-import './Main.css'
+import './Main.css';
 
 const MainPanel = () => {
   return (

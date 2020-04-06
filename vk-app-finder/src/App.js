@@ -6,6 +6,7 @@ import TabbarItem from "@vkontakte/vkui/dist/components/TabbarItem/TabbarItem";
 import Icon28Menu from '@vkontakte/icons/dist/28/menu';
 import {Epic, Panel, PanelHeader} from "@vkontakte/vkui";
 import MainPanel from "./panels/Main";
+import LostPanel from "./panels/Lost";
 
 class App extends React.Component {
   constructor(props) {
@@ -59,6 +60,9 @@ class App extends React.Component {
         <View id="discover" activePanel="discover">
           <Panel id="discover">
             <PanelHeader>Поиск</PanelHeader>
+            <Panel id="discover">
+              <LostPanel/>
+            </Panel>
           </Panel>
         </View>
         <View id="messages" activePanel="messages">
