@@ -1,0 +1,8 @@
+port: 80
+db:
+    host: localhost
+    user: postgres
+    password: postgres
+    database: postgres
+lost:
+    itemsPerPage: 5
