@@ -7,16 +7,44 @@ import Icon28Menu from '@vkontakte/icons/dist/28/menu';
 import {Epic, Panel, PanelHeader} from "@vkontakte/vkui";
 import MainPanel from "./panels/Main";
 import LostPanel from "./panels/Lost";
+import SearchFilter from "./panels/SearchFilter";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      activeStory: 'lost'
+      activeModal: null,
+      modalHistory: [],
+      activeStory: 'lost',
     };
     this.onStoryChange = this.onStoryChange.bind(this);
+
+    this.modalBack = () => {
+      this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
+    };
+    this.openFilters = () => {
+      this.setActiveModal('filters');
+    };
   }
+
+  setActiveModal(activeModal) {
+    activeModal = activeModal || null;
+    let modalHistory = this.state.modalHistory ? [...this.state.modalHistory] : [];
+
+    if (activeModal === null) {
+      modalHistory = [];
+    } else if (modalHistory.indexOf(activeModal) !== -1) {
+      modalHistory = modalHistory.splice(0, modalHistory.indexOf(activeModal) + 1);
+    } else {
+      modalHistory.push(activeModal);
+    }
+
+    this.setState({
+      activeModal,
+      modalHistory,
+    });
+  };
 
   onStoryChange(e) {
     this.setState({activeStory: e.currentTarget.dataset.story})
@@ -57,9 +85,12 @@ class App extends React.Component {
             <MainPanel/>
           </Panel>
         </View>
-        <View id="lost" activePanel="lost">
+        <View id="lost" activePanel="lost" modal={
+          <SearchFilter activeModal={this.state.activeModal}
+                        onClose={this.modalBack}/>
+        }>
           <Panel id="lost">
-            <LostPanel/>
+            <LostPanel openFilters={this.openFilters}/>
           </Panel>
         </View>
         <View id="messages" activePanel="messages">
