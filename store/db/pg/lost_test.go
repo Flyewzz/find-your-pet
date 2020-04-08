@@ -2,6 +2,7 @@ package pg
 
 import (
 	"database/sql"
+	"errors"
 	"reflect"
 	"testing"
 
@@ -80,7 +81,7 @@ func TestLostControllerPg_GetById(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"",
+			"First",
 			fields{
 				itemsPerPage: 5,
 				db:           db,
@@ -90,6 +91,42 @@ func TestLostControllerPg_GetById(t *testing.T) {
 			},
 			&realLost[0],
 			false,
+		},
+		{
+			"Third",
+			fields{
+				itemsPerPage: 5,
+				db:           db,
+			},
+			args{
+				id: 3,
+			},
+			&realLost[2],
+			false,
+		},
+		{
+			"Last",
+			fields{
+				itemsPerPage: 5,
+				db:           db,
+			},
+			args{
+				id: 5,
+			},
+			&realLost[4],
+			false,
+		},
+		{
+			"Not exists",
+			fields{
+				itemsPerPage: 5,
+				db:           db,
+			},
+			args{
+				id: 45434543,
+			},
+			nil,
+			true,
 		},
 	}
 	for _, tt := range tests {
@@ -109,12 +146,19 @@ func TestLostControllerPg_GetById(t *testing.T) {
 				"date",
 				"place",
 			})
-			lost := realLost[tt.args.id-1]
-			rows.AddRow(lost.Id, lost.TypeId, lost.AuthorId, lost.Sex,
-				lost.Breed, lost.Description, lost.StatusId,
-				lost.Date, lost.Place)
-			mock.ExpectQuery("SELECT (.+) FROM lost").WillReturnRows(rows)
-			got, err := lc.GetById(tt.args.id)
+			id := tt.args.id
+			expectQuery := mock.ExpectQuery("SELECT (.+) FROM lost WHERE id = \\$1").
+				WithArgs(id)
+			if id >= 1 && id <= 5 {
+				lost := realLost[id-1]
+				rows.AddRow(lost.Id, lost.TypeId, lost.AuthorId, lost.Sex,
+					lost.Breed, lost.Description, lost.StatusId,
+					lost.Date, lost.Place)
+				expectQuery.WillReturnRows(rows)
+			} else {
+				expectQuery.WillReturnError(errors.New("Doesn't exist"))
+			}
+			got, err := lc.GetById(id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LostControllerPg.GetById() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -140,9 +184,7 @@ func TestLostControllerPg_Add(t *testing.T) {
 		args    args
 		want    int
 		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
+	}{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			lc := &LostControllerPg{

@@ -9,7 +9,7 @@ import (
 	// "log"
 	"net/http"
 
-	"github.com/Kotyarich/find-your-pet/features"
+	"github.com/Kotyarich/find-your-pet/features/paginator"
 	"github.com/Kotyarich/find-your-pet/models"
 )
 
@@ -24,8 +24,33 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	// 		return
 	// 	}
 	// }
-	// name := r.URL.Query().Get("name")
-	losts, err := hd.LostController.Search(nil)
+	arguments := r.URL.Query()
+	strTypeId := arguments.Get("type_id")
+	var typeId int
+	var err error
+	if strTypeId == "" {
+		typeId = 0
+	} else {
+		typeId, err = strconv.Atoi(strTypeId)
+	}
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	sex := arguments.Get("sex")
+	breed := arguments.Get("breed")
+	description := arguments.Get("description")
+	place := arguments.Get("place")
+	date := arguments.Get("date")
+	lost := &models.Lost{
+		TypeId:      typeId,
+		Sex:         sex,
+		Breed:       breed,
+		Description: description,
+		Date:        date,
+		Place:       place,
+	}
+	losts, err := hd.LostController.Search(lost)
 	// MOCK
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -35,14 +60,14 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	pagesCount := features.CalculatePageCount(len(losts),
+	pagesCount := paginator.CalculatePageCount(len(losts),
 		hd.LostController.GetItemsPerPageCount())
 	lostsEncoded, err := json.Marshal(losts)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	pagesData := features.PaginatorData{
+	pagesData := paginator.PaginatorData{
 		Pages:   pagesCount,
 		Payload: lostsEncoded,
 	}

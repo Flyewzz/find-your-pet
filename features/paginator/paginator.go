@@ -1,4 +1,4 @@
-package features
+package paginator
 
 import (
 	"encoding/json"
