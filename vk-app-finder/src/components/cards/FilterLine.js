@@ -8,7 +8,7 @@ const FilterLine = (props) => {
   return (
     <Div className={'filter__wrapper'}>
       <Search type="text" placeholder="Найти..." />
-      <Icon28PlaceOutline className={'filter__map'}/>
+      <Icon28PlaceOutline onClick={props.changeView} className={'filter__map'}/>
       <Icon28SlidersOutline onClick={props.openFilters}/>
     </Div>
   );

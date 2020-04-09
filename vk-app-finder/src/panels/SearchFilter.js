@@ -1,17 +1,57 @@
-import {ModalPage, ModalPageHeader, ModalRoot, PanelHeaderButton} from "@vkontakte/vkui";
+import {Div, ModalPage, ModalRoot, Select} from "@vkontakte/vkui";
+import {ReactDadata} from "react-dadata";
 import FormLayout from "@vkontakte/vkui/dist/components/FormLayout/FormLayout";
 import FormLayoutGroup from "@vkontakte/vkui/dist/components/FormLayoutGroup/FormLayoutGroup";
-import SelectMimicry from "@vkontakte/vkui/dist/components/SelectMimicry/SelectMimicry";
 import Radio from "@vkontakte/vkui/dist/components/Radio/Radio";
-import Checkbox from "@vkontakte/vkui/dist/components/Checkbox/Checkbox";
 import Input from "@vkontakte/vkui/dist/components/Input/Input";
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import Icon24Done from '@vkontakte/icons/dist/24/done';
 import React from "react";
+import FilterHeader from "../components/filter/FilterHeader";
+import {Search} from "@vkontakte/vkui/dist/es6";
+import './SearchFilter.css'
 
 const MODAL_PAGE_FILTERS = 'filters';
 
+const getDaysCount = (date) => {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+};
+
+const daysOptions = (daysNumber) => {
+  const days = [];
+  for (let i = 1; i <= daysNumber; i++) {
+    days.push(i);
+  }
+
+  return days.map((day) => (
+    <option value={day}>{day}</option>
+  ));
+};
+
+const months = [
+  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль',
+  'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+];
+
+const monthsOptions = () => {
+  return months.map((month, index) => (
+    <option value={index}>{month}</option>
+  ));
+};
+
+const yearsOptions = () => {
+  const years = [];
+  const nowDate = new Date();
+
+  for (let i = nowDate.getFullYear(); i > 1950; i--) {
+    years.push(i);
+  }
+
+  return years.map(value => (
+    <option value={value}>{value}</option>
+  ));
+};
+
 const SearchFilter = (props) => {
+
   return (
     <ModalRoot
       activeModal={props.activeModal}
@@ -21,46 +61,34 @@ const SearchFilter = (props) => {
         id={MODAL_PAGE_FILTERS}
         onClose={props.onClose}
         header={
-          <ModalPageHeader
-            left={
-              <PanelHeaderButton onClick={props.onClose}>
-                <Icon24Cancel/>
-              </PanelHeaderButton>
-            }
-            right={<PanelHeaderButton onClick={props.onClose}>
-              <Icon24Done/>
-            </PanelHeaderButton>}
-          >
-            Фильтры
-          </ModalPageHeader>
+          <FilterHeader onDone={props.onClose} onClose={props.onClose}/>
         }
       >
         <FormLayout>
-          <SelectMimicry top="Город" placeholder="Выбрать город" disabled/>
+          <Div>
+            <ReactDadata token={'API_TOKEN'}
+                         placeholder={'Место пропажи'}/>
+          </Div>
+          <FormLayoutGroup className={'filter__date'} top={'Дата пропажи'}>
+            <Select className={'filter__date__day'} placeholder={'День'}>
+              {daysOptions(31)}
+            </Select>
+            <Select className={'filter__date__month'} placeholder={'Месяц'}>
+              {monthsOptions()}
+            </Select>
+            <Select className={'filter__date__year'} placeholder={'Год'}>
+              {yearsOptions()}
+            </Select>
+          </FormLayoutGroup>
+
+          <FormLayoutGroup top={'Порода'}>
+            <Input placeholder={'Введите породу'}/>
+          </FormLayoutGroup>
 
           <FormLayoutGroup top="Пол">
             <Radio name="sex" value={0} defaultChecked>Любой</Radio>
             <Radio name="sex" value={1}>Мужской</Radio>
             <Radio name="sex" value={2}>Женский</Radio>
-          </FormLayoutGroup>
-
-          <SelectMimicry top="Школа" placeholder="Выбрать школу" disabled/>
-          <SelectMimicry top="Университет" placeholder="Выбрать университет" disabled/>
-
-          <FormLayoutGroup top="Дополнительно">
-            <Checkbox>С фотографией</Checkbox>
-            <Checkbox>Сейчас на сайте</Checkbox>
-          </FormLayoutGroup>
-
-          <FormLayoutGroup top="Работа">
-            <Input placeholder="Место работы"/>
-            <Input placeholder="Должность"/>
-          </FormLayoutGroup>
-
-          <FormLayoutGroup top="Дата рождения">
-            <SelectMimicry placeholder="День рождения" disabled/>
-            <SelectMimicry placeholder="Месяц рождения" disabled/>
-            <SelectMimicry placeholder="Год рождения" disabled/>
           </FormLayoutGroup>
         </FormLayout>
       </ModalPage>

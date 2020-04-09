@@ -1,0 +1,18 @@
+.filter__date {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.filter__date__day {
+    min-width: 120px;
+    margin-top: 12px;
+}
+
+.filter__date__month {
+    width: 100%;
+}
+
+.filter__date__year {
+    min-width: 120px;
+}
