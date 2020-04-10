@@ -63,7 +63,8 @@ create table lost
     constraint lost_statuses_id_fk
       references statuses,
   date        timestamp default now() not null,
-  place       varchar(400)            not null
+  place       varchar(400)            not null,
+  location    geometry
 );
 
 alter table lost
@@ -71,6 +72,9 @@ alter table lost
 
 create index lost_date_index
   on lost (date desc);
+
+create index lost_gist_location_index
+  on lost using gist(location);
 
 create table found
 (
@@ -99,3 +103,4 @@ alter table found
 create index found_date_index
   on found (date desc);
 
+CREATE EXTENSION postgis;
