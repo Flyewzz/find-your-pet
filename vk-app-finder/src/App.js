@@ -8,6 +8,7 @@ import {Epic, Panel, PanelHeader} from "@vkontakte/vkui";
 import MainPanel from "./panels/Main";
 import LostPanel from "./panels/Lost";
 import SearchFilter from "./panels/SearchFilter";
+import CreateFormPanel from "./panels/CreateFormPanel";
 
 class App extends React.Component {
   constructor(props) {
@@ -16,7 +17,8 @@ class App extends React.Component {
     this.state = {
       activeModal: null,
       modalHistory: [],
-      activeStory: 'lost',
+      activeStory: 'main',
+      mainPanel: 'main',
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
@@ -50,6 +52,13 @@ class App extends React.Component {
     this.setState({activeStory: e.currentTarget.dataset.story})
   }
 
+  toCreateLostForm = () => {
+    this.setState({mainPanel: 'new_lost'});
+  };
+  toMain = () => {
+    this.setState({mainPanel: 'main'});
+  };
+
   render() {
     return (
       <Epic activeStory={this.state.activeStory} tabbar={
@@ -64,25 +73,28 @@ class App extends React.Component {
             onClick={this.onStoryChange}
             selected={this.state.activeStory === 'lost'}
             data-story="lost"
-            text="Нашлись"
+            text="Потерялись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
             selected={this.state.activeStory === 'messages'}
             data-story="messages"
-            text="Потерялись"
+            text="Нашлись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
             selected={this.state.activeStory === 'more'}
             data-story="more"
-            text="Мои объявления"
+            text="Профиль"
           ><Icon28Menu/></TabbarItem>
         </Tabbar>
       }>
-        <View id="main" activePanel="main">
+        <View id="main" activePanel={this.state.mainPanel}>
           <Panel id="main">
-            <MainPanel/>
+            <MainPanel toCreateLostForm={this.toCreateLostForm}/>
+          </Panel>
+          <Panel id="new_lost">
+            <CreateFormPanel toMain={this.toMain}/>
           </Panel>
         </View>
         <View id="lost" activePanel="lost" modal={

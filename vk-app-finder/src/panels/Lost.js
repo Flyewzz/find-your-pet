@@ -4,6 +4,7 @@ import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
 import DG from '2gis-maps';
+import PlaceService from '../services/place'
 
 const getDogs = () => {
   const dogs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -24,26 +25,41 @@ const getDogs = () => {
 class LostPanel extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {mapView: false};
+    this.state = {mapView: false, places: []};
     this.changeView = () => {
       const current = this.state.mapView;
       this.setState({mapView: !current});
+      this.getPlaces();
     };
   }
 
+  getPlaces = () => {
+    const service = new PlaceService();
+    service.get().then((result) => {
+      this.setState({places: result});
+    });
+  };
+
+
   componentDidMount() {
-    DG.map('map', {
+    this.map = DG.map('map', {
       center: [54.98, 82.89],
       zoom: 13,
     })
   }
+
+  createMarkers = () => {
+    this.state.places.forEach(value => {
+      DG.marker([value.latitude, value.longtitude]).addTo(this.map);
+    });
+  };
 
   render() {
     const mapStyle = {
       display: this.state.mapView? undefined: 'none',
       height: '500px'
     };
-    console.log(mapStyle.display);
+    this.createMarkers();
 
     return (
       <>
