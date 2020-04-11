@@ -5,4 +5,6 @@ db:
     password: postgres
     database: postgres
 lost:
-    itemsPerPage: 5
+    itemsPerPage: 9
+    files:
+        directory: ./files/lost

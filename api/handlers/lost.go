@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	// "log"
@@ -11,6 +14,8 @@ import (
 
 	"github.com/Kotyarich/find-your-pet/features/paginator"
 	"github.com/Kotyarich/find-your-pet/models"
+	uuid "github.com/satori/go.uuid"
+	"github.com/spf13/viper"
 )
 
 func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,19 +33,27 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	strTypeId := arguments.Get("type_id")
 	var typeId int
 	var err error
-	if strTypeId == "" {
-		typeId = 0
-	} else {
-		typeId, err = strconv.Atoi(strTypeId)
-	}
-	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
-		return
-	}
+	typeId, err = strconv.Atoi(strTypeId)
 	sex := arguments.Get("sex")
 	breed := arguments.Get("breed")
 	description := arguments.Get("description")
-	place := arguments.Get("place")
+	var latitude, longtitude float64
+	strLatitude := arguments.Get("latitude")
+	if strLatitude != "" {
+		latitude, err = strconv.ParseFloat(strLatitude, 64)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+	}
+	strLongtitude := arguments.Get("longtitude")
+	if strLongtitude != "" {
+		longtitude, err = strconv.ParseFloat(strLongtitude, 64)
+		if err != nil {
+			http.Error(w, "Bad request", http.StatusBadRequest)
+			return
+		}
+	}
 	date := arguments.Get("date")
 	lost := &models.Lost{
 		TypeId:      typeId,
@@ -48,7 +61,8 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		Breed:       breed,
 		Description: description,
 		Date:        date,
-		Place:       place,
+		Latitude:    latitude,
+		Longtitude:  longtitude,
 	}
 	losts, err := hd.LostController.Search(lost)
 	// MOCK
@@ -96,12 +110,12 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	err := r.ParseMultipartForm(0)
 	if err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
-	params := r.PostFormValue
+	params := r.FormValue
 	strTypeId := params("type_id")
 	typeId, err := strconv.Atoi(strTypeId)
 	if err != nil {
@@ -118,19 +132,104 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 	sex := params("sex")
 	breed := params("breed")
 	description := params("description")
-	place := params("place")
-	lost := &models.Lost{
+	strLatitude := params("latitude")
+	latitude, err := strconv.ParseFloat(strLatitude, 64)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	strLongtitude := params("longtitude")
+	longtitude, err := strconv.ParseFloat(strLongtitude, 64)
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	lostParams := &models.Lost{
 		TypeId:      typeId,
 		AuthorId:    authorId,
 		Sex:         sex,
 		Breed:       breed,
 		Description: description,
-		Place:       place,
+		Latitude:    latitude,
+		Longtitude:  longtitude,
 	}
-	addedId, err := hd.LostController.Add(lost)
+	ctx, cancel := context.WithCancel(context.Background())
+	lostIdCh := make(chan int)
+	errCh := make(chan error, 1)
+	// mFile - model of file. It's not a real file. It's only a record
+	mFileCh := make(chan *models.File)
+	// file is the real file a user sent
+	file := (r.MultipartForm.File["picture"])[0] // Only one file
+	go hd.LostAddingManager.Add(ctx, lostParams, lostIdCh,
+		mFileCh, errCh)
+
+	var lostId int
+
+addLostId:
+	for {
+		select {
+		case lostId = <-lostIdCh:
+			break addLostId
+		case err = <-errCh:
+			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	baseLostDirectoryPath := viper.GetString("lost.files.directory")
+	lostDirectoryPath := strconv.Itoa(lostId)
+	fullDirectoryPath := filepath.Join(baseLostDirectoryPath,
+		lostDirectoryPath)
+	err = os.MkdirAll(fullDirectoryPath,
+		os.ModePerm)
 	if err != nil {
+		cancel()
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte(fmt.Sprintf("Added with id %d\n", addedId)))
+	// Generate UUID key as a filename to store it into the temporary folder
+	uuid := uuid.NewV4().String()
+	fileName := file.Filename
+	dst, err := os.Create(filepath.Join(fullDirectoryPath, uuid))
+	if err != nil {
+		cancel()
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	mFile := &models.File{
+		Name: fileName,
+		Path: filepath.Join(lostDirectoryPath, uuid),
+	}
+	f, err := file.Open()
+	if err != nil {
+		cancel()
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+	_, err = io.Copy(dst, f)
+	if err != nil {
+		cancel()
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	select {
+	case err = <-errCh:
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	default:
+		mFileCh <- mFile
+	}
+
+	if err = <-errCh; err != nil {
+		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte("OK"))
+	// addedId, err := hd.LostController.Add(lost)
+	// if err != nil {
+	// 	http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+	// 	return
+	// }
+	// w.Write([]byte(fmt.Sprintf("Added with id %d\n", addedId)))
 }

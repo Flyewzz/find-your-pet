@@ -7,6 +7,7 @@ import (
 
 	"github.com/Kotyarich/find-your-pet/api/handlers"
 	"github.com/Kotyarich/find-your-pet/db"
+	"github.com/Kotyarich/find-your-pet/managers"
 	"github.com/Kotyarich/find-your-pet/store/db/pg"
 	"github.com/spf13/viper"
 )
@@ -33,5 +34,9 @@ func PrepareHandlerData() *handlers.HandlerData {
 		log.Fatalf("Error with database: %v\n", err)
 	}
 	lostController := pg.NewLostControllerPg(viper.GetInt("lost.itemsPerPage"), db)
-	return handlers.NewHandlerData(lostController)
+	lostFileController := pg.NewLostFileControllerPg(db)
+	lostAddingManager :=
+		managers.NewLostAddingManager(db, lostController, lostFileController)
+	return handlers.NewHandlerData(lostController, lostFileController,
+		lostAddingManager)
 }

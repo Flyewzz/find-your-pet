@@ -4,9 +4,17 @@ go 1.13
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.4.1
-	github.com/Flyewzz/golang-itv v0.0.0-20191223162813-8d83f7169a78
 	github.com/deckarep/golang-set v1.7.1
 	github.com/gorilla/mux v1.7.4
 	github.com/lib/pq v1.3.0
+	github.com/pelletier/go-toml v1.6.0 // indirect
+	github.com/pkg/errors v0.8.0
+	github.com/satori/go.uuid v1.2.0
+	github.com/spf13/afero v1.2.2 // indirect
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
+	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
+	golang.org/x/text v0.3.2 // indirect
+	gopkg.in/yaml.v2 v2.2.7 // indirect
 )

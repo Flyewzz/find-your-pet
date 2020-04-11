@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strings"
@@ -28,10 +29,13 @@ func NewLostControllerPg(itemsPerPage int, db *sql.DB) *LostControllerPg {
 func (lc *LostControllerPg) GetById(id int) (*models.Lost, error) {
 	var lost models.Lost
 	err := lc.db.QueryRow("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
+		"breed, description, status_id, "+
+		"date, st_x(location) as latitude, "+
+		"st_y(location) as longtitude, picture_id FROM lost "+
 		"WHERE id = $1", id).Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
 		&lost.Sex, &lost.Breed, &lost.Description,
-		&lost.StatusId, &lost.Date, &lost.Place)
+		&lost.StatusId, &lost.Date,
+		&lost.Latitude, &lost.Longtitude, &lost.PictureId)
 	if err != nil {
 		return nil, err
 	}
@@ -45,14 +49,23 @@ typeId, authorId int,
 	statusId int,
 	date, place string
 */
-func (lc *LostControllerPg) Add(params *models.Lost) (int, error) {
+func (lc *LostControllerPg) Add(ctx context.Context, params *models.Lost) (int, error) {
+	strTx := ctx.Value("tx")
+	if strTx == "" {
+		return 0, errs.MissedTransaction
+	}
+	tx := strTx.(*sql.Tx)
 	var id int = 0
 	// status_id = 1 (Not found). Temporarily
-	err := lc.db.QueryRow("INSERT INTO lost(type_id, author_id, sex, "+
-		"breed, description, status_id, place) "+
-		"VALUES($1, $2, $3, $4, $5, 1, $6) RETURNING id",
+	query := fmt.Sprintf("INSERT INTO lost(type_id, author_id, sex, "+
+		"breed, description, status_id, location) "+
+		"VALUES($1, $2, $3, $4, $5, 1, "+
+		"st_GeomFromText('point(%f %f)', 4326)) RETURNING id",
+		params.Latitude, params.Longtitude)
+
+	err := tx.QueryRow(query,
 		params.TypeId, params.AuthorId, params.Sex,
-		params.Breed, params.Description, params.Place).Scan(&id)
+		params.Breed, params.Description).Scan(&id)
 	return id, err
 }
 
@@ -67,6 +80,20 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 	tx, err := lc.db.Begin()
 	if err != nil {
 		return nil, err
+	}
+
+	// Get everything without parameters to search
+	if features.CheckEmptyLost(params) {
+		rows, err := lc.db.Query("SELECT id, type_id, " +
+			"author_id, sex, " +
+			"breed, description, status_id, " +
+			"date, st_x(location) as latitude, " +
+			"st_y(location) as longtitude, picture_id FROM lost")
+		if err != nil {
+			return nil, err
+		}
+		losts, err := db.ConvertRowsToLost(rows)
+		return losts, err
 	}
 	searchManager := search.NewSearchManager()
 
@@ -110,16 +137,16 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
-	if params.Place != "" {
-		result, err := lc.SearchByPlace(params.Place)
-		if err != nil {
-			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
-			}
-			return nil, err
-		}
-		addResultToSearchManager(&result, searchManager)
-	}
+	// if params.Location != "" {
+	// 	result, err := lc.SearchByLocation(params.Location)
+	// 	if err != nil {
+	// 		if rollErr := tx.Rollback(); rollErr != nil {
+	// 			return nil, rollErr
+	// 		}
+	// 		return nil, err
+	// 	}
+	// 	addResultToSearchManager(&result, searchManager)
+	// }
 	if params.Description != "" {
 		result, err := lc.SearchByDescription(params.Description)
 		if err != nil {
@@ -130,16 +157,18 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
-	if params.Date != "" {
-		result, err := lc.SearchByPlace(params.Place)
-		if err != nil {
-			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
-			}
-			return nil, err
-		}
-		addResultToSearchManager(&result, searchManager)
-	}
+
+	// ****** ? ***************
+	// if params.Date != "" {
+	// 	result, err := lc.SearchByPlace(params.Place)
+	// 	if err != nil {
+	// 		if rollErr := tx.Rollback(); rollErr != nil {
+	// 			return nil, rollErr
+	// 		}
+	// 		return nil, err
+	// 	}
+	// 	addResultToSearchManager(&result, searchManager)
+	// }
 	if params.StatusId != 0 {
 		result, err := lc.SearchByStatus(params.StatusId)
 		if err != nil {
@@ -165,7 +194,9 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 
 func (lc *LostControllerPg) SearchByType(typeId int) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
+		"breed, description, status_id, date, "+
+		"st_x(location) as latitude, st_y(location) as longtitude, "+
+		"picture_id FROM lost "+
 		"WHERE type_id = $1", typeId)
 	if err != nil {
 		return nil, err
@@ -176,7 +207,9 @@ func (lc *LostControllerPg) SearchByType(typeId int) ([]models.Lost, error) {
 
 func (lc *LostControllerPg) SearchBySex(sex string) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
+		"breed, description, status_id, date, "+
+		"st_x(location) as latitude, st_y(location) as longtitude, "+
+		"picture_id FROM lost "+
 		"WHERE LOWER(sex) = $1", strings.ToLower(sex))
 	if err != nil {
 		return nil, err
@@ -185,20 +218,23 @@ func (lc *LostControllerPg) SearchBySex(sex string) ([]models.Lost, error) {
 	return losts, err
 }
 
-func (lc *LostControllerPg) SearchByPlace(place string) ([]models.Lost, error) {
-	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
-		"WHERE LOWER(place) LIKE '%' || $1 || '%'", strings.ToLower(place))
-	if err != nil {
-		return nil, err
-	}
-	losts, err := db.ConvertRowsToLost(rows)
-	return losts, err
-}
+// func (lc *LostControllerPg) SearchByLocation(location string) ([]models.Lost, error) {
+// 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
+// 		"breed, description, status_id, date, "+
+// 		"location, picture_id FROM lost "+
+// 		"WHERE location = $1", location)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	losts, err := db.ConvertRowsToLost(rows)
+// 	return losts, err
+// }
 
 func (lc *LostControllerPg) SearchByDescription(description string) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
+		"breed, description, status_id, date, "+
+		"st_x(location) as latitude, st_y(location) as longtitude, "+
+		"picture_id FROM lost "+
 		"WHERE LOWER(description) LIKE '%' || $1 || '%' "+
 		"ORDER BY date DESC",
 		strings.ToLower(description))
@@ -211,7 +247,9 @@ func (lc *LostControllerPg) SearchByDescription(description string) ([]models.Lo
 
 func (lc *LostControllerPg) SearchByBreed(breed string) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
+		"breed, description, status_id, "+
+		"date, st_x(location) as latitude, st_y(location) as longtitude, "+
+		"picture_id FROM lost "+
 		"WHERE LOWER(breed) LIKE '%' || $1 || '%'", strings.ToLower(breed))
 	if err != nil {
 		return nil, err
@@ -222,7 +260,9 @@ func (lc *LostControllerPg) SearchByBreed(breed string) ([]models.Lost, error) {
 
 func (lc *LostControllerPg) SearchByStatus(statusId int) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
+		"breed, description, status_id, "+
+		"date, st_x(location) as latitude, st_y(location) as longtitude, "+
+		"picture_id FROM lost "+
 		"WHERE status_id = $1", statusId)
 	if err != nil {
 		return nil, err
@@ -237,7 +277,9 @@ func (lc *LostControllerPg) SearchByDate(date, direction string) ([]models.Lost,
 		return nil, errs.IncorrectDirection
 	}
 	sqlQuery := fmt.Sprintf("SELECT id, type_id, author_id, sex, "+
-		"breed, description, status_id, date, place FROM lost "+
+		"breed, description, status_id, "+
+		"date, st_x(location) as latitude, st_y(location) as longtitude, "+
+		"picture_id FROM lost "+
 		"WHERE date %s $1", direction)
 	rows, err := lc.db.Query(sqlQuery, date)
 	if err != nil {

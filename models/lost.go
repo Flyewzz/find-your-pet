@@ -1,13 +1,16 @@
 package models
 
 type Lost struct {
-	Id          int    `json:"id"`
-	TypeId      int    `json:"type_id"`
-	AuthorId    int    `json:"author_id"`
-	Sex         string `json:"sex"`
-	Breed       string `json:"breed"`
-	Description string `json:"description"`
-	StatusId    int    `json:"status_id"`
-	Date        string `json:"date"`
-	Place       string `json:"place"`
+	Id          int     `json:"id"`
+	TypeId      int     `json:"type_id"`
+	AuthorId    int     `json:"author_id"`
+	Sex         string  `json:"sex"`
+	Breed       string  `json:"breed"`
+	Description string  `json:"description"`
+	StatusId    int     `json:"status_id"`
+	Date        string  `json:"date"`
+	Location    string  `json:"location,omitempty"`
+	PictureId   int     `json:"picture_id"`
+	Latitude    float64 `json:"latitude,omitempty"`
+	Longtitude  float64 `json:"longtitude,omitempty"`
 }
