@@ -10,7 +10,9 @@ func GetExtension(path string) string {
 
 func IsExtensionPicture(extension string) bool {
 	normalizeExtension := strings.ToLower(extension)
-	if normalizeExtension != "png" && normalizeExtension != "jpg" {
+	if normalizeExtension != "png" &&
+		normalizeExtension != "jpg" &&
+		normalizeExtension != "jpeg" {
 		return false
 	}
 	return true

@@ -45,10 +45,6 @@ func (lam *LostAddingManager) Add(ctx context.Context, params *models.Lost,
 	lostIdCh <- lostId
 	select {
 	case file := <-fileCh:
-		// if file.Path == "Incorrect" {
-		// 	tx.Rollback()
-		// 	return errors.New("File error")
-		// }
 		_, err = lam.lostFileController.Add(ctx, file, lostId)
 		if err != nil {
 			if errRoll := tx.Rollback(); errRoll != nil {
