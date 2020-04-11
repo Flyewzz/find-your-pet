@@ -12,5 +12,5 @@ type Lost struct {
 	Location    string  `json:"location,omitempty"`
 	PictureId   int     `json:"picture_id"`
 	Latitude    float64 `json:"latitude,omitempty"`
-	Longtitude  float64 `json:"longtitude,omitempty"`
+	Longitude   float64 `json:"longitude,omitempty"`
 }

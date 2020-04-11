@@ -39,7 +39,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	sex := arguments.Get("sex")
 	breed := arguments.Get("breed")
 	description := arguments.Get("description")
-	var latitude, longtitude float64
+	var latitude, longitude float64
 	strLatitude := arguments.Get("latitude")
 	if strLatitude != "" {
 		latitude, err = strconv.ParseFloat(strLatitude, 64)
@@ -48,9 +48,9 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	strLongtitude := arguments.Get("longtitude")
-	if strLongtitude != "" {
-		longtitude, err = strconv.ParseFloat(strLongtitude, 64)
+	strLongitude := arguments.Get("longitude")
+	if strLongitude != "" {
+		longitude, err = strconv.ParseFloat(strLongitude, 64)
 		if err != nil {
 			http.Error(w, "Bad request", http.StatusBadRequest)
 			return
@@ -64,7 +64,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		Description: description,
 		Date:        date,
 		Latitude:    latitude,
-		Longtitude:  longtitude,
+		Longitude:   longitude,
 	}
 	losts, err := hd.LostController.Search(lost)
 	// MOCK
@@ -140,8 +140,8 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	strLongtitude := params("longtitude")
-	longtitude, err := strconv.ParseFloat(strLongtitude, 64)
+	strLongitude := params("longitude")
+	longitude, err := strconv.ParseFloat(strLongitude, 64)
 	if err != nil {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
@@ -185,7 +185,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		Breed:       breed,
 		Description: description,
 		Latitude:    latitude,
-		Longtitude:  longtitude,
+		Longitude:   longitude,
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	lostIdCh := make(chan int)

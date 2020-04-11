@@ -31,11 +31,11 @@ func (lc *LostControllerPg) GetById(id int) (*models.Lost, error) {
 	err := lc.db.QueryRow("SELECT id, type_id, author_id, sex, "+
 		"breed, description, status_id, "+
 		"date, st_x(location) as latitude, "+
-		"st_y(location) as longtitude, picture_id FROM lost "+
+		"st_y(location) as longitude, picture_id FROM lost "+
 		"WHERE id = $1", id).Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
 		&lost.Sex, &lost.Breed, &lost.Description,
 		&lost.StatusId, &lost.Date,
-		&lost.Latitude, &lost.Longtitude, &lost.PictureId)
+		&lost.Latitude, &lost.Longitude, &lost.PictureId)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (lc *LostControllerPg) Add(ctx context.Context, params *models.Lost) (int, 
 		"breed, description, status_id, location) "+
 		"VALUES($1, $2, $3, $4, $5, 1, "+
 		"st_GeomFromText('point(%f %f)', 4326)) RETURNING id",
-		params.Latitude, params.Longtitude)
+		params.Latitude, params.Longitude)
 
 	err := tx.QueryRow(query,
 		params.TypeId, params.AuthorId, params.Sex,
@@ -88,7 +88,7 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 			"author_id, sex, " +
 			"breed, description, status_id, " +
 			"date, st_x(location) as latitude, " +
-			"st_y(location) as longtitude, picture_id FROM lost")
+			"st_y(location) as longitude, picture_id FROM lost")
 		if err != nil {
 			return nil, err
 		}
@@ -195,7 +195,7 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 func (lc *LostControllerPg) SearchByType(typeId int) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
 		"breed, description, status_id, date, "+
-		"st_x(location) as latitude, st_y(location) as longtitude, "+
+		"st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
 		"WHERE type_id = $1", typeId)
 	if err != nil {
@@ -208,7 +208,7 @@ func (lc *LostControllerPg) SearchByType(typeId int) ([]models.Lost, error) {
 func (lc *LostControllerPg) SearchBySex(sex string) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
 		"breed, description, status_id, date, "+
-		"st_x(location) as latitude, st_y(location) as longtitude, "+
+		"st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
 		"WHERE LOWER(sex) = $1", strings.ToLower(sex))
 	if err != nil {
@@ -233,7 +233,7 @@ func (lc *LostControllerPg) SearchBySex(sex string) ([]models.Lost, error) {
 func (lc *LostControllerPg) SearchByDescription(description string) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
 		"breed, description, status_id, date, "+
-		"st_x(location) as latitude, st_y(location) as longtitude, "+
+		"st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
 		"WHERE LOWER(description) LIKE '%' || $1 || '%' "+
 		"ORDER BY date DESC",
@@ -248,7 +248,7 @@ func (lc *LostControllerPg) SearchByDescription(description string) ([]models.Lo
 func (lc *LostControllerPg) SearchByBreed(breed string) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
 		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, st_y(location) as longtitude, "+
+		"date, st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
 		"WHERE LOWER(breed) LIKE '%' || $1 || '%'", strings.ToLower(breed))
 	if err != nil {
@@ -261,7 +261,7 @@ func (lc *LostControllerPg) SearchByBreed(breed string) ([]models.Lost, error) {
 func (lc *LostControllerPg) SearchByStatus(statusId int) ([]models.Lost, error) {
 	rows, err := lc.db.Query("SELECT id, type_id, author_id, sex, "+
 		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, st_y(location) as longtitude, "+
+		"date, st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
 		"WHERE status_id = $1", statusId)
 	if err != nil {
@@ -278,7 +278,7 @@ func (lc *LostControllerPg) SearchByDate(date, direction string) ([]models.Lost,
 	}
 	sqlQuery := fmt.Sprintf("SELECT id, type_id, author_id, sex, "+
 		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, st_y(location) as longtitude, "+
+		"date, st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
 		"WHERE date %s $1", direction)
 	rows, err := lc.db.Query(sqlQuery, date)
