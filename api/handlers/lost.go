@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -12,6 +13,7 @@ import (
 	// "log"
 	"net/http"
 
+	"github.com/Kotyarich/find-your-pet/features"
 	"github.com/Kotyarich/find-your-pet/features/paginator"
 	"github.com/Kotyarich/find-your-pet/models"
 	uuid "github.com/satori/go.uuid"
@@ -144,6 +146,37 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
+	// It's a real file. The user sent it
+	file, header, err := r.FormFile("picture")
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	extension := features.GetExtension(header.Filename)
+	if !features.IsExtensionPicture(extension) {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+	fileMaxSize := viper.GetInt64("lost.files.max_size")
+	if header.Size > fileMaxSize {
+		w.WriteHeader(http.StatusBadRequest)
+		type ErrStruct struct {
+			err string `json:"error"`
+		}
+		errMsg := ErrStruct{
+			err: fmt.Sprintf("File cannot be larger than %d MB",
+				fileMaxSize),
+		}
+		data, err := json.Marshal(errMsg)
+		if err != nil {
+			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+			return
+		}
+		w.Write(data)
+		return
+	}
+
 	lostParams := &models.Lost{
 		TypeId:      typeId,
 		AuthorId:    authorId,
@@ -159,7 +192,6 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 	// mFile - model of file. It's not a real file. It's only a record
 	mFileCh := make(chan *models.File)
 	// file is the real file a user sent
-	file := (r.MultipartForm.File["picture"])[0] // Only one file
 	go hd.LostAddingManager.Add(ctx, lostParams, lostIdCh,
 		mFileCh, errCh)
 
@@ -189,8 +221,11 @@ addLostId:
 	}
 	// Generate UUID key as a filename to store it into the temporary folder
 	uuid := uuid.NewV4().String()
-	fileName := file.Filename
-	dst, err := os.Create(filepath.Join(fullDirectoryPath, uuid))
+	fileName := header.Filename
+	//Create a name with an extension for the file
+	dst, err := os.Create(filepath.Join(
+		fullDirectoryPath,
+		uuid+"."+extension))
 	if err != nil {
 		cancel()
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
@@ -200,14 +235,7 @@ addLostId:
 		Name: fileName,
 		Path: filepath.Join(lostDirectoryPath, uuid),
 	}
-	f, err := file.Open()
-	if err != nil {
-		cancel()
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
-		return
-	}
-	defer f.Close()
-	_, err = io.Copy(dst, f)
+	_, err = io.Copy(dst, file)
 	if err != nil {
 		cancel()
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
@@ -226,10 +254,4 @@ addLostId:
 		return
 	}
 	w.Write([]byte("OK"))
-	// addedId, err := hd.LostController.Add(lost)
-	// if err != nil {
-	// 	http.Error(w, "Server Internal Error", http.StatusInternalServerError)
-	// 	return
-	// }
-	// w.Write([]byte(fmt.Sprintf("Added with id %d\n", addedId)))
 }

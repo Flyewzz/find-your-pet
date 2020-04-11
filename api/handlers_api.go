@@ -6,10 +6,11 @@ import (
 )
 
 func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
-
 	// Lost
 	r.HandleFunc("/losts", hd.LostHandler).Methods("GET")
 	r.HandleFunc("/lost", hd.LostByIdGetHandler).Methods("GET")
 	r.HandleFunc("/lost", hd.AddLostHandler).Methods("POST")
 
+	// LostFile
+	r.HandleFunc("/lost/img", hd.LostImageHandler).Methods("GET")
 }
