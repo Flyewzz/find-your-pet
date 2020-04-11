@@ -158,7 +158,8 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	fileMaxSize := viper.GetInt64("lost.files.max_size")
+	// in MB
+	fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
 	if header.Size > fileMaxSize {
 		w.WriteHeader(http.StatusBadRequest)
 		type ErrStruct struct {
@@ -220,12 +221,13 @@ addLostId:
 		return
 	}
 	// Generate UUID key as a filename to store it into the temporary folder
-	uuid := uuid.NewV4().String()
+	// uuid will also contain a file extension
+	uuid := uuid.NewV4().String() + "." + extension
 	fileName := header.Filename
 	//Create a name with an extension for the file
 	dst, err := os.Create(filepath.Join(
 		fullDirectoryPath,
-		uuid+"."+extension))
+		uuid))
 	if err != nil {
 		cancel()
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
@@ -253,5 +255,6 @@ addLostId:
 		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("OK"))
+	// Send id to the client
+	w.Write([]byte(strconv.Itoa(lostId)))
 }
