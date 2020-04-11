@@ -65,7 +65,8 @@ class LostPanel extends React.Component {
       <>
         <PanelHeader left={<PanelHeaderBack/>}>Потерялись</PanelHeader>
         <Group separator="hide">
-          <FilterLine changeView={this.changeView}
+          <FilterLine isMap={this.state.mapView}
+            changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
           {!this.state.mapView && <CardGrid>{getDogs()}</CardGrid>}
           <Div>

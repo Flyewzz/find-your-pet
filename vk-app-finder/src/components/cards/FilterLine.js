@@ -5,10 +5,12 @@ import Icon28PlaceOutline from '@vkontakte/icons/dist/28/place_outline';
 import './FilterLine.css'
 
 const FilterLine = (props) => {
+  const className = props.isMap? 'checked': '';
+
   return (
     <Div className={'filter__wrapper'}>
       <Search type="text" placeholder="Найти..." />
-      <Icon28PlaceOutline onClick={props.changeView} className={'filter__map'}/>
+      <Icon28PlaceOutline onClick={props.changeView} className={'filter__map ' + className}/>
       <Icon28SlidersOutline onClick={props.openFilters}/>
     </Div>
   );

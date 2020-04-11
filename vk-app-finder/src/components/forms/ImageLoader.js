@@ -99,7 +99,9 @@ class ImageLoader extends PureComponent {
                      onImageLoaded={this.onImageLoaded}
                      onComplete={this.onCropComplete}
                      onChange={this.onCropChange}/>
-          <FormLabel text={'Выберите область изображения, на котором лучше всего видно вашего питомца'}/>
+          <div className={'form__label'}>
+            {'Выберите область изображения, на котором лучше всего видно вашего питомца'}
+          </div>
         </Div>}
         <File accept="image/*"
               before={<Icon24Camera/>} size="l"

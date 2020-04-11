@@ -1,8 +1,8 @@
 import {ModalPage, ModalRoot, FormLayout, FormLayoutGroup, Radio, Input} from "@vkontakte/vkui";
 import React from "react";
-import FilterHeader from "../components/filter/FilterHeader";
-import DateInput from "../components/filter/DateInput";
-import AddressInput from "../components/filter/AddressInput";
+import FilterHeader from "../components/forms/FilterHeader";
+import DateInput from "../components/forms/DateInput";
+import AddressInput from "../components/forms/AddressInput";
 import './SearchFilter.css'
 
 const MODAL_PAGE_FILTERS = 'filters';

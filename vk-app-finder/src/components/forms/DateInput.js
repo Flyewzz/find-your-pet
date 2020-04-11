@@ -42,17 +42,19 @@ const yearsOptions = () => {
 };
 
 const DateInput = (props) => {
+  const nowDate = new Date();
+
   return (
     <>
       <FormLabel text={'Дата пропажи'}/>
       <FormLayoutGroup className={'filter__date'} top="Дата пропажи">
-        <Select top="День" className={'filter__date__day'} placeholder={'День'}>
-          {daysOptions(31)}
+        <Select defaultValue={nowDate.getDate()} className={'filter__date__day'}>
+          {daysOptions(getDaysCount(nowDate))}
         </Select>
-        <Select className={'filter__date__month'} placeholder={'Месяц'}>
+        <Select defaultValue={nowDate.getMonth()} className={'filter__date__month'}>
           {monthsOptions()}
         </Select>
-        <Select className={'filter__date__year'} placeholder={'Год'}>
+        <Select defaultValue={nowDate.getFullYear()} className={'filter__date__year'}>
           {yearsOptions()}
         </Select>
       </FormLayoutGroup>

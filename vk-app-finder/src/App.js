@@ -1,9 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import View from '@vkontakte/vkui/dist/components/View/View';
 import '@vkontakte/vkui/dist/vkui.css';
 import Tabbar from "@vkontakte/vkui/dist/components/Tabbar/Tabbar";
 import TabbarItem from "@vkontakte/vkui/dist/components/TabbarItem/TabbarItem";
 import Icon28Menu from '@vkontakte/icons/dist/28/menu';
+import Icon28User from '@vkontakte/icons/dist/28/user';
+import Icon28HomeOutline from '@vkontakte/icons/dist/28/home_outline';
+import Icon28ListCheckOutline from '@vkontakte/icons/dist/28/list_check_outline';
 import {Epic, Panel, PanelHeader} from "@vkontakte/vkui";
 import MainPanel from "./panels/Main";
 import LostPanel from "./panels/Lost";
@@ -18,7 +21,7 @@ class App extends React.Component {
       activeModal: null,
       modalHistory: [],
       activeStory: 'main',
-      mainPanel: 'main',
+      mainPanel: 'new_lost',
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
@@ -68,7 +71,7 @@ class App extends React.Component {
             selected={this.state.activeStory === 'main'}
             data-story="main"
             text="Главная"
-          ><Icon28Menu/></TabbarItem>
+          ><Icon28HomeOutline/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
             selected={this.state.activeStory === 'lost'}
@@ -80,13 +83,13 @@ class App extends React.Component {
             selected={this.state.activeStory === 'messages'}
             data-story="messages"
             text="Нашлись"
-          ><Icon28Menu/></TabbarItem>
+          ><Icon28ListCheckOutline/></TabbarItem>
           <TabbarItem
             onClick={this.onStoryChange}
             selected={this.state.activeStory === 'more'}
             data-story="more"
             text="Профиль"
-          ><Icon28Menu/></TabbarItem>
+          ><Icon28User/></TabbarItem>
         </Tabbar>
       }>
         <View id="main" activePanel={this.state.mainPanel}>

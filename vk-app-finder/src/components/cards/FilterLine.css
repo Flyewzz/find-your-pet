@@ -7,3 +7,7 @@
 .filter__map {
     margin-right: 5px;
 }
+
+.checked {
+    color: var(--tabbar_active_icon);
+}
