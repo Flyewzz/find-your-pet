@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -9,31 +10,33 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/Kotyarich/find-your-pet/errs"
 	"github.com/spf13/viper"
 )
 
 func (hd *HandlerData) LostImageHandler(w http.ResponseWriter, r *http.Request) {
 	strId := r.URL.Query().Get("id")
 	if strId == "" {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, errors.New("Id is missing"),
+			&w, http.StatusBadRequest)
 		return
 	}
 	id, err := strconv.Atoi(strId)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	if id < 1 {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, errors.New("Id is incorrect"), &w, http.StatusBadRequest)
 		return
 	}
 	file, err := hd.LostFileController.GetById(id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			http.Error(w, "Not found", http.StatusNotFound)
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)
 			return
 		}
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	baseLostFileDirectory := viper.GetString("lost.files.directory")
@@ -43,7 +46,7 @@ func (hd *HandlerData) LostImageHandler(w http.ResponseWriter, r *http.Request) 
 		file.Path),
 	)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	defer openedFile.Close()
@@ -69,7 +72,7 @@ func (hd *HandlerData) LostImageHandler(w http.ResponseWriter, r *http.Request) 
 	io.Copy(w, openedFile) //'Copy' the file to the client
 	data, err := ioutil.ReadAll(openedFile)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	w.Write(data)

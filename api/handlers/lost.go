@@ -14,6 +14,7 @@ import (
 	// "log"
 	"net/http"
 
+	"github.com/Kotyarich/find-your-pet/errs"
 	"github.com/Kotyarich/find-your-pet/features"
 	"github.com/Kotyarich/find-your-pet/features/normalizer"
 	"github.com/Kotyarich/find-your-pet/features/paginator"
@@ -29,7 +30,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	// if strPage != "" {
 	// 	page, err = strconv.Atoi(strPage)
 	// 	if err != nil {
-	// 		http.Error(w, "Bad request", http.StatusBadRequest)
+	// 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 	// 		return
 	// 	}
 	// }
@@ -46,7 +47,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	if strLatitude != "" {
 		latitude, err = strconv.ParseFloat(strLatitude, 64)
 		if err != nil {
-			http.Error(w, "Bad request", http.StatusBadRequest)
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 			return
 		}
 	}
@@ -54,7 +55,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	if strLongitude != "" {
 		longitude, err = strconv.ParseFloat(strLongitude, 64)
 		if err != nil {
-			http.Error(w, "Bad request", http.StatusBadRequest)
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 			return
 		}
 	}
@@ -74,7 +75,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Not found", http.StatusNotFound)
 		} else {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -82,7 +83,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		hd.LostController.GetItemsPerPageCount())
 	lostsEncoded, err := json.Marshal(losts)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	pagesData := paginator.PaginatorData{
@@ -91,7 +92,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	data, err := json.Marshal(pagesData)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	w.Write(data)
@@ -101,12 +102,12 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 	strId := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	lost, err := hd.LostController.GetById(id)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	data, _ := json.Marshal(lost)
@@ -116,26 +117,26 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(0)
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	params := r.FormValue
 	strTypeId := params("type_id")
 	typeId, err := strconv.Atoi(strTypeId)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	// author_id is a temprorary parameter
 	strAuthorId := params("author_id")
 	authorId, err := strconv.Atoi(strAuthorId)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	sex, err := normalizer.SexNormalize(params("sex"))
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	// The first letter must be in uppercase
@@ -146,24 +147,24 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 	strLatitude := params("latitude")
 	latitude, err := strconv.ParseFloat(strLatitude, 64)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	strLongitude := params("longitude")
 	longitude, err := strconv.ParseFloat(strLongitude, 64)
 	if err != nil {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	// It's a real file. The user sent it
 	file, header, err := r.FormFile("picture")
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	extension := features.GetExtension(header.Filename)
 	if !features.IsExtensionPicture(extension) {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
@@ -180,7 +181,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		data, err := json.Marshal(errMsg)
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 			return
 		}
 		w.Write(data)
@@ -213,7 +214,7 @@ addLostId:
 		case lostId = <-lostIdCh:
 			break addLostId
 		case err = <-errCh:
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 			return
 		}
 	}
@@ -226,7 +227,7 @@ addLostId:
 		os.ModePerm)
 	if err != nil {
 		cancel()
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	// Generate UUID key as a filename to store it into the temporary folder
@@ -239,7 +240,7 @@ addLostId:
 		uuid))
 	if err != nil {
 		cancel()
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	mFile := &models.File{
@@ -249,19 +250,19 @@ addLostId:
 	_, err = io.Copy(dst, file)
 	if err != nil {
 		cancel()
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	select {
 	case err = <-errCh:
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	default:
 		mFileCh <- mFile
 	}
 
 	if err = <-errCh; err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	// Send id to the client

@@ -37,6 +37,10 @@ func PrepareHandlerData() *handlers.HandlerData {
 	lostFileController := pg.NewLostFileControllerPg(db)
 	lostAddingManager :=
 		managers.NewLostAddingManager(db, lostController, lostFileController)
+	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))
+	if err != nil {
+		log.Fatalln(err)
+	}
 	return handlers.NewHandlerData(lostController, lostFileController,
-		lostAddingManager)
+		lostAddingManager, debug)
 }
