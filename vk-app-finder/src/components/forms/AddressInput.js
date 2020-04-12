@@ -9,6 +9,7 @@ const AddressInput = (props) => {
       <FormLabel text={props.title}/>
       <Div>
         <ReactDadata token={'c2dbff3b19ebd89e5b88b6b70350deae900ea3d3'}
+                     onChange={props.onAddressChange}
                      placeholder={props.placeholder}/>
       </Div>
     </>

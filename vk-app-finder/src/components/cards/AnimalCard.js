@@ -6,8 +6,9 @@ import Div from "@vkontakte/vkui/dist/components/Div/Div";
 
 const AnimalCard = (props) => {
   return (
-    <Card key={props.key} style={{height: 275}} className="animal__card" size="m" mode="shadow">
-      <img className={'animal-card__photo'} src={cat} height='180px'/>
+    <Card key={props.key} style={{height: 275}}
+          className="animal__card" size="m" mode="shadow">
+      <img className={'animal-card__photo'} src={cat} height='180px' alt={''}/>
       <Div className={'animal-card__info'}>
         {`${props.animal.type}, ${props.animal.breed}`}
       </Div>

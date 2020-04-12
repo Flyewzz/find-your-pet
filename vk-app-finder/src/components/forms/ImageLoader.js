@@ -81,6 +81,7 @@ class ImageLoader extends PureComponent {
         blob.name = fileName;
         window.URL.revokeObjectURL(this.fileUrl);
         this.fileUrl = window.URL.createObjectURL(blob);
+        this.props.onPictureSet(blob);
         resolve(this.fileUrl);
       }, 'image/jpeg');
     });

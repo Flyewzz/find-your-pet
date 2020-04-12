@@ -1,4 +1,4 @@
-import {Select, FormLayoutGroup, Div} from "@vkontakte/vkui";
+import {Select, FormLayoutGroup} from "@vkontakte/vkui";
 import React from "react";
 import FormLabel from "./FormLabel";
 
@@ -41,7 +41,7 @@ const yearsOptions = () => {
   ));
 };
 
-const DateInput = (props) => {
+const DateInput = () => {
   const nowDate = new Date();
 
   return (
