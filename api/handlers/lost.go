@@ -9,11 +9,13 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	// "log"
 	"net/http"
 
 	"github.com/Kotyarich/find-your-pet/features"
+	"github.com/Kotyarich/find-your-pet/features/normalizer"
 	"github.com/Kotyarich/find-your-pet/features/paginator"
 	"github.com/Kotyarich/find-your-pet/models"
 	uuid "github.com/satori/go.uuid"
@@ -72,7 +74,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Not found", http.StatusNotFound)
 		} else {
-			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
 	}
@@ -104,7 +106,7 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 	}
 	lost, err := hd.LostController.GetById(id)
 	if err != nil {
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	data, _ := json.Marshal(lost)
@@ -131,8 +133,15 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", http.StatusBadRequest)
 		return
 	}
-	sex := params("sex")
-	breed := params("breed")
+	sex, err := normalizer.SexNormalize(params("sex"))
+	if err != nil {
+		http.Error(w, "Bad request", http.StatusBadRequest)
+		return
+	}
+	// The first letter must be in uppercase
+	breed := strings.Title(
+		strings.ToLower(params("breed")),
+	)
 	description := params("description")
 	strLatitude := params("latitude")
 	latitude, err := strconv.ParseFloat(strLatitude, 64)
@@ -171,7 +180,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		data, err := json.Marshal(errMsg)
 		if err != nil {
-			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		w.Write(data)
@@ -204,7 +213,7 @@ addLostId:
 		case lostId = <-lostIdCh:
 			break addLostId
 		case err = <-errCh:
-			http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 	}
@@ -217,7 +226,7 @@ addLostId:
 		os.ModePerm)
 	if err != nil {
 		cancel()
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	// Generate UUID key as a filename to store it into the temporary folder
@@ -230,7 +239,7 @@ addLostId:
 		uuid))
 	if err != nil {
 		cancel()
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	mFile := &models.File{
@@ -240,19 +249,19 @@ addLostId:
 	_, err = io.Copy(dst, file)
 	if err != nil {
 		cancel()
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	select {
 	case err = <-errCh:
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	default:
 		mFileCh <- mFile
 	}
 
 	if err = <-errCh; err != nil {
-		http.Error(w, "Server Internal Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	// Send id to the client
