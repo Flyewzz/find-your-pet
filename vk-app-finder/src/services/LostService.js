@@ -9,16 +9,26 @@ class LostService {
     return response.json();
   };
 
-  create = async (type, authorId, sex, breed, description,
-                  latitude, longitude, picture) => {
-    const url = config.baseUrl +
-      `lost?type_id=${type}&author_id=${authorId}&sex=${sex}` +
-      `&breed=${breed}&description=${description}&latitude=${latitude}` +
-      `&longitude=${longitude}&picture=${picture}`;
-    const options = {method: 'POST'};
-    const request = new Request(url, options);
-    const response = await fetch(request);
-    return response.json();
+  create = (type, authorId, sex, breed, description,
+            latitude, longitude, picture, callback) => {
+    const formData = new FormData();
+
+    formData.append("type_id", type);
+    formData.append("author_id", authorId);
+    formData.append("picture", picture);
+    formData.append("sex", sex);
+    formData.append("breed", breed);
+    formData.append("description", description);
+    formData.append("latitude", latitude);
+    formData.append("longitude", longitude);
+
+    const request = new XMLHttpRequest();
+    request.open("POST", config.baseUrl + 'lost');
+    request.send(formData);
+
+    request.onload = () => {
+      callback(request.status, request.response);
+    };
   };
 }
 

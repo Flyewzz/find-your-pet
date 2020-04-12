@@ -57,9 +57,9 @@ class LostStore extends GenericFormStore {
     },
   };
 
-  submit = async () => {
+  submit = (callback) => {
     try {
-      await this.userService.create(
+      this.userService.create(
         this.form.fields.typeId.value,
         this.form.fields.authorId.value,
         this.form.fields.sex.value,
@@ -68,6 +68,7 @@ class LostStore extends GenericFormStore {
         this.form.fields.latitude.value,
         this.form.fields.longitude.value,
         this.form.fields.picture.value,
+        callback,
       );
     } catch (error) {
       runInAction(() => {
