@@ -4,60 +4,62 @@ import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
 import DG from '2gis-maps';
-import PlaceService from '../services/place'
-
-const getDogs = () => {
-  const dogs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const animal_test = {
-    type: 'Кот',
-    breed: 'Сфинкс',
-    place: 'Раменское, ул. Свободы',
-    date: '22 ноября, 14:51',
-  };
-  return dogs.map((animal, index) =>
-    <>
-      {!(index % 2) && <Card size="l" styles={{height: 0}}/>}
-      <AnimalCard key={index} animal={animal_test}/>
-    </>
-  );
-};
+import LostService from '../services/LostService';
+import {decorate, observable, runInAction} from "mobx";
+import {observer} from "mobx-react";
 
 class LostPanel extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {mapView: false, places: []};
     this.changeView = () => {
       const current = this.state.mapView;
       this.setState({mapView: !current});
-      this.getPlaces();
     };
+
+    this.lostService = new LostService();
   }
 
-  getPlaces = () => {
-    const service = new PlaceService();
-    service.get().then((result) => {
-      this.setState({places: result});
-    });
-  };
-
+  animals = [];
 
   componentDidMount() {
+    // TODO get position of user and filter by it
     this.map = DG.map('map', {
       center: [54.98, 82.89],
       zoom: 13,
-    })
+    });
+
+    this.lostService.get().then(
+      result => {
+        runInAction(() => {
+          this.animals = result.payload;
+        })
+      },
+      error => {
+        alert(error);
+      })
   }
 
   createMarkers = () => {
-    this.state.places.forEach(value => {
-      DG.marker([value.latitude, value.longtitude]).addTo(this.map);
+    this.animals.forEach(value => {
+      DG.marker([value.latitude, value.longitude]).addTo(this.map);
     });
+  };
+
+  animalsToCards = () => {
+    return this.animals.map((animal, index) =>
+      <>
+        {!(index % 2) && <Card size="l" styles={{height: 0}}/>}
+        <AnimalCard key={animal.id} animal={animal}/>
+      </>
+    );
   };
 
   render() {
     const mapStyle = {
-      display: this.state.mapView? undefined: 'none',
-      height: '500px'
+      display: this.state.mapView ? undefined : 'none',
+      height: '490x'
     };
     this.createMarkers();
 
@@ -66,9 +68,9 @@ class LostPanel extends React.Component {
         <PanelHeader left={<PanelHeaderBack/>}>Потерялись</PanelHeader>
         <Group separator="hide">
           <FilterLine isMap={this.state.mapView}
-            changeView={this.changeView}
+                      changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
-          {!this.state.mapView && <CardGrid>{getDogs()}</CardGrid>}
+          {!this.state.mapView && <CardGrid>{this.animalsToCards()}</CardGrid>}
           <Div>
             <div style={mapStyle} id={'map'}/>
           </Div>
@@ -78,4 +80,8 @@ class LostPanel extends React.Component {
   }
 }
 
-export default LostPanel;
+decorate(LostPanel, {
+  animals: observable,
+});
+
+export default observer(LostPanel);

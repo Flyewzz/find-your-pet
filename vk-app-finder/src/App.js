@@ -20,7 +20,7 @@ class App extends React.Component {
     this.state = {
       activeModal: null,
       modalHistory: [],
-      activeStory: 'main',
+      activeStory: 'lost',
       mainPanel: 'new_lost',
     };
     this.onStoryChange = this.onStoryChange.bind(this);

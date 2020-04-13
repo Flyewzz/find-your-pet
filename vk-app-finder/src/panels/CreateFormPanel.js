@@ -12,43 +12,34 @@ import Textarea from "@vkontakte/vkui/dist/components/Textarea/Textarea";
 import FormLabel from "../components/forms/FormLabel";
 import LostStore from "../stores/LostStore";
 import config from '../config';
+import GeocodingService from "../services/GeocodingService";
 
 class CreateFormPanel extends React.Component {
   constructor(props) {
     super(props);
     this.lostStore = new LostStore();
+    this.geocodingService = new GeocodingService();
   }
 
   onSubmit = () => {
-    // this.lostStore.submit().then(
-    //   (result) => {
-    //     alert('res:' + result);
-    //   },
-    //   (error) => {
-    //     alert('error:' + error);
-    //   })
-    const formData = new FormData();
-    const fields = this.lostStore.form.fields;
-    formData.append("type_id", fields.typeId.value);
-    formData.append("author_id", fields.authorId.value);
-    formData.append("picture", fields.picture.value);
-    formData.append("sex", fields.sex.value);
-    formData.append("breed", fields.breed.value);
-    formData.append("description", fields.description.value);
-    formData.append("latitude", fields.latitude.value);
-    formData.append("longitude", fields.longitude.value);
-
-    const request = new XMLHttpRequest();
-    request.open("POST", config.baseUrl + 'lost');
-    request.send(formData);
+    this.lostStore.submit(
+      (result) => {
+        alert('res:' + result);
+      })
   };
 
   onAddressChange = (data) => {
-    const longitude = 50; //data.data.geo_lat;
-    const latitude = 35; //data.data.geo_lon;
+    const address = data.data.value;
+    this.geocodingService.getCoords(address).then(result => {
+      const firstCandidate = result.candidates[0];
+      // add some error here if candidate is undefined
+      const location = firstCandidate.location;
+      const longitude = location.x;
+      const latitude = location.y;
 
-    this.lostStore.form.fields.longitude.value = longitude;
-    this.lostStore.form.fields.latitude.value = latitude;
+      this.lostStore.form.fields.longitude.value = longitude;
+      this.lostStore.form.fields.latitude.value = latitude;
+    });
   };
 
   onPictureSet = (picture) => {
@@ -88,15 +79,15 @@ class CreateFormPanel extends React.Component {
             <FormLayoutGroup className={'half-width'}>
               <FormLabel text={'Вид животного'}/>
               <Select onChange={this.onTypeChange} value={fields.typeId.value}>
-                <option value={0} defaultChecked>Собака</option>
-                <option value={1}>Кошка</option>
-                <option value={2}>Другой</option>
+                <option value={1} defaultChecked>Собака</option>
+                <option value={2}>Кошка</option>
+                <option value={3}>Другой</option>
               </Select>
             </FormLayoutGroup>
             <FormLayoutGroup className={'half-width'}>
               <FormLabel text={'Пол животного'}/>
               <Select onChange={this.onSexChange} value={fields.sex.value}>
-                <option value={0}>Не определен</option>
+                <option value={'n/a'}>Не определен</option>
                 <option value={'m'}>Мужской</option>
                 <option value={'f'}>Женской</option>
               </Select>

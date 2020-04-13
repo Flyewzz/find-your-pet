@@ -11,7 +11,7 @@ class LostStore extends GenericFormStore {
   form = {
     fields: {
       typeId: {
-        value: 0,
+        value: 1,
         error: null,
         rule: 'required'
       },
@@ -21,7 +21,7 @@ class LostStore extends GenericFormStore {
         rule: 'required'
       },
       sex: {
-        value: 0,
+        value: 'm',
         error: null,
         rule: 'required'
       },

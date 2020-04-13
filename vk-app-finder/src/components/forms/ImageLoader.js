@@ -10,8 +10,8 @@ class ImageLoader extends PureComponent {
     src: null,
     crop: {
       unit: '%',
-      width: 30,
-      aspect: 16 / 9,
+      width: 40,
+      aspect: 5 / 3,
     },
   };
 

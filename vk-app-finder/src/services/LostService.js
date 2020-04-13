@@ -2,7 +2,7 @@ import config from '../config';
 
 class LostService {
   get = async () => {
-    const url = config + 'losts';
+    const url = config.baseUrl + 'losts';
     const options = {method: 'GET'};
     const request = new Request(url, options);
     const response = await fetch(request);
