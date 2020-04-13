@@ -9,6 +9,14 @@ class LostService {
     return response.json();
   };
 
+  getById = async (id) => {
+    const url = config.baseUrl + `lost?id=${id}`;
+    const options = {method: 'GET'};
+    const request = new Request(url, options);
+    const response = await fetch(request);
+    return response.json();
+  };
+
   create = (type, authorId, sex, breed, description,
             latitude, longitude, picture, callback) => {
     const formData = new FormData();

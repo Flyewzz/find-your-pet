@@ -7,6 +7,7 @@ import DG from '2gis-maps';
 import LostService from '../services/LostService';
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
+import './Lost.css';
 
 class LostPanel extends React.Component {
   constructor(props) {
@@ -43,15 +44,16 @@ class LostPanel extends React.Component {
 
   createMarkers = () => {
     this.animals.forEach(value => {
-      DG.marker([value.latitude, value.longitude]).addTo(this.map);
+      DG.marker([value.longitude, value.latitude]).addTo(this.map);
     });
   };
 
   animalsToCards = () => {
     return this.animals.map((animal, index) =>
       <>
-        {!(index % 2) && <Card size="l" styles={{height: 0}}/>}
-        <AnimalCard key={animal.id} animal={animal}/>
+        {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
+        <AnimalCard onClick={() => this.props.toLost(animal.id)}
+                    key={animal.id} animal={animal}/>
       </>
     );
   };
@@ -59,7 +61,7 @@ class LostPanel extends React.Component {
   render() {
     const mapStyle = {
       display: this.state.mapView ? undefined : 'none',
-      height: '490x'
+      height: '500x'
     };
     this.createMarkers();
 
@@ -70,7 +72,9 @@ class LostPanel extends React.Component {
           <FilterLine isMap={this.state.mapView}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
+
           {!this.state.mapView && <CardGrid>{this.animalsToCards()}</CardGrid>}
+
           <Div>
             <div style={mapStyle} id={'map'}/>
           </Div>

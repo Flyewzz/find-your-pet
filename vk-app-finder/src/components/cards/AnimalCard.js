@@ -1,4 +1,3 @@
-import cat from "../../img/cat_example.jpg";
 import React from "react";
 import Card from "@vkontakte/vkui/dist/components/Card/Card";
 import "./AnimalCard.css"
@@ -11,7 +10,7 @@ const AnimalCard = (props) => {
   const date = new Date(animal.date.replace(' ', 'T')).toLocaleDateString();
 
   return (
-    <Card key={props.key} style={{height: 275}}
+    <Card onClick={props.onClick} style={{height: 275}}
           className="animal__card" size="m" mode="shadow">
       <img className={'animal-card__photo'}
            src={config.baseUrl + `lost/img?id=${animal.picture_id}`}

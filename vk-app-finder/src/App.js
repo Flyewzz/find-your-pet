@@ -12,6 +12,7 @@ import MainPanel from "./panels/Main";
 import LostPanel from "./panels/Lost";
 import SearchFilter from "./panels/SearchFilter";
 import CreateFormPanel from "./panels/CreateFormPanel";
+import LostAnimalPanel from "./panels/LostAnimalPanel";
 
 class App extends React.Component {
   constructor(props) {
@@ -22,6 +23,7 @@ class App extends React.Component {
       modalHistory: [],
       activeStory: 'lost',
       mainPanel: 'new_lost',
+      lostPanel: 'losts',
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
@@ -60,6 +62,17 @@ class App extends React.Component {
   };
   toMain = () => {
     this.setState({mainPanel: 'main'});
+  };
+  toLostList = () => {
+    this.setState({
+      lostPanel: 'losts',
+    });
+  };
+  toLost = (id) => {
+    this.setState({
+      id: id,
+      lostPanel: 'lost',
+    });
   };
 
   render() {
@@ -100,12 +113,15 @@ class App extends React.Component {
             <CreateFormPanel toMain={this.toMain}/>
           </Panel>
         </View>
-        <View id="lost" activePanel="lost" modal={
+        <View id="lost" activePanel={this.state.lostPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         onClose={this.modalBack}/>
         }>
+          <Panel id="losts">
+            <LostPanel toLost={this.toLost} openFilters={this.openFilters}/>
+          </Panel>
           <Panel id="lost">
-            <LostPanel openFilters={this.openFilters}/>
+            <LostAnimalPanel goBack={this.toLostList} id={this.state.id}/>
           </Panel>
         </View>
         <View id="messages" activePanel="messages">
