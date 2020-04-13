@@ -89,7 +89,7 @@ class CreateFormPanel extends React.Component {
               <Select onChange={this.onSexChange} value={fields.sex.value}>
                 <option value={'n/a'}>Не определен</option>
                 <option value={'m'}>Мужской</option>
-                <option value={'f'}>Женской</option>
+                <option value={'f'}>Женский</option>
               </Select>
             </FormLayoutGroup>
           </div>

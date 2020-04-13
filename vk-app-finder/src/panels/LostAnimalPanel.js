@@ -14,6 +14,7 @@ import InfoRow from "@vkontakte/vkui/dist/components/InfoRow/InfoRow";
 import Avatar from "@vkontakte/vkui/dist/components/Avatar/Avatar";
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
+import Icon24Share from '@vkontakte/icons/dist/24/share';
 import './LostAnimalPanel.css';
 
 class LostAnimalPanel extends React.Component {
@@ -58,7 +59,12 @@ class LostAnimalPanel extends React.Component {
             <img style={{width: '100%'}}
                  src={config.baseUrl + `lost/img?id=${picture_id}`} alt={''}/>
           </Div>
-          <Header>{type + ', ' + breed}</Header>
+          <div style={{display: 'flex', alignItems: 'center'}}>
+            <Header style={{paddingBottom: '10px'}}>{type + ', ' + breed}</Header>
+            <Div style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}>
+              {'Поделиться'}<Icon24Share style={{marginLeft: '5px'}}/>
+            </Div>
+          </div>
           <Group header={<Header mode={'secondary'}>Автор</Header>}>
             <Cell
               before={<Avatar src={config.baseUrl + `lost/img?id=${picture_id}`}/>}
@@ -68,8 +74,8 @@ class LostAnimalPanel extends React.Component {
             <Cell multiline={true} description={'Напишите автору, если у вас есть информация о животном'}>
               <CellButton before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
             </Cell>
-            <Cell  multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
-              <CellButton  before={<Icon24Done/>} className={'author__action-button'}>Я нашел!</CellButton>
+            <Cell multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
+              <CellButton before={<Icon24Done/>} className={'author__action-button'}>Я нашел!</CellButton>
             </Cell>
           </Group>
           <Separator/>
@@ -81,7 +87,7 @@ class LostAnimalPanel extends React.Component {
                 </InfoRow>
               </Cell>
               <Cell>
-                <InfoRow header="Пол">
+                <InfoRow header="Пол животного">
                   {this.sexText[this.animal.sex]}
                 </InfoRow>
               </Cell>
