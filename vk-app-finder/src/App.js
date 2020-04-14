@@ -13,6 +13,7 @@ import LostPanel from "./panels/Lost";
 import SearchFilter from "./panels/SearchFilter";
 import CreateFormPanel from "./panels/CreateFormPanel";
 import LostAnimalPanel from "./panels/LostAnimalPanel";
+import ProfilePanel from "./panels/Profile";
 
 class App extends React.Component {
   constructor(props) {
@@ -131,7 +132,7 @@ class App extends React.Component {
         </View>
         <View id="more" activePanel="more">
           <Panel id="more">
-            <PanelHeader>Ещё</PanelHeader>
+          <ProfilePanel toLost={this.toLost}></ProfilePanel>
           </Panel>
         </View>
       </Epic>
