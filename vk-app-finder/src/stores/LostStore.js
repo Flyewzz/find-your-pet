@@ -1,11 +1,12 @@
 import {observable, runInAction, decorate} from 'mobx'
 import GenericFormStore from './GenericFormStore'
-import LostService from "../services/LostService";
+import LostService from '../services/LostService';
 
 class LostStore extends GenericFormStore {
-  constructor() {
+  constructor(userStore) {
     super();
-    this.userService = new LostService();
+    this.lostService = new LostService();
+    this.userStore = userStore;
   }
 
   form = {
@@ -59,17 +60,17 @@ class LostStore extends GenericFormStore {
 
   submit = (callback) => {
     try {
-      this.userService.create(
-        this.form.fields.typeId.value,
-        this.form.fields.authorId.value,
-        this.form.fields.sex.value,
-        this.form.fields.breed.value,
-        this.form.fields.description.value,
-        this.form.fields.latitude.value,
-        this.form.fields.longitude.value,
-        this.form.fields.picture.value,
-        callback,
-      );
+        this.lostService.create(
+          this.form.fields.typeId.value,
+          this.userStore.id,
+          this.form.fields.sex.value,
+          this.form.fields.breed.value,
+          this.form.fields.description.value,
+          this.form.fields.latitude.value,
+          this.form.fields.longitude.value,
+          this.form.fields.picture.value,
+          callback
+        );
     } catch (error) {
       runInAction(() => {
         console.log(error);

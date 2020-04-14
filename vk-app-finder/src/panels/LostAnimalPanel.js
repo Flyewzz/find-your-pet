@@ -1,9 +1,6 @@
 import React from "react";
-import {Button, Card, CardGrid, CellButton, Div, Group, Header, PanelHeader} from "@vkontakte/vkui";
+import {CellButton, Div, Group, Header, PanelHeader} from "@vkontakte/vkui";
 import {Cell, PanelHeaderBack, Separator} from "@vkontakte/vkui/dist/es6";
-import AnimalCard from "../components/cards/AnimalCard";
-import FilterLine from "../components/cards/FilterLine";
-import DG from '2gis-maps';
 import LostService from '../services/LostService';
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
@@ -24,13 +21,21 @@ class LostAnimalPanel extends React.Component {
   }
 
   animal = {date: ''};
+  // TODO add default avatar
+  author = {first_name: '', last_name: '', photo_50: ''};
 
   componentDidMount() {
     this.lostService.getById(this.props.id).then(
       result => {
         runInAction(() => {
           this.animal = result;
-        })
+        });
+        this.props.userStore.getUserById(this.animal.author_id).then(
+          result => {
+            runInAction(() => {
+              this.author = result.response[0];
+            })
+          });
       },
       error => {
         alert(error);
@@ -41,6 +46,18 @@ class LostAnimalPanel extends React.Component {
     'm': 'Мужской',
     'f': 'Женский',
     'n/a': 'Не указан',
+  };
+
+  getShareText = () => {
+    const {type_id} = this.animal;
+    const breed = this.animal.breed === '' ? 'порода не указана' : this.animal.breed;
+    // TODO getting address from coords
+    return `Потерян питомец: ${config.types[type_id - 1]}, ${breed}. ` +
+      `Адрес: ${'тут должен быть адрес'}. ${config.appUrl}`
+  };
+
+  share = () => {
+    this.props.userStore.share(this.getShareText());
   };
 
   render() {
@@ -61,18 +78,20 @@ class LostAnimalPanel extends React.Component {
           </Div>
           <div style={{display: 'flex', alignItems: 'center'}}>
             <Header style={{paddingBottom: '10px'}}>{type + ', ' + breed}</Header>
-            <Div style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}>
+            <Div onClick={this.share}
+                 style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}>
               {'Поделиться'}<Icon24Share style={{marginLeft: '5px'}}/>
             </Div>
           </div>
           <Group header={<Header mode={'secondary'}>Автор</Header>}>
             <Cell
-              before={<Avatar src={config.baseUrl + `lost/img?id=${picture_id}`}/>}
-            >
-              Артур Стамбульцян
+              before={<Avatar src={this.author.photo_50}/>}>
+              {this.author.first_name + ' ' + this.author.last_name}
             </Cell>
             <Cell multiline={true} description={'Напишите автору, если у вас есть информация о животном'}>
-              <CellButton before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
+              <CellButton href={`https://vk.com/id${this.animal.author_id}`}
+                          target={'_blank'}
+                          before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
             </Cell>
             <Cell multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
               <CellButton before={<Icon24Done/>} className={'author__action-button'}>Я нашел!</CellButton>
@@ -111,6 +130,7 @@ class LostAnimalPanel extends React.Component {
 
 decorate(LostAnimalPanel, {
   animal: observable,
+  author: observable,
 });
 
 export default observer(LostAnimalPanel);

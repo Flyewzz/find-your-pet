@@ -38,7 +38,8 @@
     "react-dom": "^16.13.1",
     "react-image-crop": "^8.6.2",
     "react-yandex-maps": "^4.2.0",
-    "validatorjs": "^3.18.1"
+    "validatorjs": "^3.18.1",
+    "vk-openapi": "^0.1.2"
   },
   "browserslist": {
     "production": [

@@ -4,27 +4,25 @@ import {
 } from "@vkontakte/vkui";
 import {observer} from 'mobx-react';
 import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
-import DateInput from "../components/forms/DateInput";
 import AddressInput from "../components/forms/AddressInput";
 import ImageLoader from "../components/forms/ImageLoader";
 import './CreateFormPanel.css';
 import Textarea from "@vkontakte/vkui/dist/components/Textarea/Textarea";
 import FormLabel from "../components/forms/FormLabel";
 import LostStore from "../stores/LostStore";
-import config from '../config';
 import GeocodingService from "../services/GeocodingService";
 
 class CreateFormPanel extends React.Component {
   constructor(props) {
     super(props);
-    this.lostStore = new LostStore();
+    this.lostStore = new LostStore(props.userStore);
     this.geocodingService = new GeocodingService();
   }
 
   onSubmit = () => {
     this.lostStore.submit(
       (result) => {
-        alert('res:' + result);
+        console.log('res:' + result);
       })
   };
 

@@ -3,7 +3,6 @@ import {Card, CardGrid, Div, Group, PanelHeader} from "@vkontakte/vkui";
 import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
-import DG from '2gis-maps';
 import LostService from '../services/LostService';
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
@@ -13,7 +12,6 @@ import {YMaps, Map, Placemark, ZoomControl} from 'react-yandex-maps';
 class LostPanel extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       mapView: props.mapStore.isMapView,
       places: []
