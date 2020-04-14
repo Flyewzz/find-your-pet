@@ -10,3 +10,8 @@ lost:
     files:
         directory: ./files/lost
         max_size: 10 # MB
+    open_id: 1
+    close_id: 2
+profile:
+    lost:
+        itemsPerPage: 9
