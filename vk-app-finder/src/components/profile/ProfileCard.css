@@ -1,0 +1,20 @@
+.profile__card__photo {
+    margin: 9px;
+    border-radius: 10px;
+    width: 40%;
+    height: auto;
+    object-fit: cover;
+}
+
+.profile__card__details {
+    display: flex;
+    flex-direction: column;
+    align-content: start;
+    justify-content: start;
+}
+
+.profile__cancel-icon {
+    position: absolute;
+    top: -9px;
+    right: 2px;
+}

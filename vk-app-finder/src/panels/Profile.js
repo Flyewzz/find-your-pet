@@ -1,19 +1,12 @@
 import React from "react";
-import { Card, CardGrid, Div, Group, PanelHeader } from "@vkontakte/vkui";
-import { PanelHeaderBack } from "@vkontakte/vkui/dist/es6";
-import ProfileCard from "../components/cards/ProfileCard";
-import FilterLine from "../components/cards/FilterLine";
-import DG from "2gis-maps";
+import {Group, PanelHeader} from "@vkontakte/vkui";
+import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
 import ProfileService from "../services/ProfileService";
-import { decorate, observable, runInAction } from "mobx";
-import { observer } from "mobx-react";
-import LostPanel from "./Lost";
-import { Tabs } from '@vkontakte/vkui'
-import { TabsItem } from '@vkontakte/vkui'
-import { Separator } from '@vkontakte/vkui'
-import { Panel } from '@vkontakte/vkui'
-import { View } from '@vkontakte/vkui'
-import LostTab from './ProfileTabs/LostTab';
+import {decorate, observable, runInAction} from "mobx";
+import {observer} from "mobx-react";
+import {Tabs} from '@vkontakte/vkui'
+import {TabsItem} from '@vkontakte/vkui'
+import LostTab from '../components/profile/LostTab';
 import './Profile.css';
 
 class ProfilePanel extends React.Component {
@@ -30,7 +23,7 @@ class ProfilePanel extends React.Component {
 
     this.changeView = () => {
       const current = this.state.mapView;
-      this.setState({ mapView: !current });
+      this.setState({mapView: !current});
     };
 
     this.profileService = new ProfileService();
@@ -41,7 +34,7 @@ class ProfilePanel extends React.Component {
 
   select(e) {
     const mode = e.currentTarget.dataset.mode;
-    this.setState({ mode, contextOpened: false });
+    this.setState({mode, contextOpened: false});
   }
 
   toLost = (id) => {
@@ -64,52 +57,25 @@ class ProfilePanel extends React.Component {
     );
   }
 
-  animalsToCards = () => {
-    return this.animals.map((animal, index) => (
-      <>
-        {/* <Card key={-animal.id} size="l" styles={{height: 0}}/> */}
-        <ProfileCard
-          onClick={() => this.props.toLost(animal.id)}
-          key={animal.id}
-          animal={animal}
-        />
-      </>
-    ));
-  };
-
   render() {
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack />}>Ваши объявления</PanelHeader>
-        <View activePanel={this.state.activePanel} header={false}>
-        <Panel id="main-panel" separator={false}>
-            <Tabs>
-              <TabsItem
-                onClick={() => this.setState({ activeTab: 'lost' })}
-                selected={this.state.activeTab === 'lost'}
-              >
-                Пропавшие
-              </TabsItem>
-              <TabsItem
-                onClick={() => this.setState({ activeTab: 'found' })}
-                selected={this.state.activeTab === 'found'}
-              >
-                Найденные
-              </TabsItem>
-            </Tabs>
-            <Separator />
+        <PanelHeader left={<PanelHeaderBack/>}>Ваши объявления</PanelHeader>
+        <Tabs>
+          <TabsItem
+            onClick={() => this.setState({activeTab: 'lost'})}
+            selected={this.state.activeTab === 'lost'}>
+            Пропавшие
+          </TabsItem>
+          <TabsItem
+            onClick={() => this.setState({activeTab: 'found'})}
+            selected={this.state.activeTab === 'found'}>
+            Найденные
+          </TabsItem>
+        </Tabs>
         <Group separator="hide">
-          <FilterLine
-            isMap={this.state.mapView}
-            changeView={this.changeView}
-            openFilters={this.props.openFilters}
-          />
-
-          {this.state.activeTab === 'lost' &&
-           <LostTab toLost={this.toLost} />}
+          {this.state.activeTab === 'lost' && <LostTab toLost={this.toLost}/>}
         </Group>
-      </Panel>
-      </View>
       </>
     );
   }

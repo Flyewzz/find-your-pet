@@ -1,9 +1,8 @@
 import React from "react";
 import { CardGrid } from "@vkontakte/vkui";
-import ProfileCard from "../../components/cards/ProfileCard";
+import ProfileCard from "./ProfileCard";
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
-import DG from '2gis-maps';
 import ProfileService from '../../services/LostService';
 
 
@@ -28,14 +27,12 @@ class LostTab extends React.Component {
   }
 
   animalsToCards = () => {
-    return this.animals.map((animal, index) => (
-      <>
+    return this.animals.map(animal => (
         <ProfileCard
           onClick={() => this.props.toLost(animal.id)}
           key={animal.id}
           animal={animal}
         />
-      </>
     ));
   };
 

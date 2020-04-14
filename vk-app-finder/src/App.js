@@ -24,7 +24,7 @@ class App extends React.Component {
     this.state = {
       activeModal: null,
       modalHistory: [],
-      activeStory: 'lost',
+      activeStory: 'more',
       mainPanel: 'new_lost',
       lostPanel: 'losts',
     };
@@ -138,7 +138,7 @@ class App extends React.Component {
         </View>
         <View id="more" activePanel="more">
           <Panel id="more">
-          <ProfilePanel toLost={this.toLost}></ProfilePanel>
+            <ProfilePanel toLost={this.toLost}/>
           </Panel>
         </View>
       </Epic>
