@@ -77,10 +77,6 @@ typeId int,
 */
 
 func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
-	tx, err := lc.db.Begin()
-	if err != nil {
-		return nil, err
-	}
 
 	// Get everything without parameters to search
 	if features.CheckEmptyLost(params) {
@@ -93,7 +89,13 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 			return nil, err
 		}
 		losts, err := db.ConvertRowsToLost(rows)
+		rows.Close()
 		return losts, err
+	}
+
+	tx, err := lc.db.Begin()
+	if err != nil {
+		return nil, err
 	}
 	searchManager := search.NewSearchManager()
 
@@ -201,6 +203,7 @@ func (lc *LostControllerPg) SearchByType(typeId int) ([]models.Lost, error) {
 	if err != nil {
 		return nil, err
 	}
+	rows.Close()
 	losts, err := db.ConvertRowsToLost(rows)
 	return losts, err
 }

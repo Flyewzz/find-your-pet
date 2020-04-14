@@ -24,16 +24,6 @@ import (
 )
 
 func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
-	// var page int = 0
-	// var err error
-	// strPage := r.URL.Query().Get("page")
-	// if strPage != "" {
-	// 	page, err = strconv.Atoi(strPage)
-	// 	if err != nil {
-	// 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
-	// 		return
-	// 	}
-	// }
 	arguments := r.URL.Query()
 	strTypeId := arguments.Get("type_id")
 	var typeId int
@@ -163,10 +153,6 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	extension := features.GetExtension(header.Filename)
-	if !features.IsExtensionPicture(extension) {
-		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
-		return
-	}
 	defer file.Close()
 	// in MB
 	fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024

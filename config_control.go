@@ -33,6 +33,7 @@ func PrepareHandlerData() *handlers.HandlerData {
 	if err != nil {
 		log.Fatalf("Error with database: %v\n", err)
 	}
+	db.SetMaxOpenConns(viper.GetInt("db.max_connections"))
 	lostController := pg.NewLostControllerPg(viper.GetInt("lost.itemsPerPage"), db)
 	lostFileController := pg.NewLostFileControllerPg(db)
 	lostAddingManager :=

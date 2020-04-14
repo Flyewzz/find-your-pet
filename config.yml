@@ -1,9 +1,10 @@
-port: 80
+port: 5555
 db:
     host: localhost
     user: postgres
     password: postgres
     database: postgres
+    max_connections: 50
 lost:
     itemsPerPage: 9
     files:
