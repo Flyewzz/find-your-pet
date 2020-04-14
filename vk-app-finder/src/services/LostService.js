@@ -22,7 +22,7 @@ class LostService {
     const formData = new FormData();
 
     formData.append("type_id", type);
-    formData.append("author_id", authorId);
+    formData.append("vk_id", authorId);
     formData.append("picture", picture);
     formData.append("sex", sex);
     formData.append("breed", breed);

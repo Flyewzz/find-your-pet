@@ -30,7 +30,7 @@ class LostAnimalPanel extends React.Component {
         runInAction(() => {
           this.animal = result;
         });
-        this.props.userStore.getUserById(this.animal.author_id).then(
+        this.props.userStore.getUserById(this.animal.vk_id).then(
           result => {
             runInAction(() => {
               this.author = result.response[0];
@@ -89,7 +89,7 @@ class LostAnimalPanel extends React.Component {
               {this.author.first_name + ' ' + this.author.last_name}
             </Cell>
             <Cell multiline={true} description={'Напишите автору, если у вас есть информация о животном'}>
-              <CellButton href={`https://vk.com/id${this.animal.author_id}`}
+              <CellButton href={`https://vk.com/id${this.animal.vk_id}`}
                           target={'_blank'}
                           before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
             </Cell>
