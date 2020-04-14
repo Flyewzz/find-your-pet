@@ -8,15 +8,19 @@ import LostService from '../services/LostService';
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
 import './Lost.css';
+import {YMaps, Map, Placemark, ZoomControl} from 'react-yandex-maps';
 
 class LostPanel extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {mapView: false, places: []};
+    this.state = {
+      mapView: props.mapStore.isMapView,
+      places: []
+    };
     this.changeView = () => {
-      const current = this.state.mapView;
-      this.setState({mapView: !current});
+      const current = props.mapStore.isMapView;
+      props.mapStore.isMapView = !current;
     };
 
     this.lostService = new LostService();
@@ -25,12 +29,6 @@ class LostPanel extends React.Component {
   animals = [];
 
   componentDidMount() {
-    // TODO get position of user and filter by it
-    this.map = DG.map('map', {
-      center: [54.98, 82.89],
-      zoom: 13,
-    });
-
     this.lostService.get().then(
       result => {
         runInAction(() => {
@@ -43,9 +41,10 @@ class LostPanel extends React.Component {
   }
 
   createMarkers = () => {
-    this.animals.forEach(value => {
-      DG.marker([value.longitude, value.latitude]).addTo(this.map);
-    });
+    return this.animals.map(value =>
+      <Placemark onClick={() => this.props.toLost(value.id)}
+                 geometry={[value.longitude, value.latitude]}/>
+    )
   };
 
   animalsToCards = () => {
@@ -58,12 +57,17 @@ class LostPanel extends React.Component {
     );
   };
 
+  onBoundsChange = e => {
+    this.props.mapStore.center = e.get('target').getCenter();
+    this.props.mapStore.zoom = e.get('target').getZoom();
+  };
+
   render() {
     const mapStyle = {
-      display: this.state.mapView ? undefined : 'none',
-      height: '500x'
+      display: this.props.mapStore.isMapView ? undefined : 'none',
+      height: '490px',
+      width: '100%',
     };
-    this.createMarkers();
 
     return (
       <>
@@ -73,11 +77,23 @@ class LostPanel extends React.Component {
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 
-          {!this.state.mapView && <CardGrid>{this.animalsToCards()}</CardGrid>}
+          {!this.props.mapStore.isMapView
+          && <CardGrid>{this.animalsToCards()}</CardGrid>}
 
-          <Div>
-            <div style={mapStyle} id={'map'}/>
-          </Div>
+          <Div><YMaps>
+            <div>
+              <Map style={mapStyle}
+                   onBoundsChange={this.onBoundsChange}
+                   state={{
+                     center: this.props.mapStore.center,
+                     zoom: this.props.mapStore.zoom,
+                   }}>
+                <ZoomControl/>
+                {this.createMarkers()}
+              </Map>
+            </div>
+          </YMaps></Div>
+
         </Group>
       </>
     );

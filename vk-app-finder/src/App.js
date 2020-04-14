@@ -13,6 +13,7 @@ import LostPanel from "./panels/Lost";
 import SearchFilter from "./panels/SearchFilter";
 import CreateFormPanel from "./panels/CreateFormPanel";
 import LostAnimalPanel from "./panels/LostAnimalPanel";
+import MapStateStore from "./stores/MapStateStore";
 
 class App extends React.Component {
   constructor(props) {
@@ -30,6 +31,7 @@ class App extends React.Component {
     this.modalBack = () => {
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
+    this.mapStore = new MapStateStore();
     this.openFilters = () => {
       this.setActiveModal('filters');
     };
@@ -118,7 +120,9 @@ class App extends React.Component {
                         onClose={this.modalBack}/>
         }>
           <Panel id="losts">
-            <LostPanel toLost={this.toLost} openFilters={this.openFilters}/>
+            <LostPanel toLost={this.toLost}
+                       mapStore={this.mapStore}
+                       openFilters={this.openFilters}/>
           </Panel>
           <Panel id="lost">
             <LostAnimalPanel goBack={this.toLostList} id={this.state.id}/>
