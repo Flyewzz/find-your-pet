@@ -118,7 +118,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// author_id is a temprorary parameter
-	strAuthorId := params("author_id")
+	strAuthorId := params("vk_id")
 	authorId, err := strconv.Atoi(strAuthorId)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)

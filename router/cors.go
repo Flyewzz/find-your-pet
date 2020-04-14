@@ -17,6 +17,12 @@ func CorsSetup() *cors.Cors {
 		AllowedOrigins: []string{
 			"https://localhost:10888",
 		},
+		AllowedMethods: []string{
+			"HEAD",
+			"GET",
+			"POST",
+			"OPTIONS",
+		},
 		AllowCredentials: true,
 		// Enable Debugging for testing, consider disabling in production
 		Debug: debugMode,

@@ -3,7 +3,7 @@ package models
 type Found struct {
 	Id          int    `json:"id"`
 	TypeId      int    `json:"type_id"`
-	AuthorId    int    `json:"author_id"`
+	AuthorId    int    `json:"vk_id"`
 	Sex         string `json:"sex"`
 	Breed       string `json:"breed"`
 	Description string `json:"description"`
