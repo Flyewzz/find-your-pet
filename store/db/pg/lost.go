@@ -60,7 +60,7 @@ func (lc *LostControllerPg) Add(ctx context.Context, params *models.Lost) (int, 
 	query := fmt.Sprintf("INSERT INTO lost(type_id, vk_id, sex, "+
 		"breed, description, status_id, location) "+
 		"VALUES($1, $2, $3, $4, $5, 1, "+
-		"st_GeomFromText('point(%f %f)', 4326)) RETURNING vk_id",
+		"st_GeomFromText('point(%f %f)', 4326)) RETURNING id",
 		params.Latitude, params.Longitude)
 
 	err := tx.QueryRow(query,
