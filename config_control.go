@@ -38,10 +38,13 @@ func PrepareHandlerData() *handlers.HandlerData {
 	lostFileController := pg.NewLostFileControllerPg(db)
 	lostAddingManager :=
 		managers.NewLostAddingManager(db, lostController, lostFileController)
+	profileController := pg.NewProfileControllerPg(
+		viper.GetInt("profile.lost.itemsPerPage"),
+		db)
 	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
 		log.Fatalln(err)
 	}
 	return handlers.NewHandlerData(lostController, lostFileController,
-		lostAddingManager, debug)
+		lostAddingManager, profileController, debug)
 }
