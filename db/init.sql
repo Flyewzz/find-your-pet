@@ -36,7 +36,9 @@ alter table files
 
 create table lost
 (
-  id          serial                  not null,
+  id          serial                  not null
+    constraint lost_pk
+      primary key,
   type_id     integer                 not null
     constraint lost_animaltypes_id_fk
       references animaltypes,
@@ -63,12 +65,11 @@ create index lost_date_index
 create index lost_gist_location_index
   on lost (location);
 
-create unique index lost_vk_id_uindex
-  on lost (vk_id);
-
 create table found
 (
-  id          serial                  not null,
+  id          serial                  not null
+    constraint found_pk
+      primary key,
   type_id     integer                 not null
     constraint found_animaltypes_id_fk
       references animaltypes,
@@ -91,6 +92,3 @@ alter table found
 
 create index found_date_index
   on found (date desc);
-
-create unique index found_vk_id_uindex
-  on found (vk_id);
