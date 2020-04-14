@@ -15,7 +15,7 @@ import CreateFormPanel from "./panels/CreateFormPanel";
 import LostAnimalPanel from "./panels/LostAnimalPanel";
 import MapStateStore from "./stores/MapStateStore";
 import UserStore from "./stores/UserStore";
-import config from './config';
+import ProfilePanel from "./panels/Profile";
 
 class App extends React.Component {
   constructor(props) {
@@ -138,7 +138,7 @@ class App extends React.Component {
         </View>
         <View id="more" activePanel="more">
           <Panel id="more">
-            <PanelHeader>Ещё</PanelHeader>
+          <ProfilePanel toLost={this.toLost}></ProfilePanel>
           </Panel>
         </View>
       </Epic>

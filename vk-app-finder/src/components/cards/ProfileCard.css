@@ -1,0 +1,27 @@
+.animal-card__photo {
+    border-radius: 10px 10px 20px 0;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.animal-card__details {
+    flex-grow: 2;
+}
+
+.animal-card__address {
+    padding-top: 0;
+    padding-bottom: 6px;
+}
+
+.animal-card__info {
+    padding-bottom: 6px;
+}
+
+.animal-card__date {
+    padding-top: 0;
+}
+
+.animal-card__container {
+    display: flex;
+    justify-content: left;
+}
