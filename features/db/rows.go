@@ -8,7 +8,6 @@ import (
 
 func ConvertRowsToLost(rows *sql.Rows) ([]models.Lost, error) {
 	var err error
-	defer rows.Close()
 	var losts []models.Lost
 	for rows.Next() {
 		var lost models.Lost

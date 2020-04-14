@@ -97,6 +97,8 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	ctx := context.WithValue(context.Background(), "tx", tx)
 	searchManager := search.NewSearchManager()
 
 	addResultToSearchManager := func(result *[]models.Lost,
@@ -110,7 +112,7 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 		searchManager.Add(&set)
 	}
 	if params.TypeId != 0 {
-		result, err := lc.SearchByType(params.TypeId)
+		result, err := lc.SearchByType(ctx, params.TypeId)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
 				return nil, rollErr
@@ -120,7 +122,7 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 		addResultToSearchManager(&result, searchManager)
 	}
 	if params.Sex != "" {
-		result, err := lc.SearchBySex(params.Sex)
+		result, err := lc.SearchBySex(ctx, params.Sex)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
 				return nil, rollErr
@@ -130,7 +132,7 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 		addResultToSearchManager(&result, searchManager)
 	}
 	if params.Breed != "" {
-		result, err := lc.SearchByBreed(params.Breed)
+		result, err := lc.SearchByBreed(ctx, params.Breed)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
 				return nil, rollErr
@@ -149,16 +151,15 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 	// 	}
 	// 	addResultToSearchManager(&result, searchManager)
 	// }
-	if params.Description != "" {
-		result, err := lc.SearchByDescription(params.Description)
-		if err != nil {
-			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
-			}
-			return nil, err
-		}
-		addResultToSearchManager(&result, searchManager)
-	}
+	// if params.Description != "" {
+	// 	result, err := lc.SearchByDescription(params.Description)
+	// 	if err != nil {
+	// 		if rollErr := tx.Rollback(); rollErr != nil {
+	// 			return nil, rollErr
+	// 		}
+	// 		return nil, err
+	// 	}
+	// addResultToSearchManager(&result, searchManager)
 
 	// ****** ? ***************
 	// if params.Date != "" {
@@ -171,18 +172,21 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 	// 	}
 	// 	addResultToSearchManager(&result, searchManager)
 	// }
-	if params.StatusId != 0 {
-		result, err := lc.SearchByStatus(params.StatusId)
-		if err != nil {
-			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
-			}
-			return nil, err
-		}
-		addResultToSearchManager(&result, searchManager)
-	}
+	// if params.StatusId != 0 {
+	// 	result, err := lc.SearchByStatus(params.StatusId)
+	// 	if err != nil {
+	// 		if rollErr := tx.Rollback(); rollErr != nil {
+	// 			return nil, rollErr
+	// 		}
+	// 		return nil, err
+	// 	}
+	// 	addResultToSearchManager(&result, searchManager)
+	// }
 	err = tx.Commit()
 	if err != nil {
+		if rollErr := tx.Rollback(); rollErr != nil {
+			return nil, rollErr
+		}
 		return nil, err
 	}
 
@@ -194,8 +198,9 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 	return results, nil
 }
 
-func (lc *LostControllerPg) SearchByType(typeId int) ([]models.Lost, error) {
-	rows, err := lc.db.Query("SELECT id, type_id, vk_id, sex, "+
+func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Lost, error) {
+	tx := ctx.Value("tx").(*sql.Tx)
+	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, date, "+
 		"st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
@@ -203,13 +208,14 @@ func (lc *LostControllerPg) SearchByType(typeId int) ([]models.Lost, error) {
 	if err != nil {
 		return nil, err
 	}
-	rows.Close()
 	losts, err := db.ConvertRowsToLost(rows)
+	rows.Close()
 	return losts, err
 }
 
-func (lc *LostControllerPg) SearchBySex(sex string) ([]models.Lost, error) {
-	rows, err := lc.db.Query("SELECT id, type_id, vk_id, sex, "+
+func (lc *LostControllerPg) SearchBySex(ctx context.Context, sex string) ([]models.Lost, error) {
+	tx := ctx.Value("tx").(*sql.Tx)
+	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, date, "+
 		"st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
@@ -218,6 +224,22 @@ func (lc *LostControllerPg) SearchBySex(sex string) ([]models.Lost, error) {
 		return nil, err
 	}
 	losts, err := db.ConvertRowsToLost(rows)
+	rows.Close()
+	return losts, err
+}
+
+func (lc *LostControllerPg) SearchByBreed(ctx context.Context, breed string) ([]models.Lost, error) {
+	tx := ctx.Value("tx").(*sql.Tx)
+	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
+		"breed, description, status_id, "+
+		"date, st_x(location) as latitude, st_y(location) as longitude, "+
+		"picture_id FROM lost "+
+		"WHERE LOWER(breed) LIKE '%' || $1 || '%'", strings.ToLower(breed))
+	if err != nil {
+		return nil, err
+	}
+	losts, err := db.ConvertRowsToLost(rows)
+	rows.Close()
 	return losts, err
 }
 
@@ -233,46 +255,33 @@ func (lc *LostControllerPg) SearchBySex(sex string) ([]models.Lost, error) {
 // 	return losts, err
 // }
 
-func (lc *LostControllerPg) SearchByDescription(description string) ([]models.Lost, error) {
-	rows, err := lc.db.Query("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, date, "+
-		"st_x(location) as latitude, st_y(location) as longitude, "+
-		"picture_id FROM lost "+
-		"WHERE LOWER(description) LIKE '%' || $1 || '%' "+
-		"ORDER BY date DESC",
-		strings.ToLower(description))
-	if err != nil {
-		return nil, err
-	}
-	losts, err := db.ConvertRowsToLost(rows)
-	return losts, err
-}
+// func (lc *LostControllerPg) SearchByDescription(description string) ([]models.Lost, error) {
+// 	rows, err := lc.db.Query("SELECT id, type_id, vk_id, sex, "+
+// 		"breed, description, status_id, date, "+
+// 		"st_x(location) as latitude, st_y(location) as longitude, "+
+// 		"picture_id FROM lost "+
+// 		"WHERE LOWER(description) LIKE '%' || $1 || '%' "+
+// 		"ORDER BY date DESC",
+// 		strings.ToLower(description))
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	losts, err := db.ConvertRowsToLost(rows)
+// 	return losts, err
+// }
 
-func (lc *LostControllerPg) SearchByBreed(breed string) ([]models.Lost, error) {
-	rows, err := lc.db.Query("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, st_y(location) as longitude, "+
-		"picture_id FROM lost "+
-		"WHERE LOWER(breed) LIKE '%' || $1 || '%'", strings.ToLower(breed))
-	if err != nil {
-		return nil, err
-	}
-	losts, err := db.ConvertRowsToLost(rows)
-	return losts, err
-}
-
-func (lc *LostControllerPg) SearchByStatus(statusId int) ([]models.Lost, error) {
-	rows, err := lc.db.Query("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, st_y(location) as longitude, "+
-		"picture_id FROM lost "+
-		"WHERE status_id = $1", statusId)
-	if err != nil {
-		return nil, err
-	}
-	losts, err := db.ConvertRowsToLost(rows)
-	return losts, err
-}
+// func (lc *LostControllerPg) SearchByStatus(statusId int) ([]models.Lost, error) {
+// 	rows, err := lc.db.Query("SELECT id, type_id, vk_id, sex, "+
+// 		"breed, description, status_id, "+
+// 		"date, st_x(location) as latitude, st_y(location) as longitude, "+
+// 		"picture_id FROM lost "+
+// 		"WHERE status_id = $1", statusId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	losts, err := db.ConvertRowsToLost(rows)
+// 	return losts, err
+// }
 
 // A direction is needed to specify a date (must be less or greater or equal)
 func (lc *LostControllerPg) SearchByDate(date, direction string) ([]models.Lost, error) {

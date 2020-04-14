@@ -28,7 +28,13 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	strTypeId := arguments.Get("type_id")
 	var typeId int
 	var err error
-	typeId, err = strconv.Atoi(strTypeId)
+	if strTypeId != "" {
+		typeId, err = strconv.Atoi(strTypeId)
+		if err != nil {
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+			return
+		}
+	}
 	sex := arguments.Get("sex")
 	breed := arguments.Get("breed")
 	description := arguments.Get("description")
