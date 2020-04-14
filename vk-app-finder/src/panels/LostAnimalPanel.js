@@ -48,6 +48,19 @@ class LostAnimalPanel extends React.Component {
     'n/a': 'Не указан',
   };
 
+  writeHref = () => {
+    if (this.author.can_write_private_message) {
+      return {
+        href: `https://vk.com/im?sel=${this.animal.vk_id}`,
+        description: 'Напишите автору, если у вас есть информация о животном'
+      };
+    }
+    return {
+      href: `https://vk.com/id${this.animal.vk_id}`,
+      description: 'ЛС автора закрыто, но вы можете отправить заявку на добавление в друзья'
+    };
+  };
+
   getShareText = () => {
     const {type_id} = this.animal;
     const breed = this.animal.breed === '' ? 'порода не указана' : this.animal.breed;
@@ -88,8 +101,8 @@ class LostAnimalPanel extends React.Component {
               before={<Avatar src={this.author.photo_50}/>}>
               {this.author.first_name + ' ' + this.author.last_name}
             </Cell>
-            <Cell multiline={true} description={'Напишите автору, если у вас есть информация о животном'}>
-              <CellButton href={`https://vk.com/id${this.animal.vk_id}`}
+            <Cell multiline={true} description={this.writeHref().description}>
+              <CellButton href={this.writeHref().href}
                           target={'_blank'}
                           before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
             </Cell>
