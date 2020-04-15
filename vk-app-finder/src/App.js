@@ -146,6 +146,12 @@ class App extends React.Component {
       mainPanel: 'new_lost',
     })
   };
+  toMainFoundForm = () => {
+    this.setState({
+      activeStory: 'main',
+      mainPanel: 'new_found',
+    })
+  };
   toProfileMain = () => {
     this.setState({
       activeStory: 'more',
@@ -241,6 +247,7 @@ class App extends React.Component {
                           openDestructive={this.openDestructive}
                           goBack={this.toProfile}
                           toMainForm={this.toMainForm}
+                          toMainFoundForm={this.toMainFoundForm}
                           toLost={this.toProfileLost}/>
           </Panel>
           <Panel id="lost">

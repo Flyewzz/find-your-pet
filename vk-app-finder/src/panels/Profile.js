@@ -6,6 +6,7 @@ import {Tabs} from '@vkontakte/vkui'
 import {TabsItem} from '@vkontakte/vkui'
 import LostTab from '../components/profile/LostTab';
 import './Profile.css';
+import FoundTab from "../components/profile/FoundTab";
 
 class ProfilePanel extends React.Component {
   constructor(props) {
@@ -55,6 +56,13 @@ class ProfilePanel extends React.Component {
                       toMainForm={this.props.toMainForm}
                       goBack={this.props.goBack}
                       toLost={this.props.toLost}/>}
+          {this.state.activeTab === 'found'
+          && <FoundTab userStore={this.props.userStore}
+                       openDestructive={this.props.openDestructive}
+                       toMainForm={this.props.toMainFoundForm}
+                       goBack={this.props.goBack}
+                       toLost={this.props.toLost}/>}
+
         </Group>
       </>
     );
