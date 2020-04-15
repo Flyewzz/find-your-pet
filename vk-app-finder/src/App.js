@@ -20,6 +20,7 @@ import {Alert} from "@vkontakte/vkui";
 import LostFilterStore from "./stores/LostFilterStore";
 import FoundPanel from "./panels/Found";
 import FoundFilterStore from "./stores/FoundFilterStore";
+import CreateFormFoundPanel from "./panels/CreateFormFoundPanel";
 
 class App extends React.Component {
   constructor(props) {
@@ -102,6 +103,9 @@ class App extends React.Component {
   toCreateLostForm = () => {
     this.setState({mainPanel: 'new_lost'});
   };
+  toCreateFoundForm = () => {
+    this.setState({mainPanel: 'new_found'});
+  };
   toMain = () => {
     this.setState({mainPanel: 'main'});
   };
@@ -181,12 +185,18 @@ class App extends React.Component {
       }>
         <View id="main" activePanel={this.state.mainPanel}>
           <Panel id="main">
-            <MainPanel toCreateLostForm={this.toCreateLostForm}/>
+            <MainPanel toCreateFoundForm={this.toCreateFoundForm}
+                       toCreateLostForm={this.toCreateLostForm}/>
           </Panel>
           <Panel id="new_lost">
             <CreateFormPanel userStore={this.userStore}
                              toProfile={this.toProfileMain}
                              toMain={this.toMain}/>
+          </Panel>
+          <Panel id="new_found">
+            <CreateFormFoundPanel userStore={this.userStore}
+                                  toProfile={this.toProfileMain}
+                                  toMain={this.toMain}/>
           </Panel>
         </View>
         <View popup={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={

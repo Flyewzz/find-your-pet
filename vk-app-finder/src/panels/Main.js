@@ -15,7 +15,7 @@ const MainPanel = (props) => {
         </Div>
         <Div className={'main__buttons-group'}>
           <Button onClick={props.toCreateLostForm} className={'main__button'}>Я потерял</Button>
-          <Button className={'main__button'}>Я нашел</Button>
+          <Button onClick={props.toCreateFoundForm} className={'main__button'}>Я нашел</Button>
         </Div>
       </FixedLayout>
     </>
