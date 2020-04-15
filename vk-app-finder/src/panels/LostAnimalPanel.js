@@ -15,15 +15,18 @@ import Icon24Share from '@vkontakte/icons/dist/24/share';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import './LostAnimalPanel.css';
 import ProfileService from "../services/ProfileService";
+import GeocodingService from "../services/GeocodingService";
 
 class LostAnimalPanel extends React.Component {
   constructor(props) {
     super(props);
     this.lostService = new LostService();
     this.profileService = new ProfileService();
+    this.geocodingService = new GeocodingService();
   }
 
   animal = {date: ''};
+  address = '';
   // TODO add default avatar
   author = {first_name: '', last_name: '', photo_50: ''};
   isMy = false;
@@ -36,6 +39,7 @@ class LostAnimalPanel extends React.Component {
             this.animal = result;
             this.isMy = this.animal.vk_id === resultId.id;
           });
+          this.getAddress();
           this.props.userStore.getUserById(this.animal.vk_id).then(
             result => {
               runInAction(() => {
@@ -48,6 +52,17 @@ class LostAnimalPanel extends React.Component {
         })
     );
   }
+
+  getAddress = () => {
+    const {latitude, longitude} = this.animal;
+    this.geocodingService.addressByCoords(longitude, latitude).then(
+      result => {
+        const address = result.address;
+        this.address = `${address.District}, ${address.Address}`
+          + (address.MetroArea === ''? '' : `, ${address.MetroArea}`);
+      }
+    );
+  };
 
   sexText = {
     'm': 'Мужской',
@@ -73,7 +88,7 @@ class LostAnimalPanel extends React.Component {
     const breed = this.animal.breed === '' ? 'порода не указана' : this.animal.breed;
     // TODO getting address from coords
     return `Потерян питомец: ${config.types[type_id - 1]}, ${breed}. ` +
-      `Адрес: ${'тут должен быть адрес'}. ${config.appUrl}`
+      `Адрес: ${this.address}. ${config.appUrl}`
   };
 
   share = () => {
@@ -139,7 +154,7 @@ class LostAnimalPanel extends React.Component {
             <List>
               <Cell>
                 <InfoRow header="Место пропажи">
-                  {'тут должен быть адрес'}
+                  {this.address}
                 </InfoRow>
               </Cell>
               <Cell>
@@ -168,6 +183,7 @@ class LostAnimalPanel extends React.Component {
 decorate(LostAnimalPanel, {
   animal: observable,
   author: observable,
+  address: observable,
   isMy: observable,
 });
 

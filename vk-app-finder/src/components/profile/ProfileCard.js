@@ -10,7 +10,6 @@ const ProfileCard = (props) => {
   const animal = props.animal;
   const breed = animal.breed === '' ? 'порода не указана' : animal.breed;
   const date = new Date(animal.date.replace(' ', 'T')).toLocaleDateString();
-  const place = 'Адрес, улица, дом';
 
   return (
     <Card
@@ -35,7 +34,8 @@ const ProfileCard = (props) => {
               {`${config.types[animal.type_id - 1]}, ${breed}`}
             </Cell>
             <Cell>
-              <span style={{fontWeight: 'bold'}}>Адрес: </span>{place}
+              <span style={{fontWeight: 'bold'}}>Адрес: </span>
+              {props.address}
             </Cell>
             <Cell>
               <span style={{fontWeight: 'bold'}}>Дата пропажи: </span>{date}

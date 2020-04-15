@@ -7,15 +7,18 @@ import ProfileService from '../../services/ProfileService';
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
 import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
 import Button from "@vkontakte/vkui/dist/components/Button/Button";
+import GeocodingService from "../../services/GeocodingService";
 
 
 class LostTab extends React.Component {
   constructor(props) {
     super(props);
     this.profileService = new ProfileService();
+    this.geocodingService = new GeocodingService();
   }
 
   animals = null;
+  addresses = [];
 
   componentDidMount() {
     this.props.userStore.getId().then(
@@ -23,11 +26,23 @@ class LostTab extends React.Component {
     );
   }
 
+  updateAddress = (index, result) => {
+    this.addresses[index] = result.District + ', ' + (result.MetroArea === ""
+      ? result.Address : result.MetroArea);
+  };
+
   fetchLost = (id) => {
     this.profileService.getLost(id).then(
       (result) => {
         runInAction(() => {
           this.animals = result.payload;
+          this.addresses = this.animals.map(() => '')
+        });
+        this.animals.forEach((value, index) => {
+          const {longitude, latitude} = value;
+          this.geocodingService.addressByCoords(longitude, latitude).then(
+            result => this.updateAddress(index, result.address)
+          );
         });
       },
       (error) => {
@@ -40,14 +55,13 @@ class LostTab extends React.Component {
     const vkId = this.props.userStore.id;
     this.profileService.close(id, vkId).then(
       () => {
-        console.log('я тута');
         this.props.goBack();
       }
     );
   };
 
   animalsToCards = () => {
-    return this.animals.map(animal => (
+    return this.animals.map((animal, index) => (
       <ProfileCard
         onClick={() => this.props.toLost(animal.id)}
         cancel={() => {
@@ -55,6 +69,7 @@ class LostTab extends React.Component {
         }}
         key={animal.id}
         animal={animal}
+        address={this.addresses[index]}
       />
     ));
   };
@@ -77,6 +92,7 @@ class LostTab extends React.Component {
 
 decorate(LostTab, {
   animals: observable,
+  addresses: observable,
 });
 
 export default observer(LostTab);

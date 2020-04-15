@@ -7,9 +7,10 @@ import LostService from '../services/LostService';
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
 import './Lost.css';
-import {YMaps, Map, Placemark, ZoomControl} from 'react-yandex-maps';
+import {Map, Placemark, YMaps, ZoomControl} from 'react-yandex-maps';
 import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
+import GeocodingService from "../services/GeocodingService";
 
 class LostPanel extends React.Component {
   constructor(props) {
@@ -23,37 +24,53 @@ class LostPanel extends React.Component {
       props.mapStore.isMapView = !current;
     };
 
+    this.geocodingService = new GeocodingService();
     this.lostService = new LostService();
   }
 
   animals = null;
+  addresses = [];
 
   componentDidMount() {
     this.lostService.get().then(
       result => {
         runInAction(() => {
           this.animals = result.payload;
-        })
+          this.addresses = this.animals.map(() => '')
+        });
+
+        this.animals.forEach((value, index) => {
+          const {longitude, latitude} = value;
+          this.geocodingService.addressByCoords(longitude, latitude).then(
+            result => this.updateAddress(index, result.address)
+          );
+        });
       },
       error => {
         alert(error);
       })
   }
 
+  updateAddress = (index, result) => {
+    this.addresses[index] = result.District + ', ' + (result.MetroArea === ""
+      ? result.Address : result.MetroArea);
+  };
+
   createMarkers = () => {
     return this.animals.map(value =>
       <Placemark onClick={() => this.props.toLost(value.id)}
-                 geometry={[value.longitude, value.latitude]}/>
-    )
+                 geometry={[value.latitude, value.longitude]}/>
+    );
   };
 
   animalsToCards = () => {
     return this.animals.map((animal, index) =>
-      <>
+      <React.Fragment key={1}>
         {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
         <AnimalCard onClick={() => this.props.toLost(animal.id)}
+                    address={this.addresses[index]}
                     key={animal.id} animal={animal}/>
-      </>
+      </React.Fragment>
     );
   };
 
@@ -107,6 +124,7 @@ class LostPanel extends React.Component {
 
 decorate(LostPanel, {
   animals: observable,
+  addresses: observable,
 });
 
 export default observer(LostPanel);

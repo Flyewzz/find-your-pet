@@ -35,6 +35,16 @@ class GeocodingService {
       return this._coordsRequest(address, token);
     });
   };
+
+  addressByCoords = async (long, lat) => {
+    const baseUrl = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?';
+    const parameters = `location=${long},${lat}&f=json`;
+    const url = baseUrl + parameters;
+    const options = {method: 'GET'};
+    const request = new Request(url, options);
+    const response = await fetch(request);
+    return await response.json();
+  };
 }
 
 export default GeocodingService;

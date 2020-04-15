@@ -8,6 +8,7 @@ const AnimalCard = (props) => {
   const animal = props.animal;
   const breed = animal.breed === ''? 'порода не указана': animal.breed;
   const date = new Date(animal.date.replace(' ', 'T')).toLocaleDateString();
+  console.log(props.address);
 
   return (
     <Card onClick={props.onClick} style={{height: 275}}
@@ -18,7 +19,7 @@ const AnimalCard = (props) => {
       <Div className={'animal-card__info'}>
         {`${config.types[animal.type_id - 1]}, ${breed}`}
       </Div>
-      <Div className={'animal-card__address'}>{props.animal.place}</Div>
+      <Div className={'animal-card__address'}>{props.address}</Div>
       <Div className={'animal-card__date'}>{date}</Div>
     </Card>
   );
