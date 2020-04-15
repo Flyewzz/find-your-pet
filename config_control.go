@@ -35,9 +35,14 @@ func PrepareHandlerData() *handlers.HandlerData {
 	}
 	db.SetMaxOpenConns(viper.GetInt("db.max_connections"))
 	lostController := pg.NewLostControllerPg(viper.GetInt("lost.itemsPerPage"), db)
-	lostFileController := pg.NewLostFileControllerPg(db)
+	FileController := pg.NewFileControllerPg(db)
 	lostAddingManager :=
-		managers.NewLostAddingManager(db, lostController, lostFileController)
+		managers.NewLostAddingManager(db, lostController, FileController)
+
+	foundController := pg.NewFoundControllerPg(viper.GetInt("found.itemsPerPage"), db)
+	foundAddingManager :=
+		managers.NewFoundAddingManager(db, foundController, FileController)
+
 	profileController := pg.NewProfileControllerPg(
 		viper.GetInt("profile.lost.itemsPerPage"),
 		db)
@@ -45,6 +50,7 @@ func PrepareHandlerData() *handlers.HandlerData {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return handlers.NewHandlerData(lostController, lostFileController,
-		lostAddingManager, profileController, debug)
+	return handlers.NewHandlerData(lostController, FileController,
+		lostAddingManager, foundController, foundAddingManager,
+		profileController, debug)
 }

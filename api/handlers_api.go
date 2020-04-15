@@ -14,7 +14,15 @@ func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 	// LostFile
 	r.HandleFunc("/lost/img", hd.LostImageHandler).Methods("GET")
 
+	// Found
+	r.HandleFunc("/founds", hd.FoundHandler).Methods("GET")
+	r.HandleFunc("/found", hd.FoundByIdGetHandler).Methods("GET")
+	r.HandleFunc("/found", hd.AddFoundHandler).Methods("POST")
+
+	// FoundFile
+	r.HandleFunc("/found/img", hd.FoundImageHandler).Methods("GET")
+
 	// Profile
-	r.HandleFunc("/profile/lost", hd.ProfileHandler).Methods("GET")
+	r.HandleFunc("/profile/lost", hd.ProfileLostHandler).Methods("GET")
 	r.HandleFunc("/lost", hd.ProfileLostOpeningHandler).Methods("PUT")
 }

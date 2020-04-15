@@ -12,6 +12,15 @@ lost:
         max_size: 10 # MB
     open_id: 1
     close_id: 2
+found:
+    itemsPerPage: 9
+    files:
+            directory: ./files/found
+            max_size: 10 # MB
+    open_id: 1
+    close_id: 2
 profile:
     lost:
+        itemsPerPage: 9
+    found:
         itemsPerPage: 9

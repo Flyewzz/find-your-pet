@@ -7,20 +7,25 @@ import (
 
 type HandlerData struct {
 	LostController     interfaces.LostController
-	LostFileController interfaces.LostFileController
+	FileController     interfaces.FileController
 	LostAddingManager  *managers.LostAddingManager
+	FoundController    interfaces.FoundController
+	FoundAddingManager *managers.FoundAddingManager
 	ProfileController  interfaces.ProfileController
 	DebugMode          bool
 }
 
 func NewHandlerData(lc interfaces.LostController,
-	fc interfaces.LostFileController,
-	lam *managers.LostAddingManager, pc interfaces.ProfileController,
+	fc interfaces.FileController,
+	lam *managers.LostAddingManager, fnd interfaces.FoundController,
+	fam *managers.FoundAddingManager, pc interfaces.ProfileController,
 	isDebug bool) *HandlerData {
 	return &HandlerData{
 		LostController:     lc,
-		LostFileController: fc,
+		FileController:     fc,
 		LostAddingManager:  lam,
+		FoundController:    fnd,
+		FoundAddingManager: fam,
 		ProfileController:  pc,
 		DebugMode:          isDebug,
 	}
