@@ -3,7 +3,7 @@ import Card from '@vkontakte/vkui/dist/components/Card/Card';
 import './ProfileCard.css';
 import Icon28CancelOutline from '@vkontakte/icons/dist/28/cancel_outline';
 import config from '../../config';
-import {Group, InfoRow, List} from "@vkontakte/vkui";
+import {Group, List} from "@vkontakte/vkui";
 import {Cell} from "@vkontakte/vkui/dist/es6";
 
 const ProfileCard = (props) => {

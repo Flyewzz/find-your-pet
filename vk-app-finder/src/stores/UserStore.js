@@ -16,6 +16,10 @@ class UserStore {
     return bridge.send("VKWebAppGetUserInfo", {});
   };
 
+  getPosition = async () => {
+    return bridge.send("VKWebAppGetGeodata", {});
+  };
+
   share(text) {
     console.log(text);
     bridge.send("VKWebAppShowWallPostBox", {message: text}).then(

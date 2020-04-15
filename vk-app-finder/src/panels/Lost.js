@@ -1,9 +1,8 @@
 import React from "react";
 import {Card, CardGrid, Div, Group, PanelHeader} from "@vkontakte/vkui";
-import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
-import {computed, decorate, observable} from "mobx";
+import {decorate, observable} from "mobx";
 import {observer} from "mobx-react";
 import './Lost.css';
 import {Map, Placemark, YMaps, ZoomControl} from 'react-yandex-maps';
@@ -86,7 +85,7 @@ class LostPanel extends React.Component {
 
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack/>}>Потерялись</PanelHeader>
+        <PanelHeader>Потерялись</PanelHeader>
         <Group separator="hide">
           <FilterLine isMap={this.state.mapView}
                       filterStore={this.props.lostFilterStore}

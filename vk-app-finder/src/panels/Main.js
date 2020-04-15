@@ -6,7 +6,7 @@ import './Main.css';
 const MainPanel = (props) => {
   return (
     <>
-      <PanelHeader left={<PanelHeaderBack/>}>Главная</PanelHeader>
+      <PanelHeader>Главная</PanelHeader>
       <FixedLayout className={'main__wrapper'}>
         <Div className={'main__welcome-text'}>
           Здесь вам помогут найти<br/>

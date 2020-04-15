@@ -23,6 +23,7 @@ class CreateFormPanel extends React.Component {
     this.lostStore.submit(
       (result) => {
         console.log('res:' + result);
+        this.props.toProfile();
       })
   };
 

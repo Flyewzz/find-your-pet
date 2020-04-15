@@ -26,8 +26,8 @@ class App extends React.Component {
     this.state = {
       activeModal: null,
       modalHistory: [],
-      activeStory: 'lost',
-      mainPanel: 'new_lost',
+      activeStory: 'main',
+      mainPanel: 'main',
       lostPanel: 'losts',
       profilePanel: 'more',
 
@@ -38,8 +38,8 @@ class App extends React.Component {
     this.modalBack = () => {
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
-    this.mapStore = new MapStateStore();
     this.userStore = new UserStore();
+    this.mapStore = new MapStateStore(this.userStore);
     this.lostFilterStore = new LostFilterStore();
     this.openFilters = () => {
       this.setActiveModal('filters');
@@ -126,6 +126,12 @@ class App extends React.Component {
       mainPanel: 'new_lost',
     })
   };
+  toProfileMain = () => {
+    this.setState({
+      activeStory: 'more',
+      profilePanel: 'more',
+    });
+  };
 
   render() {
     return (
@@ -162,7 +168,9 @@ class App extends React.Component {
             <MainPanel toCreateLostForm={this.toCreateLostForm}/>
           </Panel>
           <Panel id="new_lost">
-            <CreateFormPanel userStore={this.userStore} toMain={this.toMain}/>
+            <CreateFormPanel userStore={this.userStore}
+                             toProfile={this.toProfileMain}
+                             toMain={this.toMain}/>
           </Panel>
         </View>
         <View popup={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
@@ -185,7 +193,7 @@ class App extends React.Component {
         </View>
         <View id="messages" activePanel="messages">
           <Panel id="messages">
-            <PanelHeader>Сообщения</PanelHeader>
+            <PanelHeader>Найденные</PanelHeader>
           </Panel>
         </View>
         <View popout={this.state.popout} id="more" activePanel={this.state.profilePanel}>
