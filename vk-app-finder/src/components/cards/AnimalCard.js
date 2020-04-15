@@ -3,6 +3,7 @@ import Card from "@vkontakte/vkui/dist/components/Card/Card";
 import "./AnimalCard.css"
 import Div from "@vkontakte/vkui/dist/components/Div/Div";
 import config from '../../config';
+import {Cell} from "@vkontakte/vkui";
 
 const AnimalCard = (props) => {
   const animal = props.animal;
@@ -11,16 +12,16 @@ const AnimalCard = (props) => {
   console.log(props.address);
 
   return (
-    <Card onClick={props.onClick} style={{height: 275}}
+    <Card onClick={props.onClick} style={{height: 315}}
           className="animal__card" size="m" mode="shadow">
       <img className={'animal-card__photo'}
            src={config.baseUrl + `lost/img?id=${animal.picture_id}`}
            height='180px' alt={''}/>
-      <Div className={'animal-card__info'}>
+      <Cell className={'animal-card__info'}>
         {`${config.types[animal.type_id - 1]}, ${breed}`}
-      </Div>
-      <Div className={'animal-card__address'}>{props.address}</Div>
-      <Div className={'animal-card__date'}>{date}</Div>
+      </Cell>
+      <Cell className={'animal-card__address'}>{props.address}</Cell>
+      <Cell className={'animal-card__date'}>{date}</Cell>
     </Card>
   );
 };

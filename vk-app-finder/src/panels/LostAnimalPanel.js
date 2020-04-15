@@ -56,10 +56,18 @@ class LostAnimalPanel extends React.Component {
   getAddress = () => {
     const {latitude, longitude} = this.animal;
     this.geocodingService.addressByCoords(longitude, latitude).then(
-      result => {
-        const address = result.address;
-        this.address = `${address.District}, ${address.Address}`
-          + (address.MetroArea === ''? '' : `, ${address.MetroArea}`);
+      response => {
+        const result = response.address;
+
+        let address = result.City === '' ? result.District : result.City;
+        if (result.Address !== '') {
+          address += ', ' + result.Address;
+        }
+        if (result.MetroArea !== '') {
+          address += ', ' + result.MetroArea;
+        }
+
+        this.address = address;
       }
     );
   };

@@ -27,8 +27,9 @@ class LostTab extends React.Component {
   }
 
   updateAddress = (index, result) => {
-    this.addresses[index] = result.District + ', ' + (result.MetroArea === ""
-      ? result.Address : result.MetroArea);
+    const city = result.City === '' ? result.District : result.City;
+    const address = result.MetroArea === '' ? result.Address : result.MetroArea;
+    this.addresses[index] = city + (address === '' ? '' : ', ' + address);
   };
 
   fetchLost = (id) => {
@@ -36,7 +37,7 @@ class LostTab extends React.Component {
       (result) => {
         runInAction(() => {
           this.animals = result.payload;
-          this.addresses = this.animals.map(() => '')
+          this.addresses = result.payload === null ? [] : this.animals.map(() => '')
         });
         this.animals.forEach((value, index) => {
           const {longitude, latitude} = value;
