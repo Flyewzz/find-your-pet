@@ -16,6 +16,7 @@ import LostAnimalPanel from "./panels/LostAnimalPanel";
 import MapStateStore from "./stores/MapStateStore";
 import UserStore from "./stores/UserStore";
 import ProfilePanel from "./panels/Profile";
+import {Alert} from "@vkontakte/vkui";
 
 class App extends React.Component {
   constructor(props) {
@@ -28,6 +29,8 @@ class App extends React.Component {
       mainPanel: 'new_lost',
       lostPanel: 'losts',
       profilePanel: 'more',
+
+      popout: null,
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
@@ -62,6 +65,32 @@ class App extends React.Component {
   onStoryChange(e) {
     this.setState({activeStory: e.currentTarget.dataset.story})
   }
+
+  openDestructive = (onAccept) => {
+    console.log('открыть попап кликнуто');
+    this.setState({ popout:
+        <Alert
+          actionsLayout="vertical"
+          actions={[{
+            title: 'Закрыть объявление',
+            autoclose: true,
+            mode: 'destructive',
+            action: () => onAccept(),
+          }, {
+            title: 'Отмена',
+            autoclose: true,
+            mode: 'cancel'
+          }]}
+          onClose={this.closePopout}>
+          <h2>Подтвердите действие</h2>
+          <p>Вы уверены, что хотите закрыть объявление?</p>
+        </Alert>
+    });
+  };
+
+  closePopout = () => {
+    this.setState({ popout: null });
+  };
 
   toCreateLostForm = () => {
     this.setState({mainPanel: 'new_lost'});
@@ -128,7 +157,7 @@ class App extends React.Component {
             <CreateFormPanel userStore={this.userStore} toMain={this.toMain}/>
           </Panel>
         </View>
-        <View id="lost" activePanel={this.state.lostPanel} modal={
+        <View popup={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         onClose={this.modalBack}/>
         }>
@@ -139,6 +168,7 @@ class App extends React.Component {
           </Panel>
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
+                             openDestructive={this.openDestructive}
                              goBack={this.toLostList}
                              id={this.state.id}/>
           </Panel>
@@ -148,13 +178,15 @@ class App extends React.Component {
             <PanelHeader>Сообщения</PanelHeader>
           </Panel>
         </View>
-        <View id="more" activePanel={this.state.profilePanel}>
+        <View popout={this.state.popout} id="more" activePanel={this.state.profilePanel}>
           <Panel id="more">
             <ProfilePanel userStore={this.userStore}
+                          openDestructive={this.openDestructive}
                           toLost={this.toProfileLost}/>
           </Panel>
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
+                             openDestructive={this.openDestructive}
                              goBack={this.toProfile}
                              id={this.state.profileId}/>
           </Panel>

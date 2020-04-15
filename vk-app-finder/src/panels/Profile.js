@@ -59,7 +59,9 @@ class ProfilePanel extends React.Component {
         </Tabs>
         <Group separator="hide">
           {this.state.activeTab === 'lost'
-          && <LostTab userStore={this.props.userStore} toLost={this.props.toLost}/>}
+          && <LostTab userStore={this.props.userStore}
+                      openDestructive={this.props.openDestructive}
+                      toLost={this.props.toLost}/>}
         </Group>
       </>
     );

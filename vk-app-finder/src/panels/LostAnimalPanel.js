@@ -116,12 +116,13 @@ class LostAnimalPanel extends React.Component {
             </Cell>}
             {this.isMy &&
             <CellButton before={<Icon24Write/>}>
-              Изменить
+              Изменить объявление
             </CellButton>}
             {this.isMy &&
             <CellButton before={<Icon24Cancel/>}
+                        onClick={() => this.props.openDestructive(() => {})}
                         mode={'danger'}>
-              Закрыть
+              Закрыть объявление
             </CellButton>}
           </Group>
           <Separator/>
