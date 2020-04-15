@@ -21,6 +21,7 @@ func CorsSetup() *cors.Cors {
 			"HEAD",
 			"GET",
 			"POST",
+			"PUT",
 			"OPTIONS",
 		},
 		AllowCredentials: true,

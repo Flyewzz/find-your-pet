@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/Kotyarich/find-your-pet/errs"
+	"github.com/Kotyarich/find-your-pet/features"
 	"github.com/Kotyarich/find-your-pet/features/paginator"
+	"github.com/spf13/viper"
 )
 
 func (hd *HandlerData) ProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +23,13 @@ func (hd *HandlerData) ProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	lost, err := hd.ProfileController.GetLost(userId)
+	closeId := viper.GetInt("lost.close_id")
+	ctx := context.WithValue(
+		context.Background(),
+		"close_id",
+		closeId,
+	)
+	lost, err := hd.ProfileController.GetLost(ctx, userId)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
@@ -57,7 +66,20 @@ func (hd *HandlerData) ProfileLostOpeningHandler(w http.ResponseWriter, r *http.
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	err = hd.ProfileController.SetLostOpening(lostId, opened)
+	ctx := context.WithValue(
+		context.Background(),
+		"params",
+		features.StatusIdParams{
+			OpenId:  viper.GetInt("lost.open_id"),
+			CloseId: viper.GetInt("lost.close_id"),
+		},
+	)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
+	viper.GetInt("lost.open_id")
+	err = hd.ProfileController.SetLostOpening(ctx, lostId, opened)
 	if err != nil {
 		if err == errs.LostNotFound {
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)

@@ -1,12 +1,14 @@
 package interfaces
 
 import (
+	"context"
+
 	"github.com/Kotyarich/find-your-pet/models"
 )
 
 type ProfileController interface {
-	GetLost(userId int) ([]models.Lost, error)
-	SetLostOpening(lostId int, opened bool) error
+	GetLost(ctx context.Context, userId int) ([]models.Lost, error)
+	SetLostOpening(ctx context.Context, lostId int, opened bool) error
 
 	GetItemsPerPageCount() int
 }
