@@ -18,6 +18,8 @@ import UserStore from "./stores/UserStore";
 import ProfilePanel from "./panels/Profile";
 import {Alert} from "@vkontakte/vkui";
 import LostFilterStore from "./stores/LostFilterStore";
+import FoundPanel from "./panels/Found";
+import FoundFilterStore from "./stores/FoundFilterStore";
 
 class App extends React.Component {
   constructor(props) {
@@ -29,6 +31,7 @@ class App extends React.Component {
       activeStory: 'main',
       mainPanel: 'main',
       lostPanel: 'losts',
+      foundPanel: 'messages',
       profilePanel: 'more',
 
       popout: null,
@@ -41,6 +44,7 @@ class App extends React.Component {
     this.userStore = new UserStore();
     this.mapStore = new MapStateStore(this.userStore);
     this.lostFilterStore = new LostFilterStore();
+    this.foundFilterStore = new FoundFilterStore();
     this.openFilters = () => {
       this.setActiveModal('filters');
     };
@@ -70,7 +74,8 @@ class App extends React.Component {
 
   openDestructive = (onAccept) => {
     console.log('открыть попап кликнуто');
-    this.setState({ popout:
+    this.setState({
+      popout:
         <Alert
           actionsLayout="vertical"
           actions={[{
@@ -91,7 +96,7 @@ class App extends React.Component {
   };
 
   closePopout = () => {
-    this.setState({ popout: null });
+    this.setState({popout: null});
   };
 
   toCreateLostForm = () => {
@@ -109,6 +114,17 @@ class App extends React.Component {
     this.setState({
       id: id,
       lostPanel: 'lost',
+    });
+  };
+  toFoundList = () => {
+    this.setState({
+      foundPanel: 'messages',
+    });
+  };
+  toFound = (id) => {
+    this.setState({
+      foundId: id,
+      foundPanel: 'found',
     });
   };
   toProfile = () => {
@@ -191,9 +207,22 @@ class App extends React.Component {
                              id={this.state.id}/>
           </Panel>
         </View>
-        <View id="messages" activePanel="messages">
+        <View popup={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
+          <SearchFilter activeModal={this.state.activeModal}
+                        filterStore={this.lostFilterStore}
+                        onClose={this.modalBack}/>
+        }>
           <Panel id="messages">
-            <PanelHeader>Найденные</PanelHeader>
+            <FoundPanel toLost={this.toFound}
+                        lostFilterStore={this.foundFilterStore}
+                        mapStore={this.mapStore}
+                        openFilters={this.openFilters}/>
+          </Panel>
+          <Panel id="found">
+            <LostAnimalPanel userStore={this.userStore}
+                             openDestructive={this.openDestructive}
+                             goBack={this.toFoundList}
+                             id={this.state.foundId}/>
           </Panel>
         </View>
         <View popout={this.state.popout} id="more" activePanel={this.state.profilePanel}>
