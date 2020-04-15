@@ -11,10 +11,15 @@
     flex-direction: column;
     align-content: start;
     justify-content: start;
+    width: 60%;
 }
 
 .profile__cancel-icon {
     position: absolute;
-    top: -9px;
-    right: 2px;
+    top: 4px;
+    right: 4px;
+}
+
+.profile__card__info {
+    width: 90%;
 }

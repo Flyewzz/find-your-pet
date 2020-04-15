@@ -15,7 +15,7 @@ const ProfileCard = (props) => {
   return (
     <Card
       onClick={() => props.onClick(animal.id)}
-      style={{height: 181}}
+      style={{height: 190}}
       className={'profile__card__container'}
       size="l"
       mode="shadow"
@@ -27,29 +27,24 @@ const ProfileCard = (props) => {
           alt={""}
         />
         <Group className={'profile__card__details'}>
-          <Icon28CancelOutline onClick={() => props.cancel(animal.id)} className={'profile__cancel-icon'}/>
-          <Cell>
-            <InfoRow className={'profile__card__info'}>
+          <List>
+            <Icon28CancelOutline onClick={() => props.cancel(animal.id)}
+                                 className={'profile__cancel-icon'}/>
+            <Cell className={'profile__card__info'}>
               <span style={{fontWeight: 'bold'}}>Потерялся: </span>
               {`${config.types[animal.type_id - 1]}, ${breed}`}
-            </InfoRow>
-          </Cell>
-          <Cell>
-            <InfoRow className={'profile__card__address'}>
+            </Cell>
+            <Cell>
               <span style={{fontWeight: 'bold'}}>Адрес: </span>{place}
-            </InfoRow>
-          </Cell>
-          <Cell>
-            <InfoRow className={'profile__card__date'}>
+            </Cell>
+            <Cell>
               <span style={{fontWeight: 'bold'}}>Дата пропажи: </span>{date}
-            </InfoRow>
-          </Cell>
-          <Cell>
-            <InfoRow>
+            </Cell>
+            <Cell size="m">
               <span style={{fontWeight: 'bold'}}>Описание: </span>
               {animal.description}
-            </InfoRow>
-          </Cell>
+            </Cell>
+          </List>
         </Group>
       </div>
     </Card>
