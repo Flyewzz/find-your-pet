@@ -27,6 +27,7 @@ class App extends React.Component {
       activeStory: 'more',
       mainPanel: 'new_lost',
       lostPanel: 'losts',
+      profilePanel: 'more',
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
@@ -79,6 +80,15 @@ class App extends React.Component {
       lostPanel: 'lost',
     });
   };
+  toProfile = () => {
+    this.setState({profilePanel: 'more'});
+  };
+  toProfileLost = (id) => {
+    this.setState({
+      profilePanel: 'lost',
+      profileId: id,
+    });
+  };
 
   render() {
     return (
@@ -128,7 +138,9 @@ class App extends React.Component {
                        openFilters={this.openFilters}/>
           </Panel>
           <Panel id="lost">
-            <LostAnimalPanel userStore={this.userStore} goBack={this.toLostList} id={this.state.id}/>
+            <LostAnimalPanel userStore={this.userStore}
+                             goBack={this.toLostList}
+                             id={this.state.id}/>
           </Panel>
         </View>
         <View id="messages" activePanel="messages">
@@ -136,9 +148,15 @@ class App extends React.Component {
             <PanelHeader>Сообщения</PanelHeader>
           </Panel>
         </View>
-        <View id="more" activePanel="more">
+        <View id="more" activePanel={this.state.profilePanel}>
           <Panel id="more">
-            <ProfilePanel toLost={this.toLost}/>
+            <ProfilePanel userStore={this.userStore}
+                          toLost={this.toProfileLost}/>
+          </Panel>
+          <Panel id="lost">
+            <LostAnimalPanel userStore={this.userStore}
+                             goBack={this.toProfile}
+                             id={this.state.profileId}/>
           </Panel>
         </View>
       </Epic>

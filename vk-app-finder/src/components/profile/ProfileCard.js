@@ -14,7 +14,7 @@ const ProfileCard = (props) => {
 
   return (
     <Card
-      onClick={props.onClick}
+      onClick={() => props.onClick(animal.id)}
       style={{height: 181}}
       className={'profile__card__container'}
       size="l"

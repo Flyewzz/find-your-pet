@@ -12,6 +12,7 @@ import Avatar from "@vkontakte/vkui/dist/components/Avatar/Avatar";
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon24Share from '@vkontakte/icons/dist/24/share';
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import './LostAnimalPanel.css';
 
 class LostAnimalPanel extends React.Component {
@@ -23,23 +24,27 @@ class LostAnimalPanel extends React.Component {
   animal = {date: ''};
   // TODO add default avatar
   author = {first_name: '', last_name: '', photo_50: ''};
+  isMy = false;
 
   componentDidMount() {
-    this.lostService.getById(this.props.id).then(
-      result => {
-        runInAction(() => {
-          this.animal = result;
-        });
-        this.props.userStore.getUserById(this.animal.vk_id).then(
-          result => {
-            runInAction(() => {
-              this.author = result.response[0];
-            })
+    this.props.userStore.getId().then(resultId =>
+      this.lostService.getById(this.props.id).then(
+        result => {
+          runInAction(() => {
+            this.animal = result;
+            this.isMy = this.animal.vk_id === resultId.id;
           });
-      },
-      error => {
-        alert(error);
-      })
+          this.props.userStore.getUserById(this.animal.vk_id).then(
+            result => {
+              runInAction(() => {
+                this.author = result.response[0];
+              })
+            });
+        },
+        error => {
+          alert(error);
+        })
+    );
   }
 
   sexText = {
@@ -96,19 +101,28 @@ class LostAnimalPanel extends React.Component {
               {'Поделиться'}<Icon24Share style={{marginLeft: '5px'}}/>
             </Div>
           </div>
-          <Group header={<Header mode={'secondary'}>Автор</Header>}>
-            <Cell
+          <Group header={!this.isMy && <Header mode={'secondary'}>Автор</Header>}>
+            {!this.isMy && <Cell
               before={<Avatar src={this.author.photo_50}/>}>
               {this.author.first_name + ' ' + this.author.last_name}
-            </Cell>
-            <Cell multiline={true} description={this.writeHref().description}>
+            </Cell>}
+            {!this.isMy && <Cell multiline={true} description={this.writeHref().description}>
               <CellButton href={this.writeHref().href}
                           target={'_blank'}
                           before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
-            </Cell>
-            <Cell multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
+            </Cell>}
+            {!this.isMy && <Cell multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
               <CellButton before={<Icon24Done/>} className={'author__action-button'}>Я нашел!</CellButton>
-            </Cell>
+            </Cell>}
+            {this.isMy &&
+            <CellButton before={<Icon24Write/>}>
+              Изменить
+            </CellButton>}
+            {this.isMy &&
+            <CellButton before={<Icon24Cancel/>}
+                        mode={'danger'}>
+              Закрыть
+            </CellButton>}
           </Group>
           <Separator/>
           <Group>
@@ -144,6 +158,7 @@ class LostAnimalPanel extends React.Component {
 decorate(LostAnimalPanel, {
   animal: observable,
   author: observable,
+  isMy: observable,
 });
 
 export default observer(LostAnimalPanel);

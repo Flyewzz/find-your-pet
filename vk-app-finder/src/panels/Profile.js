@@ -26,11 +26,8 @@ class ProfilePanel extends React.Component {
       this.setState({mapView: !current});
     };
 
-    this.profileService = new ProfileService();
     this.select = this.select.bind(this);
   }
-
-  animals = [];
 
   select(e) {
     const mode = e.currentTarget.dataset.mode;
@@ -43,19 +40,6 @@ class ProfilePanel extends React.Component {
       lostPanel: 'lost',
     });
   };
-
-  componentDidMount() {
-    this.profileService.get().then(
-      (result) => {
-        runInAction(() => {
-          this.animals = result.payload;
-        });
-      },
-      (error) => {
-        alert(error);
-      }
-    );
-  }
 
   render() {
     return (
@@ -74,15 +58,14 @@ class ProfilePanel extends React.Component {
           </TabsItem>
         </Tabs>
         <Group separator="hide">
-          {this.state.activeTab === 'lost' && <LostTab toLost={this.toLost}/>}
+          {this.state.activeTab === 'lost'
+          && <LostTab userStore={this.props.userStore} toLost={this.props.toLost}/>}
         </Group>
       </>
     );
   }
 }
 
-decorate(ProfilePanel, {
-  animals: observable,
-});
+decorate(ProfilePanel, {});
 
 export default observer(ProfilePanel);

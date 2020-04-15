@@ -1,20 +1,27 @@
 import React from "react";
-import { CardGrid } from "@vkontakte/vkui";
+import {CardGrid} from "@vkontakte/vkui";
 import ProfileCard from "./ProfileCard";
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
-import ProfileService from '../../services/LostService';
+import ProfileService from '../../services/ProfileService';
 
 
 class LostTab extends React.Component {
   constructor(props) {
     super(props);
     this.profileService = new ProfileService();
-    this.animals = [];
   }
 
+  animals = null;
+
   componentDidMount() {
-    this.profileService.get().then(
+    this.props.userStore.getId().then(
+      result => this.fetchLost(result.id)
+    );
+  }
+
+  fetchLost = (id) => {
+    this.profileService.getLost(id).then(
       (result) => {
         runInAction(() => {
           this.animals = result.payload;
@@ -24,20 +31,24 @@ class LostTab extends React.Component {
         alert(error);
       }
     );
-  }
+  };
 
   animalsToCards = () => {
     return this.animals.map(animal => (
-        <ProfileCard
-          onClick={() => this.props.toLost(animal.id)}
-          key={animal.id}
-          animal={animal}
-        />
+      <ProfileCard
+        onClick={() => this.props.toLost(animal.id)}
+        key={animal.id}
+        animal={animal}
+      />
     ));
   };
 
   render() {
-    return <CardGrid>{this.animalsToCards()}</CardGrid>;
+    return (
+      <CardGrid>
+        {!this.animals && 'пуста'}
+        {this.animals && this.animalsToCards()}
+      </CardGrid>);
   }
 }
 

@@ -12,6 +12,9 @@ class UserStore {
   }
 
   id = -1;
+  getId = async () => {
+    return bridge.send("VKWebAppGetUserInfo", {});
+  };
 
   share(text) {
     console.log(text);
