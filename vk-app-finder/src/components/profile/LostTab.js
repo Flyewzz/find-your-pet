@@ -33,11 +33,23 @@ class LostTab extends React.Component {
     );
   };
 
+  onRemove = (id) => {
+    const vkId = this.props.userStore.id;
+    this.profileService.close(id, vkId).then(
+      () => {
+        console.log('я тута');
+        this.props.goBack();
+      }
+    );
+  };
+
   animalsToCards = () => {
     return this.animals.map(animal => (
       <ProfileCard
         onClick={() => this.props.toLost(animal.id)}
-        cancel={this.props.openDestructive}
+        cancel={() => {
+          this.props.openDestructive(() => this.onRemove(animal.id))
+        }}
         key={animal.id}
         animal={animal}
       />

@@ -14,11 +14,13 @@ import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon24Share from '@vkontakte/icons/dist/24/share';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import './LostAnimalPanel.css';
+import ProfileService from "../services/ProfileService";
 
 class LostAnimalPanel extends React.Component {
   constructor(props) {
     super(props);
     this.lostService = new LostService();
+    this.profileService = new ProfileService();
   }
 
   animal = {date: ''};
@@ -78,6 +80,13 @@ class LostAnimalPanel extends React.Component {
     this.props.userStore.share(this.getShareText());
   };
 
+  onClose = () => {
+    const vkId = this.props.userStore.id;
+    this.profileService.close(this.props.id, vkId).then(
+      () => this.props.goBack()
+    )
+  };
+
   render() {
     const {picture_id, type_id, description} = this.animal;
     const breed = this.animal.breed === '' ? 'порода не указана' : this.animal.breed;
@@ -120,7 +129,7 @@ class LostAnimalPanel extends React.Component {
             </CellButton>}
             {this.isMy &&
             <CellButton before={<Icon24Cancel/>}
-                        onClick={() => this.props.openDestructive(() => {})}
+                        onClick={() => this.props.openDestructive(this.onClose)}
                         mode={'danger'}>
               Закрыть объявление
             </CellButton>}

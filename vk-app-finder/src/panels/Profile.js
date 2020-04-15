@@ -34,17 +34,10 @@ class ProfilePanel extends React.Component {
     this.setState({mode, contextOpened: false});
   }
 
-  toLost = (id) => {
-    this.setState({
-      id: id,
-      lostPanel: 'lost',
-    });
-  };
-
   render() {
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack/>}>Ваши объявления</PanelHeader>
+        <PanelHeader>Ваши объявления</PanelHeader>
         <Tabs>
           <TabsItem
             onClick={() => this.setState({activeTab: 'lost'})}
@@ -61,6 +54,7 @@ class ProfilePanel extends React.Component {
           {this.state.activeTab === 'lost'
           && <LostTab userStore={this.props.userStore}
                       openDestructive={this.props.openDestructive}
+                      goBack={this.props.goBack}
                       toLost={this.props.toLost}/>}
         </Group>
       </>

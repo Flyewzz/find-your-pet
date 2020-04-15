@@ -182,6 +182,7 @@ class App extends React.Component {
           <Panel id="more">
             <ProfilePanel userStore={this.userStore}
                           openDestructive={this.openDestructive}
+                          goBack={this.toProfile}
                           toLost={this.toProfileLost}/>
           </Panel>
           <Panel id="lost">
