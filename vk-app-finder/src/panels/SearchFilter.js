@@ -49,7 +49,7 @@ class SearchFilter extends React.Component {
           onClose={props.onClose}
           header={<FilterHeader onDone={this.onAccept} onClose={props.onClose}/>}>
           <FormLayout>
-            <AddressInput title={'Местро пропажи'} placeholder={'Место пропажи'}/>
+            {/*<AddressInput title={'Местро пропажи'} placeholder={'Место пропажи'}/>*/}
             <div className={'selects-wrapper'}>
               <FormLayoutGroup className={'half-width'}>
                 <FormLabel text={'Вид животного'}/>
