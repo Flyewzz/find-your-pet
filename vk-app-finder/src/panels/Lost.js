@@ -8,6 +8,8 @@ import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
 import './Lost.css';
 import {YMaps, Map, Placemark, ZoomControl} from 'react-yandex-maps';
+import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
+import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
 
 class LostPanel extends React.Component {
   constructor(props) {
@@ -24,7 +26,7 @@ class LostPanel extends React.Component {
     this.lostService = new LostService();
   }
 
-  animals = [];
+  animals = null;
 
   componentDidMount() {
     this.lostService.get().then(
@@ -75,8 +77,13 @@ class LostPanel extends React.Component {
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 
-          {!this.props.mapStore.isMapView
+          {!this.props.mapStore.isMapView && this.animals
           && <CardGrid>{this.animalsToCards()}</CardGrid>}
+          {!this.props.mapStore.isMapView && !this.animals
+          && <Placeholder stretched={true}
+                          icon={<Icon56InfoOutline/>}>
+            Ничего не найдено<br/>Попробуйте позже или измените фильтры
+          </Placeholder>}
 
           <Div><YMaps>
             <div>
@@ -87,7 +94,7 @@ class LostPanel extends React.Component {
                      zoom: this.props.mapStore.zoom,
                    }}>
                 <ZoomControl/>
-                {this.createMarkers()}
+                {this.animals && this.createMarkers()}
               </Map>
             </div>
           </YMaps></Div>

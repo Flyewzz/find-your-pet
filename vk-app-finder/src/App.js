@@ -118,6 +118,12 @@ class App extends React.Component {
       profileId: id,
     });
   };
+  toMainForm = () => {
+    this.setState({
+      activeStory: 'main',
+      mainPanel: 'new_lost',
+    })
+  };
 
   render() {
     return (
@@ -183,6 +189,7 @@ class App extends React.Component {
             <ProfilePanel userStore={this.userStore}
                           openDestructive={this.openDestructive}
                           goBack={this.toProfile}
+                          toMainForm={this.toMainForm}
                           toLost={this.toProfileLost}/>
           </Panel>
           <Panel id="lost">

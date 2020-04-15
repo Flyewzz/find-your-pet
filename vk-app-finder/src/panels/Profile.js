@@ -1,9 +1,7 @@
-import React from "react";
-import {Group, PanelHeader} from "@vkontakte/vkui";
-import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
-import ProfileService from "../services/ProfileService";
-import {decorate, observable, runInAction} from "mobx";
-import {observer} from "mobx-react";
+import React from 'react';
+import {Group, PanelHeader} from '@vkontakte/vkui';
+import {decorate} from 'mobx';
+import {observer} from 'mobx-react';
 import {Tabs} from '@vkontakte/vkui'
 import {TabsItem} from '@vkontakte/vkui'
 import LostTab from '../components/profile/LostTab';
@@ -54,6 +52,7 @@ class ProfilePanel extends React.Component {
           {this.state.activeTab === 'lost'
           && <LostTab userStore={this.props.userStore}
                       openDestructive={this.props.openDestructive}
+                      toMainForm={this.toMainForm}
                       goBack={this.props.goBack}
                       toLost={this.props.toLost}/>}
         </Group>

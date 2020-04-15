@@ -4,6 +4,9 @@ import ProfileCard from "./ProfileCard";
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
 import ProfileService from '../../services/ProfileService';
+import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
+import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
+import Button from "@vkontakte/vkui/dist/components/Button/Button";
 
 
 class LostTab extends React.Component {
@@ -59,7 +62,14 @@ class LostTab extends React.Component {
   render() {
     return (
       <CardGrid>
-        {!this.animals && 'пуста'}
+        {!this.animals
+        && <Placeholder stretched={true}
+                        icon={<Icon56InfoOutline/>}
+                        action={<Button onClick={this.toMainForm} size="l">
+                          Cоздать новое объявление
+                        </Button>}>
+          У вас пока нет объявлений о пропаже
+        </Placeholder>}
         {this.animals && this.animalsToCards()}
       </CardGrid>);
   }
