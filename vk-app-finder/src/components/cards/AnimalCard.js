@@ -1,7 +1,6 @@
 import React from "react";
 import Card from "@vkontakte/vkui/dist/components/Card/Card";
 import "./AnimalCard.css"
-import Div from "@vkontakte/vkui/dist/components/Div/Div";
 import config from '../../config';
 import {Cell} from "@vkontakte/vkui";
 
@@ -17,10 +16,10 @@ const AnimalCard = (props) => {
       <img className={'animal-card__photo'}
            src={config.baseUrl + `lost/img?id=${animal.picture_id}`}
            height='180px' alt={''}/>
+      <Cell className={'animal-card__address'}>{props.address}</Cell>
       <Cell className={'animal-card__info'}>
         {`${config.types[animal.type_id - 1]}, ${breed}`}
       </Cell>
-      <Cell className={'animal-card__address'}>{props.address}</Cell>
       <Cell className={'animal-card__date'}>{date}</Cell>
     </Card>
   );

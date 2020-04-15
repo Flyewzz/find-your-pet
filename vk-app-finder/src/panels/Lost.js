@@ -39,12 +39,14 @@ class LostPanel extends React.Component {
           this.addresses = result.payload === null ? [] : this.animals.map(() => '')
         });
 
-        this.animals.forEach((value, index) => {
-          const {longitude, latitude} = value;
-          this.geocodingService.addressByCoords(longitude, latitude).then(
-            result => this.updateAddress(index, result.address)
-          );
-        });
+        if (this.animals !== null) {
+          this.animals.forEach((value, index) => {
+            const {longitude, latitude} = value;
+            this.geocodingService.addressByCoords(longitude, latitude).then(
+              result => this.updateAddress(index, result.address)
+            );
+          });
+        }
       },
       error => {
         alert(error);
