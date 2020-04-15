@@ -129,7 +129,7 @@ class LostAnimalPanel extends React.Component {
           <div style={{display: 'flex', alignItems: 'center'}}>
             <Header style={{paddingBottom: '10px'}}>{type + ', ' + breed}</Header>
             <Div onClick={this.share}
-                 style={{display: 'flex', alignItems: 'center', marginLeft: 'auto'}}>
+                 style={{cursor: 'pointer', display: 'flex', alignItems: 'center', marginLeft: 'auto'}}>
               {'Поделиться'}<Icon24Share style={{marginLeft: '5px'}}/>
             </Div>
           </div>
