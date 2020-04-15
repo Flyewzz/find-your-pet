@@ -3,8 +3,7 @@ import {Card, CardGrid, Div, Group, PanelHeader} from "@vkontakte/vkui";
 import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
-import LostService from '../services/LostService';
-import {decorate, observable, runInAction} from "mobx";
+import {computed, decorate, observable} from "mobx";
 import {observer} from "mobx-react";
 import './Lost.css';
 import {Map, Placemark, YMaps, ZoomControl} from 'react-yandex-maps';
@@ -25,33 +24,28 @@ class LostPanel extends React.Component {
     };
 
     this.geocodingService = new GeocodingService();
-    this.lostService = new LostService();
+    this.props.lostFilterStore.onFetch = this.computeAddresses;
   }
 
-  animals = null;
   addresses = [];
 
   componentDidMount() {
-    this.lostService.get().then(
-      result => {
-        runInAction(() => {
-          this.animals = result.payload;
-          this.addresses = result.payload === null ? [] : this.animals.map(() => '')
-        });
-
-        if (this.animals !== null) {
-          this.animals.forEach((value, index) => {
-            const {longitude, latitude} = value;
-            this.geocodingService.addressByCoords(longitude, latitude).then(
-              result => this.updateAddress(index, result.address)
-            );
-          });
-        }
-      },
-      error => {
-        alert(error);
-      })
+    this.props.lostFilterStore.fetch();
   }
+
+  computeAddresses = () => {
+    const store = this.props.lostFilterStore;
+    this.addresses = store.animals === null ? [] : store.animals.map(() => '');
+
+    if (store.animals !== null) {
+      store.animals.forEach((value, index) => {
+        const {longitude, latitude} = value;
+        this.geocodingService.addressByCoords(longitude, latitude).then(
+          result => this.updateAddress(index, result.address)
+        );
+      });
+    }
+  };
 
   updateAddress = (index, result) => {
     const city = result.City === '' ? result.District : result.City;
@@ -60,14 +54,14 @@ class LostPanel extends React.Component {
   };
 
   createMarkers = () => {
-    return this.animals.map(value =>
+    return this.props.lostFilterStore.animals.map(value =>
       <Placemark onClick={() => this.props.toLost(value.id)}
                  geometry={[value.latitude, value.longitude]}/>
     );
   };
 
   animalsToCards = () => {
-    return this.animals.map((animal, index) =>
+    return this.props.lostFilterStore.animals.map((animal, index) =>
       <React.Fragment key={1}>
         {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
         <AnimalCard onClick={() => this.props.toLost(animal.id)}
@@ -83,6 +77,7 @@ class LostPanel extends React.Component {
   };
 
   render() {
+    const animals = this.props.lostFilterStore.animals;
     const mapStyle = {
       display: this.props.mapStore.isMapView ? undefined : 'none',
       height: '490px',
@@ -94,14 +89,14 @@ class LostPanel extends React.Component {
         <PanelHeader left={<PanelHeaderBack/>}>Потерялись</PanelHeader>
         <Group separator="hide">
           <FilterLine isMap={this.state.mapView}
+                      filterStore={this.props.lostFilterStore}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 
-          {!this.props.mapStore.isMapView && this.animals
+          {!this.props.mapStore.isMapView && animals
           && <CardGrid>{this.animalsToCards()}</CardGrid>}
-          {!this.props.mapStore.isMapView && !this.animals
-          && <Placeholder stretched={true}
-                          icon={<Icon56InfoOutline/>}>
+          {!this.props.mapStore.isMapView && !animals
+          && <Placeholder icon={<Icon56InfoOutline/>}>
             Ничего не найдено<br/>Попробуйте позже или измените фильтры
           </Placeholder>}
 
@@ -114,7 +109,7 @@ class LostPanel extends React.Component {
                      zoom: this.props.mapStore.zoom,
                    }}>
                 <ZoomControl/>
-                {this.animals && this.createMarkers()}
+                {animals && this.createMarkers()}
               </Map>
             </div>
           </YMaps></Div>
@@ -125,8 +120,8 @@ class LostPanel extends React.Component {
   }
 }
 
+
 decorate(LostPanel, {
-  animals: observable,
   addresses: observable,
 });
 

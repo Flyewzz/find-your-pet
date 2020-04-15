@@ -1,6 +1,25 @@
 {
   "name": "vk-app-finder",
   "version": "1.0.0",
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-decorators",
+        {
+          "legacy": true
+        }
+      ],
+      [
+        "@babel/plugin-proposal-class-properties",
+        {
+          "loose": true
+        }
+      ]
+    ]
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,6 +32,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-decorators": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
     "cross-env": "^5.2.1",
     "react-hot-loader": "^4.12.20",
     "react-scripts": "^3.4.1"

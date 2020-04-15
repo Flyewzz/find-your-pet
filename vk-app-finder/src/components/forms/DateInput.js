@@ -48,13 +48,16 @@ const DateInput = () => {
     <>
       <FormLabel text={'Дата пропажи'}/>
       <FormLayoutGroup className={'filter__date'} top="Дата пропажи">
-        <Select defaultValue={nowDate.getDate()} className={'filter__date__day'}>
+        <Select defaultValue={-1} className={'filter__date__day'}>
+          <option value={-1}>День</option>
           {daysOptions(getDaysCount(nowDate))}
         </Select>
-        <Select defaultValue={nowDate.getMonth()} className={'filter__date__month'}>
+        <Select defaultValue={-1} className={'filter__date__month'}>
+          <option value={-1}>Месяц</option>
           {monthsOptions()}
         </Select>
-        <Select defaultValue={nowDate.getFullYear()} className={'filter__date__year'}>
+        <Select defaultValue={-1} className={'filter__date__year'}>
+          <option value={-1}>Год</option>
           {yearsOptions()}
         </Select>
       </FormLayoutGroup>

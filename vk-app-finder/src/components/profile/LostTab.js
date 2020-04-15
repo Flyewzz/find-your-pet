@@ -81,10 +81,9 @@ class LostTab extends React.Component {
     return (
       <CardGrid>
         {!this.animals
-        && <Placeholder stretched={true}
-                        icon={<Icon56InfoOutline/>}
-                        action={<Button onClick={this.toMainForm} size="l">
-                          Cоздать новое объявление
+        && <Placeholder icon={<Icon56InfoOutline/>}
+                        action={<Button onClick={this.props.toMainForm} size="l">
+                          Cоздать объявление
                         </Button>}>
           У вас пока нет объявлений о пропаже
         </Placeholder>}

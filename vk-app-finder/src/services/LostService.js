@@ -1,8 +1,17 @@
 import config from '../config';
 
 class LostService {
-  get = async () => {
-    const url = config.baseUrl + 'losts';
+  get = async (type, sex, breed) => {
+    let url = config.baseUrl + 'losts?';
+    if (type !== '0') {
+      url += '&type_id=' + type;
+    }
+    if (sex !== '0') {
+      url += '&sex=' + sex;
+    }
+    if (breed !== '') {
+      url += '&breed=' + breed;
+    }
     const options = {method: 'GET'};
     const request = new Request(url, options);
     const response = await fetch(request);

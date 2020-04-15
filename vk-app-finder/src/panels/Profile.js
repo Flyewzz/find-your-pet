@@ -52,7 +52,7 @@ class ProfilePanel extends React.Component {
           {this.state.activeTab === 'lost'
           && <LostTab userStore={this.props.userStore}
                       openDestructive={this.props.openDestructive}
-                      toMainForm={this.toMainForm}
+                      toMainForm={this.props.toMainForm}
                       goBack={this.props.goBack}
                       toLost={this.props.toLost}/>}
         </Group>

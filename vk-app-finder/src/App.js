@@ -17,6 +17,7 @@ import MapStateStore from "./stores/MapStateStore";
 import UserStore from "./stores/UserStore";
 import ProfilePanel from "./panels/Profile";
 import {Alert} from "@vkontakte/vkui";
+import LostFilterStore from "./stores/LostFilterStore";
 
 class App extends React.Component {
   constructor(props) {
@@ -25,7 +26,7 @@ class App extends React.Component {
     this.state = {
       activeModal: null,
       modalHistory: [],
-      activeStory: 'more',
+      activeStory: 'lost',
       mainPanel: 'new_lost',
       lostPanel: 'losts',
       profilePanel: 'more',
@@ -39,6 +40,7 @@ class App extends React.Component {
     };
     this.mapStore = new MapStateStore();
     this.userStore = new UserStore();
+    this.lostFilterStore = new LostFilterStore();
     this.openFilters = () => {
       this.setActiveModal('filters');
     };
@@ -165,10 +167,12 @@ class App extends React.Component {
         </View>
         <View popup={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
+                        filterStore={this.lostFilterStore}
                         onClose={this.modalBack}/>
         }>
           <Panel id="losts">
             <LostPanel toLost={this.toLost}
+                       lostFilterStore={this.lostFilterStore}
                        mapStore={this.mapStore}
                        openFilters={this.openFilters}/>
           </Panel>
