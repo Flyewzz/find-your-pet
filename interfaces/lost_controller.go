@@ -7,9 +7,9 @@ import (
 )
 
 type LostController interface {
-	GetById(id int) (*models.Lost, error)
+	GetById(ctx context.Context, id int) (*models.Lost, error)
 	Add(ctx context.Context, params *models.Lost) (int, error)
-	Search(params *models.Lost) ([]models.Lost, error)
+	Search(ctx context.Context, params *models.Lost) ([]models.Lost, error)
 
 	GetItemsPerPageCount() int
 }

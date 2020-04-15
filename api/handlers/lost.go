@@ -65,7 +65,10 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		Latitude:    latitude,
 		Longitude:   longitude,
 	}
-	losts, err := hd.LostController.Search(lost)
+	mapCloseId := make(map[string]interface{})
+	mapCloseId["close_id"] = viper.GetInt("lost.close_id")
+	ctx := context.WithValue(context.Background(), "params", mapCloseId)
+	losts, err := hd.LostController.Search(ctx, lost)
 	// MOCK
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -101,9 +104,15 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	lost, err := hd.LostController.GetById(id)
+	closeId := viper.GetInt("lost.close_id")
+	ctx := context.WithValue(context.Background(), "close_id", closeId)
+	lost, err := hd.LostController.GetById(ctx, id)
 	if err != nil {
-		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		if err == sql.ErrNoRows {
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)
+		} else {
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		}
 		return
 	}
 	data, _ := json.Marshal(lost)

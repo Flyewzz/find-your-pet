@@ -26,21 +26,22 @@ func NewLostControllerPg(itemsPerPage int, db *sql.DB) *LostControllerPg {
 	}
 }
 
-func (lc *LostControllerPg) GetById(id int) (*models.Lost, error) {
+func (lc *LostControllerPg) GetById(ctx context.Context, id int) (*models.Lost, error) {
+	closeId := ctx.Value("close_id").(int)
 	var lost models.Lost
 	err := lc.db.QueryRow("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, "+
 		"date, st_x(location) as latitude, "+
 		"st_y(location) as longitude, picture_id FROM lost "+
-		"WHERE id = $1", id).Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
-		&lost.Sex, &lost.Breed, &lost.Description,
-		&lost.StatusId, &lost.Date,
-		&lost.Latitude, &lost.Longitude, &lost.PictureId)
+		"WHERE id = $1 AND status_id != $2", id, closeId).
+		Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
+			&lost.Sex, &lost.Breed, &lost.Description,
+			&lost.StatusId, &lost.Date,
+			&lost.Latitude, &lost.Longitude, &lost.PictureId)
 	if err != nil {
 		return nil, err
 	}
 	return &lost, nil
-
 }
 
 /*
@@ -76,15 +77,17 @@ typeId int,
 	date, place string, typeId int,
 */
 
-func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
-
+func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost) ([]models.Lost, error) {
+	ctxParams := ctx.Value("params").(map[string]interface{})
 	// Get everything without parameters to search
 	if features.CheckEmptyLost(params) {
-		rows, err := lc.db.Query("SELECT id, type_id, " +
-			"vk_id, sex, " +
-			"breed, description, status_id, " +
-			"date, st_x(location) as latitude, " +
-			"st_y(location) as longitude, picture_id FROM lost")
+		rows, err := lc.db.Query("SELECT id, type_id, "+
+			"vk_id, sex, "+
+			"breed, description, status_id, "+
+			"date, st_x(location) as latitude, "+
+			"st_y(location) as longitude, picture_id FROM lost "+
+			"WHERE status_id != $1",
+			ctxParams["close_id"].(int))
 		if err != nil {
 			return nil, err
 		}
@@ -97,8 +100,8 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	ctx := context.WithValue(context.Background(), "tx", tx)
+	ctxParams["tx"] = tx
+	ctx = context.WithValue(context.Background(), "params", ctxParams)
 	searchManager := search.NewSearchManager()
 
 	addResultToSearchManager := func(result *[]models.Lost,
@@ -199,12 +202,14 @@ func (lc *LostControllerPg) Search(params *models.Lost) ([]models.Lost, error) {
 }
 
 func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Lost, error) {
-	tx := ctx.Value("tx").(*sql.Tx)
+	params := ctx.Value("params").(map[string]interface{})
+	tx := params["tx"].(*sql.Tx)
+	closeId := params["close_id"].(int)
 	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, date, "+
 		"st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
-		"WHERE type_id = $1", typeId)
+		"WHERE type_id = $1 AND status_id != $2", typeId, closeId)
 	if err != nil {
 		return nil, err
 	}
@@ -214,12 +219,14 @@ func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]mod
 }
 
 func (lc *LostControllerPg) SearchBySex(ctx context.Context, sex string) ([]models.Lost, error) {
-	tx := ctx.Value("tx").(*sql.Tx)
+	params := ctx.Value("params").(map[string]interface{})
+	tx := params["tx"].(*sql.Tx)
+	closeId := params["close_id"].(int)
 	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, date, "+
 		"st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
-		"WHERE LOWER(sex) = $1", strings.ToLower(sex))
+		"WHERE LOWER(sex) = $1 AND status_id != $2", strings.ToLower(sex), closeId)
 	if err != nil {
 		return nil, err
 	}
@@ -229,12 +236,15 @@ func (lc *LostControllerPg) SearchBySex(ctx context.Context, sex string) ([]mode
 }
 
 func (lc *LostControllerPg) SearchByBreed(ctx context.Context, breed string) ([]models.Lost, error) {
-	tx := ctx.Value("tx").(*sql.Tx)
+	params := ctx.Value("params").(map[string]interface{})
+	tx := params["tx"].(*sql.Tx)
+	closeId := params["close_id"].(int)
 	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, "+
 		"date, st_x(location) as latitude, st_y(location) as longitude, "+
 		"picture_id FROM lost "+
-		"WHERE LOWER(breed) LIKE '%' || $1 || '%'", strings.ToLower(breed))
+		"WHERE LOWER(breed) LIKE '%' || $1 || '%' "+
+		"AND status_id != $2", strings.ToLower(breed), closeId)
 	if err != nil {
 		return nil, err
 	}
