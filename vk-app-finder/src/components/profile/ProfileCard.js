@@ -10,7 +10,8 @@ import { autorun } from "mobx";
 const ProfileCard = (props) => {
   const animal = props.animal;
   const breed = animal.breed === "" ? "порода не указана" : animal.breed;
-  const date = new Date(animal.date.replace(" ", "T")).toLocaleDateString();
+  const date = new Date(animal.date.replace(" ", "T")).toLocaleDateString()
+  .replace(/\//g, '.');
 
   return (
     <Card
