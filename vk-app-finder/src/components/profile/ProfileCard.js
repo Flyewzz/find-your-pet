@@ -9,7 +9,7 @@ import { autorun } from "mobx";
 
 const ProfileCard = (props) => {
   const animal = props.animal;
-  const breed = animal.breed === "" ? "порода не указана" : animal.breed;
+  const breed = animal.breed === "" ? "Порода не указана" : animal.breed;
   const date = new Date(animal.date.replace(" ", "T")).toLocaleDateString()
   .replace(/\//g, '.');
 
@@ -17,7 +17,7 @@ const ProfileCard = (props) => {
     <Card
       onClick={() => props.onClick(animal.id)}
       style={{
-        height: "max(190, auto)",
+        height: "max(180, auto)",
         display: "flex",
         flexDirection: "column",
         alignItems: "stretch",

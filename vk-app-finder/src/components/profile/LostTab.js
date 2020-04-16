@@ -85,7 +85,7 @@ class LostTab extends React.Component {
                         action={<Button onClick={this.props.toMainForm} size="l">
                           Cоздать объявление
                         </Button>}>
-          У вас пока нет объявлений о пропаже
+          У Вас пока нет объявлений о пропаже
         </Placeholder>}
         {this.animals && this.animalsToCards()}
       </CardGrid>);

@@ -29,7 +29,7 @@ class LostAnimalPanel extends React.Component {
   address = '';
   // TODO add default avatar
   author = {first_name: '', last_name: '', photo_50: ''};
-  isMy = false;
+  isMine = false;
 
   componentDidMount() {
     this.props.userStore.getId().then(resultId =>
@@ -37,7 +37,7 @@ class LostAnimalPanel extends React.Component {
         result => {
           runInAction(() => {
             this.animal = result;
-            this.isMy = this.animal.vk_id === resultId.id;
+            this.isMine = this.animal.vk_id === resultId.id;
           });
           this.getAddress();
           this.props.userStore.getUserById(this.animal.vk_id).then(
@@ -82,12 +82,12 @@ class LostAnimalPanel extends React.Component {
     if (this.author.can_write_private_message) {
       return {
         href: `https://vk.com/im?sel=${this.animal.vk_id}`,
-        description: 'Напишите автору, если у вас есть информация о животном'
+        description: 'Напишите автору, если у Вас есть информация о животном'
       };
     }
     return {
       href: `https://vk.com/id${this.animal.vk_id}`,
-      description: 'ЛС автора закрыто, но вы можете отправить заявку на добавление в друзья'
+      description: `Отправить заявку на добавление в друзья`
     };
   };
 
@@ -133,30 +133,30 @@ class LostAnimalPanel extends React.Component {
               {'Поделиться'}<Icon24Share style={{marginLeft: '5px'}}/>
             </Div>
           </div>
-          <Group header={!this.isMy && <Header mode={'secondary'}>Автор</Header>}>
-            {!this.isMy && <Cell
+          {!this.isMine &&
+          <Group header={!this.isMine && <Header mode={'secondary'}>Автор</Header>}>
+            <Cell
               before={<Avatar src={this.author.photo_50}/>}>
               {this.author.first_name + ' ' + this.author.last_name}
-            </Cell>}
-            {!this.isMy && <Cell multiline={true} description={this.writeHref().description}>
+            </Cell>
+            <Cell multiline={true} description={this.writeHref().description}>
               <CellButton href={this.writeHref().href}
                           target={'_blank'}
                           before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
-            </Cell>}
-            {!this.isMy && <Cell multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
+            </Cell>
+            <Cell multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
               <CellButton before={<Icon24Done/>} className={'author__action-button'}>Я нашел!</CellButton>
-            </Cell>}
-            {this.isMy &&
+            </Cell>
+            
             <CellButton before={<Icon24Write/>}>
               Изменить объявление
-            </CellButton>}
-            {this.isMy &&
+            </CellButton>
             <CellButton before={<Icon24Cancel/>}
                         onClick={() => this.props.openDestructive(this.onClose)}
                         mode={'danger'}>
               Закрыть объявление
-            </CellButton>}
-          </Group>
+            </CellButton>
+          </Group>}
           <Separator/>
           <Group>
             <List>
@@ -192,7 +192,7 @@ decorate(LostAnimalPanel, {
   animal: observable,
   author: observable,
   address: observable,
-  isMy: observable,
+  isMine: observable,
 });
 
 export default observer(LostAnimalPanel);
