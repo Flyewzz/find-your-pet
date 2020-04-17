@@ -1,14 +1,13 @@
 import React from "react";
-import {CardGrid} from "@vkontakte/vkui";
+import { CardGrid } from "@vkontakte/vkui";
 import ProfileLostCard from "./ProfileLostCard";
-import {decorate, observable, runInAction} from "mobx";
-import {observer} from "mobx-react";
-import ProfileService from '../../services/ProfileService';
-import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
+import { decorate, observable, runInAction } from "mobx";
+import { observer } from "mobx-react";
+import ProfileService from "../../services/ProfileService";
+import Icon56InfoOutline from "@vkontakte/icons/dist/56/info_outline";
 import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
 import Button from "@vkontakte/vkui/dist/components/Button/Button";
 import GeocodingService from "../../services/GeocodingService";
-
 
 class LostTab extends React.Component {
   constructor(props) {
@@ -21,15 +20,13 @@ class LostTab extends React.Component {
   addresses = [];
 
   componentDidMount() {
-    this.props.userStore.getId().then(
-      result => this.fetchLost(result.id)
-    );
+    this.props.userStore.getId().then((result) => this.fetchLost(result.id));
   }
 
   updateAddress = (index, result) => {
-    const city = result.City === '' ? result.District : result.City;
-    const address = result.MetroArea === '' ? result.Address : result.MetroArea;
-    this.addresses[index] = city + (address === '' ? '' : ', ' + address);
+    const city = result.City === "" ? result.District : result.City;
+    const address = result.MetroArea === "" ? result.Address : result.MetroArea;
+    this.addresses[index] = city + (address === "" ? "" : ", " + address);
   };
 
   fetchLost = (id) => {
@@ -37,14 +34,15 @@ class LostTab extends React.Component {
       (result) => {
         runInAction(() => {
           this.animals = result.payload;
-          this.addresses = result.payload === null ? [] : this.animals.map(() => '')
+          this.addresses =
+            result.payload === null ? [] : this.animals.map(() => "");
         });
         if (this.animals !== null) {
           this.animals.forEach((value, index) => {
-            const {longitude, latitude} = value;
-            this.geocodingService.addressByCoords(longitude, latitude).then(
-              result => this.updateAddress(index, result.address)
-            );
+            const { longitude, latitude } = value;
+            this.geocodingService
+              .addressByCoords(longitude, latitude)
+              .then((result) => this.updateAddress(index, result.address));
           });
         }
       },
@@ -56,19 +54,19 @@ class LostTab extends React.Component {
 
   onRemove = (id) => {
     const vkId = this.props.userStore.id;
-    this.profileService.closeLost(id, vkId).then(
-      () => {
-        this.props.goBack();
-      }
-    );
+    this.profileService.closeLost(id, vkId).then(() => {
+      this.props.goBack();
+    });
   };
 
   animalsToCards = () => {
     return this.animals.map((animal, index) => (
       <ProfileLostCard
-        onClick={() => {this.props.toLost(animal.id)}}
+        onClick={() => {
+          this.props.toLost(animal.id);
+        }}
         cancel={() => {
-          this.props.openDestructive(() => this.onRemove(animal.id))
+          this.props.openDestructive(() => this.onRemove(animal.id));
         }}
         key={animal.id}
         animal={animal}
@@ -80,15 +78,22 @@ class LostTab extends React.Component {
   render() {
     return (
       <CardGrid>
-        {!this.animals
-        && <Placeholder icon={<Icon56InfoOutline/>}
-                        action={<Button onClick={this.props.toMainForm} size="l">
-                          Cоздать объявление
-                        </Button>}>
-          У Вас пока нет объявлений о пропаже
-        </Placeholder>}
+        {!this.animals && (
+          <Placeholder
+            icon={<Icon56InfoOutline />}
+            action={
+              <Button onClick={this.props.toMainForm} size="l"
+              style={{cursor: 'pointer'}}>
+                Cоздать объявление
+              </Button>
+            }
+          >
+            У Вас пока нет объявлений о пропаже
+          </Placeholder>
+        )}
         {this.animals && this.animalsToCards()}
-      </CardGrid>);
+      </CardGrid>
+    );
   }
 }
 

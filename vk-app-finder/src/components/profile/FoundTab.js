@@ -82,7 +82,8 @@ class FoundTab extends React.Component {
           <Placeholder
             icon={<Icon56InfoOutline />}
             action={
-              <Button onClick={this.props.toMainForm} size="l">
+              <Button onClick={this.props.toMainForm} size="l"
+              style={{cursor: 'pointer'}}>
                 Cоздать объявление
               </Button>
             }
