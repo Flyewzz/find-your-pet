@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func (hd *HandlerData) LostImageHandler(w http.ResponseWriter, r *http.Request) {
+func (hd *HandlerData) FoundImageHandler(w http.ResponseWriter, r *http.Request) {
 	strId := r.URL.Query().Get("id")
 	if strId == "" {
 		errs.ErrHandler(hd.DebugMode, errors.New("Id is missing"),
@@ -39,10 +39,10 @@ func (hd *HandlerData) LostImageHandler(w http.ResponseWriter, r *http.Request) 
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
-	baseLostFileDirectory := viper.GetString("lost.files.directory")
+	baseFoundFileDirectory := viper.GetString("found.files.directory")
 	// A database stores only the smallest part of the file path
 	openedFile, err := os.Open(filepath.Join(
-		baseLostFileDirectory,
+		baseFoundFileDirectory,
 		file.Path),
 	)
 	if err != nil {

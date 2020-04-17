@@ -82,7 +82,7 @@ create table found
       references statuses,
   date        timestamp default now() not null,
   location    geometry                not null,
-  picture_id  integer                 not null
+  picture_id  integer
     constraint found_files_file_id_fk
       references files
 );

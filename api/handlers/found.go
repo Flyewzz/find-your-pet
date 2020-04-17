@@ -22,7 +22,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
+func (hd *HandlerData) FoundHandler(w http.ResponseWriter, r *http.Request) {
 	arguments := r.URL.Query()
 	strTypeId := arguments.Get("type_id")
 	var typeId int
@@ -54,7 +54,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	lost := &models.Lost{
+	found := &models.Found{
 		TypeId:      typeId,
 		Sex:         sex,
 		Breed:       breed,
@@ -63,9 +63,9 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		Longitude:   longitude,
 	}
 	mapCloseId := make(map[string]interface{})
-	mapCloseId["close_id"] = viper.GetInt("lost.close_id")
+	mapCloseId["close_id"] = viper.GetInt("found.close_id")
 	ctx := context.WithValue(context.Background(), "params", mapCloseId)
-	losts, err := hd.LostController.Search(ctx, lost)
+	founds, err := hd.FoundController.Search(ctx, found)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Not found", http.StatusNotFound)
@@ -74,35 +74,38 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	pagesCount := paginator.CalculatePageCount(len(losts),
-		hd.LostController.GetItemsPerPageCount())
-	lostsEncoded, err := json.Marshal(losts)
+	pagesCount := paginator.CalculatePageCount(len(founds),
+		hd.FoundController.GetItemsPerPageCount())
+	foundsEncoded, err := json.Marshal(founds)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	pagesData := paginator.PaginatorData{
 		Pages:   pagesCount,
-		Payload: lostsEncoded,
+		Payload: foundsEncoded,
 	}
 	data, err := json.Marshal(pagesData)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+	}
 	w.Write(data)
 }
 
-func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request) {
+func (hd *HandlerData) FoundByIdGetHandler(w http.ResponseWriter, r *http.Request) {
 	strId := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	closeId := viper.GetInt("lost.close_id")
+	closeId := viper.GetInt("found.close_id")
 	ctx := context.WithValue(context.Background(), "close_id", closeId)
-	lost, err := hd.LostController.GetById(ctx, id)
+	found, err := hd.FoundController.GetById(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)
@@ -111,15 +114,14 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 		}
 		return
 	}
-	data, err := json.Marshal(lost)
+	data, err := json.Marshal(found)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
-		return
 	}
 	w.Write(data)
 }
 
-func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
+func (hd *HandlerData) AddFoundHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(0)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
@@ -170,7 +172,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 	extension := features.GetExtension(header.Filename)
 	defer file.Close()
 	// in MB
-	fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
+	fileMaxSize := viper.GetInt64("found.files.max_size") * 1024 * 1024
 	if header.Size > fileMaxSize {
 		w.WriteHeader(http.StatusBadRequest)
 		type ErrStruct struct {
@@ -189,7 +191,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lostParams := &models.Lost{
+	foundParams := &models.Found{
 		TypeId:      typeId,
 		AuthorId:    authorId,
 		Sex:         sex,
@@ -199,31 +201,31 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		Longitude:   longitude,
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	lostIdCh := make(chan int)
+	foundIdCh := make(chan int)
 	errCh := make(chan error, 1)
 	// mFile - model of file. It's not a real file. It's only a record
 	mFileCh := make(chan *models.File)
 	// file is the real file a user sent
-	go hd.LostAddingManager.Add(ctx, lostParams, lostIdCh,
+	go hd.FoundAddingManager.Add(ctx, foundParams, foundIdCh,
 		mFileCh, errCh)
 
-	var lostId int
+	var foundId int
 
-addLostId:
+addFoundId:
 	for {
 		select {
-		case lostId = <-lostIdCh:
-			break addLostId
+		case foundId = <-foundIdCh:
+			break addFoundId
 		case err = <-errCh:
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 			return
 		}
 	}
 
-	baseLostDirectoryPath := viper.GetString("lost.files.directory")
-	lostDirectoryPath := strconv.Itoa(lostId)
-	fullDirectoryPath := filepath.Join(baseLostDirectoryPath,
-		lostDirectoryPath)
+	baseFoundDirectoryPath := viper.GetString("found.files.directory")
+	foundDirectoryPath := strconv.Itoa(foundId)
+	fullDirectoryPath := filepath.Join(baseFoundDirectoryPath,
+		foundDirectoryPath)
 	err = os.MkdirAll(fullDirectoryPath,
 		os.ModePerm)
 	if err != nil {
@@ -246,7 +248,7 @@ addLostId:
 	}
 	mFile := &models.File{
 		Name: fileName,
-		Path: filepath.Join(lostDirectoryPath, uuid),
+		Path: filepath.Join(foundDirectoryPath, uuid),
 	}
 	_, err = io.Copy(dst, file)
 	if err != nil {
@@ -267,5 +269,5 @@ addLostId:
 		return
 	}
 	// Send id to the client
-	w.Write([]byte(strconv.Itoa(lostId)))
+	w.Write([]byte(strconv.Itoa(foundId)))
 }

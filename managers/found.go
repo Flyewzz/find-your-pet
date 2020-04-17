@@ -9,31 +9,31 @@ import (
 	"github.com/Kotyarich/find-your-pet/models"
 )
 
-type LostAddingManager struct {
-	db             *sql.DB
-	lostController interfaces.LostController
-	FileController interfaces.FileController
+type FoundAddingManager struct {
+	db              *sql.DB
+	FoundController interfaces.FoundController
+	FileController  interfaces.FileController
 }
 
-func NewLostAddingManager(db *sql.DB, lc interfaces.LostController,
-	lfc interfaces.FileController) *LostAddingManager {
-	return &LostAddingManager{
-		db:             db,
-		lostController: lc,
-		FileController: lfc,
+func NewFoundAddingManager(db *sql.DB, fc interfaces.FoundController,
+	lfc interfaces.FileController) *FoundAddingManager {
+	return &FoundAddingManager{
+		db:              db,
+		FoundController: fc,
+		FileController:  lfc,
 	}
 }
 
-func (lam *LostAddingManager) Add(ctx context.Context, params *models.Lost,
-	lostIdCh chan<- int,
+func (fam *FoundAddingManager) Add(ctx context.Context, params *models.Found,
+	foundIdCh chan<- int,
 	fileCh <-chan *models.File, errCh chan<- error) {
-	tx, err := lam.db.Begin()
+	tx, err := fam.db.Begin()
 	if err != nil {
 		errCh <- err
 		return
 	}
 	ctx = context.WithValue(ctx, "tx", tx)
-	lostId, err := lam.lostController.Add(ctx, params)
+	foundId, err := fam.FoundController.Add(ctx, params)
 	if err != nil {
 		if errRoll := tx.Rollback(); errRoll != nil {
 			errCh <- errRoll
@@ -42,10 +42,10 @@ func (lam *LostAddingManager) Add(ctx context.Context, params *models.Lost,
 		}
 		return
 	}
-	lostIdCh <- lostId
+	foundIdCh <- foundId
 	select {
 	case file := <-fileCh:
-		_, err = lam.FileController.AddToLost(ctx, file, lostId)
+		_, err = fam.FileController.AddToFound(ctx, file, foundId)
 		if err != nil {
 			if errRoll := tx.Rollback(); errRoll != nil {
 				errCh <- errRoll

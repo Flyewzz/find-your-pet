@@ -6,7 +6,8 @@ import (
 	"github.com/Kotyarich/find-your-pet/models"
 )
 
-type LostFileController interface {
+type FileController interface {
 	GetById(id int) (*models.File, error)
-	Add(ctx context.Context, file *models.File, lostId int) (int, error)
+	AddToLost(ctx context.Context, file *models.File, lostId int) (int, error)
+	AddToFound(ctx context.Context, file *models.File, foundId int) (int, error)
 }
