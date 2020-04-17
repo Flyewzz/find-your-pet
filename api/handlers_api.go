@@ -25,4 +25,7 @@ func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 	// Profile
 	r.HandleFunc("/profile/lost", hd.ProfileLostHandler).Methods("GET")
 	r.HandleFunc("/lost", hd.ProfileLostOpeningHandler).Methods("PUT")
+	r.HandleFunc("/profile/found", hd.ProfileFoundHandler).Methods("GET")
+	r.HandleFunc("/found", hd.ProfileFoundOpeningHandler).Methods("PUT")
+
 }

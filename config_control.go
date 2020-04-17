@@ -33,6 +33,10 @@ func PrepareHandlerData() *handlers.HandlerData {
 	if err != nil {
 		log.Fatalf("Error with database: %v\n", err)
 	}
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Error with connection to the database: %v\n", err)
+	}
 	db.SetMaxOpenConns(viper.GetInt("db.max_connections"))
 	lostController := pg.NewLostControllerPg(viper.GetInt("lost.itemsPerPage"), db)
 	FileController := pg.NewFileControllerPg(db)
