@@ -135,30 +135,32 @@ class LostAnimalPanel extends React.Component {
               {'Поделиться'}<Icon24Share style={{marginLeft: '5px'}}/>
             </Div>
           </div>
-          {!this.isMine &&
           <Group header={!this.isMine && <Header mode={'secondary'}>Автор</Header>}>
+          { !this.isMine ? (
+            [
             <Cell
               before={<Avatar src={this.author.photo_50}/>}>
               {this.author.first_name + ' ' + this.author.last_name}
-            </Cell>
+            </Cell>,
             <Cell multiline={true} description={this.writeHref().description}>
               <CellButton href={this.writeHref().href}
                           target={'_blank'}
                           before={<Icon24Write/>} className={'author__action-button'}>Написать</CellButton>
-            </Cell>
+            </Cell>,
             <Cell multiline={true} description={'Или дайте ему знать, мы пришлем ему уведомление'}>
               <CellButton before={<Icon24Done/>} className={'author__action-button'}>Я нашел!</CellButton>
             </Cell>
-            
+            ]) : ([
             <CellButton before={<Icon24Write/>}>
               Изменить объявление
-            </CellButton>
+            </CellButton>,
             <CellButton before={<Icon24Cancel/>}
                         onClick={() => this.props.openDestructive(this.onClose)}
                         mode={'danger'}>
               Закрыть объявление
-            </CellButton>
-          </Group>}
+            </CellButton>]
+            )}
+          </Group>
           <Separator/>
           <Group>
             <List>
