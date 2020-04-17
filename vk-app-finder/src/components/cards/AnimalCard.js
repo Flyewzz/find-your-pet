@@ -27,14 +27,14 @@ const AnimalCard = (props) => {
         </div>
         <img
           className={"animal-card__photo"}
-          src={config.baseUrl + `${props.type}/img?id=${animal.picture_id}`}
+          src={config.baseUrl + `${type}/img?id=${animal.picture_id}`}
           height="180px"
           alt={""}
         />
       </div>
       <Div className={"animal-card__data"}>
         <p className={"animal-card__address"}>{props.address}</p>
-        <p className={"animal-card__date"}>Дата пропажи: {date}</p>
+        <p className={"animal-card__date"}>Дата {type === 'lost' ? 'пропажи' : 'находки'}: {date}</p>
       </Div>
     </Card>
   );
