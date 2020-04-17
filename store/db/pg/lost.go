@@ -86,7 +86,7 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost) ([]
 			"breed, description, status_id, "+
 			"date, st_x(location) as latitude, "+
 			"st_y(location) as longitude, picture_id FROM lost "+
-			"WHERE status_id != $1",
+			"WHERE status_id != $1 ORDER BY date DESC",
 			ctxParams["close_id"].(int))
 		if err != nil {
 			return nil, err
