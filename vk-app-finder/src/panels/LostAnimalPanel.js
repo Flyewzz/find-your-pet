@@ -105,7 +105,7 @@ class LostAnimalPanel extends React.Component {
 
   onClose = () => {
     const vkId = this.props.userStore.id;
-    this.profileService.close(this.props.id, vkId).then(
+    this.profileService.closeLost(this.props.id, vkId).then(
       () => this.props.goBack()
     )
   };

@@ -75,7 +75,7 @@ class App extends React.Component {
   }
 
   openDestructive = (onAccept) => {
-    console.log('открыть попап кликнуто');
+    console.log('Открыть popup кликнуто');
     this.setState({
       popout:
         <Alert
@@ -138,6 +138,12 @@ class App extends React.Component {
   toProfileLost = (id) => {
     this.setState({
       profilePanel: 'lost',
+      profileId: id,
+    });
+  };
+  toProfileFound = (id) => {
+    this.setState({
+      profilePanel: 'found',
       profileId: id,
     });
   };
@@ -250,10 +256,18 @@ class App extends React.Component {
                           goBack={this.toProfile}
                           toMainForm={this.toMainForm}
                           toMainFoundForm={this.toMainFoundForm}
-                          toLost={this.toProfileLost}/>
+                          toLost={this.toProfileLost}
+                          toFound={this.toProfileFound}
+                          />
           </Panel>
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
+                             openDestructive={this.openDestructive}
+                             goBack={this.toProfile}
+                             id={this.state.profileId}/>
+          </Panel>
+          <Panel id="found">
+            <FoundAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
                              goBack={this.toProfile}
                              id={this.state.profileId}/>

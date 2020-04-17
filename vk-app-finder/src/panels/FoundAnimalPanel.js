@@ -37,7 +37,7 @@ class FoundAnimalPanel extends React.Component {
         result => {
           runInAction(() => {
             this.animal = result;
-            this.isMine = this.animal.vk_id === resultId.id;
+            this.isMine = (this.animal.vk_id === resultId.id);
           });
           this.getAddress();
           this.props.userStore.getUserById(this.animal.vk_id).then(
@@ -105,7 +105,7 @@ class FoundAnimalPanel extends React.Component {
 
   onClose = () => {
     const vkId = this.props.userStore.id;
-    this.profileService.close(this.props.id, vkId).then(
+    this.profileService.closeFound(this.props.id, vkId).then(
       () => this.props.goBack()
     )
   };
@@ -159,7 +159,7 @@ class FoundAnimalPanel extends React.Component {
               Закрыть объявление
             </CellButton>
           ])}
-          </Group>}
+          </Group>
           <Separator/>
           <Group>
             <List>

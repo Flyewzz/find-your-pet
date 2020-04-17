@@ -1,6 +1,6 @@
 import React from "react";
 import {CardGrid} from "@vkontakte/vkui";
-import ProfileCard from "./ProfileCard";
+import ProfileLostCard from "./ProfileLostCard";
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
 import ProfileService from '../../services/ProfileService';
@@ -56,7 +56,7 @@ class LostTab extends React.Component {
 
   onRemove = (id) => {
     const vkId = this.props.userStore.id;
-    this.profileService.close(id, vkId).then(
+    this.profileService.closeLost(id, vkId).then(
       () => {
         this.props.goBack();
       }
@@ -65,8 +65,8 @@ class LostTab extends React.Component {
 
   animalsToCards = () => {
     return this.animals.map((animal, index) => (
-      <ProfileCard
-        onClick={() => this.props.toLost(animal.id)}
+      <ProfileLostCard
+        onClick={() => {this.props.toLost(animal.id)}}
         cancel={() => {
           this.props.openDestructive(() => this.onRemove(animal.id))
         }}

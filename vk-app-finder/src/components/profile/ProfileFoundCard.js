@@ -1,13 +1,13 @@
 import React from "react";
 import Card from "@vkontakte/vkui/dist/components/Card/Card";
-import "./ProfileCard.css";
+import "./ProfileFoundCard.css";
 import Icon28CancelOutline from "@vkontakte/icons/dist/28/cancel_outline";
 import config from "../../config";
 import { Group, List } from "@vkontakte/vkui";
 import { Cell } from "@vkontakte/vkui/dist/es6";
 import { autorun } from "mobx";
 
-const ProfileCard = (props) => {
+const ProfileFoundCard = (props) => {
   const animal = props.animal;
   const breed = animal.breed === "" ? "Порода не указана" : animal.breed;
   const date = new Date(animal.date.replace(" ", "T")).toLocaleDateString()
@@ -35,7 +35,7 @@ const ProfileCard = (props) => {
           </div>
           <img
             className={"profile__card__photo"}
-            src={config.baseUrl + `lost/img?id=${animal.picture_id}`}
+            src={config.baseUrl + `found/img?id=${animal.picture_id}`}
             alt={""}
           />
         </div>
@@ -66,4 +66,4 @@ const ProfileCard = (props) => {
   );
 };
 
-export default ProfileCard;
+export default ProfileFoundCard;
