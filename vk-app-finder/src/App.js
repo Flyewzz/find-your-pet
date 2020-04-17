@@ -21,6 +21,7 @@ import LostFilterStore from "./stores/LostFilterStore";
 import FoundPanel from "./panels/Found";
 import FoundFilterStore from "./stores/FoundFilterStore";
 import CreateFormFoundPanel from "./panels/CreateFormFoundPanel";
+import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 
 class App extends React.Component {
   constructor(props) {
@@ -127,7 +128,7 @@ class App extends React.Component {
   };
   toFound = (id) => {
     this.setState({
-      foundId: id,
+      id: id,
       foundPanel: 'found',
     });
   };
@@ -229,16 +230,17 @@ class App extends React.Component {
                         onClose={this.modalBack}/>
         }>
           <Panel id="messages">
-            <FoundPanel toLost={this.toFound}
-                        lostFilterStore={this.foundFilterStore}
+            <FoundPanel toFound={this.toFound}
+                        foundFilterStore={this.foundFilterStore}
                         mapStore={this.mapStore}
-                        openFilters={this.openFilters}/>
+                        openFilters={this.openFilters}
+                        />
           </Panel>
           <Panel id="found">
-            <LostAnimalPanel userStore={this.userStore}
+            <FoundAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
                              goBack={this.toFoundList}
-                             id={this.state.foundId}/>
+                             id={this.state.id}/>
           </Panel>
         </View>
         <View popout={this.state.popout} id="more" activePanel={this.state.profilePanel}>

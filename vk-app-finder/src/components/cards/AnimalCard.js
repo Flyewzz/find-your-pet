@@ -6,11 +6,12 @@ import { Div } from "@vkontakte/vkui";
 
 const AnimalCard = (props) => {
   const animal = props.animal;
-  const breed = animal.breed === "" ? "порода не указана" : animal.breed;
+  const breed = animal.breed === "" ? "Порода не указана" : animal.breed;
   const date = new Date(animal.date.replace(" ", "T"))
     .toLocaleDateString()
     .replace(/\//g, ".");
   console.log(props.address);
+  const type = props.type;
 
   return (
     <Card
@@ -26,7 +27,7 @@ const AnimalCard = (props) => {
         </div>
         <img
           className={"animal-card__photo"}
-          src={config.baseUrl + `lost/img?id=${animal.picture_id}`}
+          src={config.baseUrl + `${props.type}/img?id=${animal.picture_id}`}
           height="180px"
           alt={""}
         />

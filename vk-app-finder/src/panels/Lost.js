@@ -65,7 +65,7 @@ class LostPanel extends React.Component {
         {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
         <AnimalCard onClick={() => this.props.toLost(animal.id)}
                     address={this.addresses[index]}
-                    key={animal.id} animal={animal}/>
+                    key={animal.id} animal={animal} type={'lost'} />
       </React.Fragment>
     );
   };

@@ -4,7 +4,7 @@ import FoundService from "../services/FoundService";
 
 class FoundFilterStore {
   constructor() {
-    this.lostService = new FoundService();
+    this.foundService = new FoundService();
   }
 
   fields = {
@@ -22,7 +22,7 @@ class FoundFilterStore {
 
   fetch = async () => {
     const {type, sex, breed} = this.fields;
-    return this.lostService.get(type, sex, breed).then(result => {
+    return this.foundService.get(type, sex, breed).then(result => {
       this.animals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
       this.onFetch();

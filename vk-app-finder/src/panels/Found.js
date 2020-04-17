@@ -23,17 +23,17 @@ class FoundPanel extends React.Component {
     };
 
     this.geocodingService = new GeocodingService();
-    this.props.lostFilterStore.onFetch = this.computeAddresses;
+    this.props.foundFilterStore.onFetch = this.computeAddresses;
   }
 
   addresses = [];
 
   componentDidMount() {
-    this.props.lostFilterStore.fetch();
+    this.props.foundFilterStore.fetch();
   }
 
   computeAddresses = () => {
-    const store = this.props.lostFilterStore;
+    const store = this.props.foundFilterStore;
     this.addresses = store.animals === null ? [] : store.animals.map(() => '');
 
     if (store.animals !== null) {
@@ -53,19 +53,19 @@ class FoundPanel extends React.Component {
   };
 
   createMarkers = () => {
-    return this.props.lostFilterStore.animals.map(value =>
-      <Placemark onClick={() => this.props.toLost(value.id)}
+    return this.props.foundFilterStore.animals.map(value =>
+      <Placemark onClick={() => this.props.toFound(value.id)}
                  geometry={[value.latitude, value.longitude]}/>
     );
   };
 
   animalsToCards = () => {
-    return this.props.lostFilterStore.animals.map((animal, index) =>
+    return this.props.foundFilterStore.animals.map((animal, index) =>
       <React.Fragment key={1}>
         {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
-        <AnimalCard onClick={() => this.props.toLost(animal.id)}
+        <AnimalCard onClick={() => this.props.toFound(animal.id)}
                     address={this.addresses[index]}
-                    key={animal.id} animal={animal}/>
+                    key={animal.id} animal={animal} type={'found'} />
       </React.Fragment>
     );
   };
@@ -76,7 +76,7 @@ class FoundPanel extends React.Component {
   };
 
   render() {
-    const animals = this.props.lostFilterStore.animals;
+    const animals = this.props.foundFilterStore.animals;
     const mapStyle = {
       display: this.props.mapStore.isMapView ? undefined : 'none',
       height: '490px',
@@ -85,10 +85,10 @@ class FoundPanel extends React.Component {
 
     return (
       <>
-        <PanelHeader>Потерялись</PanelHeader>
+        <PanelHeader>Нашлись</PanelHeader>
         <Group separator="hide">
           <FilterLine isMap={this.state.mapView}
-                      filterStore={this.props.lostFilterStore}
+                      filterStore={this.props.foundFilterStore}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 

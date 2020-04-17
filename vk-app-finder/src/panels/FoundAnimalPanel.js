@@ -1,10 +1,9 @@
 import React from "react";
 import {CellButton, Div, Group, Header, PanelHeader} from "@vkontakte/vkui";
 import {Cell, PanelHeaderBack, Separator} from "@vkontakte/vkui/dist/es6";
-import LostService from '../services/LostService';
 import {decorate, observable, runInAction} from "mobx";
 import {observer} from "mobx-react";
-import './Lost.css';
+import './Lost.css'; // The same styles
 import config from "../config";
 import List from "@vkontakte/vkui/dist/components/List/List";
 import InfoRow from "@vkontakte/vkui/dist/components/InfoRow/InfoRow";
@@ -13,14 +12,15 @@ import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon24Share from '@vkontakte/icons/dist/24/share';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import './LostAnimalPanel.css';
+import './FoundAnimalPanel.css';
+import FoundService from "../services/FoundService";
 import ProfileService from "../services/ProfileService";
 import GeocodingService from "../services/GeocodingService";
 
-class LostAnimalPanel extends React.Component {
+class FoundAnimalPanel extends React.Component {
   constructor(props) {
     super(props);
-    this.lostService = new LostService();
+    this.foundService = new FoundService();
     this.profileService = new ProfileService();
     this.geocodingService = new GeocodingService();
   }
@@ -33,7 +33,7 @@ class LostAnimalPanel extends React.Component {
 
   componentDidMount() {
     this.props.userStore.getId().then(resultId =>
-      this.lostService.getById(this.props.id).then(
+      this.foundService.getById(this.props.id).then(
         result => {
           runInAction(() => {
             this.animal = result;
@@ -119,13 +119,13 @@ class LostAnimalPanel extends React.Component {
     return (
       <>
         <PanelHeader left={<PanelHeaderBack onClick={this.props.goBack}/>}>
-          Потерянный питомец
+          Найденный питомец
         </PanelHeader>
         <Group separator="hide">
           <Div>
-            { picture_id != undefined &&
+            {picture_id != undefined &&
             <img style={{width: '100%'}}
-                 src={config.baseUrl + `lost/img?id=${picture_id}`} alt={''}/>
+                 src={config.baseUrl + `found/img?id=${picture_id}`} alt={''}/>
             }
           </Div>
           <div style={{display: 'flex', alignItems: 'center'}}>
@@ -163,7 +163,7 @@ class LostAnimalPanel extends React.Component {
           <Group>
             <List>
               <Cell>
-                <InfoRow header="Место пропажи">
+                <InfoRow header="Место находки">
                   {this.address}
                 </InfoRow>
               </Cell>
@@ -190,11 +190,11 @@ class LostAnimalPanel extends React.Component {
   }
 }
 
-decorate(LostAnimalPanel, {
+decorate(FoundAnimalPanel, {
   animal: observable,
   author: observable,
   address: observable,
   isMine: observable,
 });
 
-export default observer(LostAnimalPanel);
+export default observer(FoundAnimalPanel);
