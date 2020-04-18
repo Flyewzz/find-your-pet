@@ -215,7 +215,7 @@ class App extends React.Component {
                                   toMain={this.toMain}/>
           </Panel>
         </View>
-        <View popup={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
+        <View popout={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.lostFilterStore}
                         onClose={this.modalBack}/>
@@ -233,7 +233,7 @@ class App extends React.Component {
                              id={this.state.id}/>
           </Panel>
         </View>
-        <View popup={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
+        <View popout={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.lostFilterStore}
                         onClose={this.modalBack}/>
