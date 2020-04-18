@@ -1,3 +1,5 @@
+require('dotenv').load();
+
 const config = {
   baseUrl: process.env.BASE_URL , // '/' at the end is strictly necessary (!)
   clientID: process.env.CLIENT_ID,
