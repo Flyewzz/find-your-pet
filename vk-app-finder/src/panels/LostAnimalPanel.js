@@ -112,7 +112,7 @@ class LostAnimalPanel extends React.Component {
 
   render() {
     const {picture_id, type_id, description} = this.animal;
-    const breed = this.animal.breed === '' ? 'порода не указана' : this.animal.breed;
+    const breed = this.animal.breed === '' ? ' Порода не указана' : this.animal.breed;
     const date = new Date(this.animal.date.replace(' ', 'T')).toLocaleDateString();
     const type = config.types[type_id - 1];
 
