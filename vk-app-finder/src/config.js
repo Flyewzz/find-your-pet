@@ -1,13 +1,11 @@
-require('dotenv').load();
-
 const config = {
-  baseUrl: process.env.BASE_URL , // '/' at the end is strictly necessary (!)
-  clientID: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
-  serviceKey: process.env.SERVICE_KEY,
-  types: ["Собака", "Кошка", "Животное"],
-  appUrl: process.env.APP_URL,
-  appId: process.env.APPLICATION_ID,
+  baseUrl: 'http://fezzo:ru/',
+  clientID: '',
+  clientSecret: '',
+  serviceKey: '',
+  types: ['Собака', 'Кошка', 'Животное'],
+  appUrl: 'https://vk.com/app7390966_30319530',
+  appId: '7390966',
 };
 
 export default config;
