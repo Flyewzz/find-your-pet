@@ -9,6 +9,7 @@ import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder
 import Button from "@vkontakte/vkui/dist/components/Button/Button";
 import GeocodingService from "../../services/GeocodingService";
 
+
 class LostTab extends React.Component {
   constructor(props) {
     super(props);
