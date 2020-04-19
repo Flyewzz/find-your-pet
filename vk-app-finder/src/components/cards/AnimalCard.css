@@ -1,8 +1,46 @@
 .animal-card__photo {
-    border-radius: 10px 10px 20px 0;
-    width: 100%;
+  border-radius: 10px 10px 20px 0;
+  width: 100%;
+}
+
+.animal-card__date {
+  padding-top: 0;
+}
+
+.animal-card__data {
+  margin-top: 0;
+  padding-top: 4px;
+}
+
+.animal-card__data > * {
+  margin: 0;
+  margin-top: 4px;
 }
 
 .animal-card__address {
-    font-weight: bold;
+  font-weight: bold;
+}
+
+.animal-card__photo__breed {
+  display: inline-block;
+  background-color: rgb(83, 118, 164);
+  padding: 4px 10px;
+  border-radius: 10px 10px 20px 0;
+  margin: 6px 5px;
+  background-size: 300% 100%;
+  transition: all 0.4s ease-in-out;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.animal-card__photo__corner {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.animal-card__photo__container {
+  position: relative;
+  height: auto;
 }

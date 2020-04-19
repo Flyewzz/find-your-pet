@@ -1,10 +1,9 @@
 import React from "react";
 import { CellButton, Div, Group, Header, PanelHeader } from "@vkontakte/vkui";
 import { Cell, PanelHeaderBack, Separator } from "@vkontakte/vkui/dist/es6";
-import LostService from "../services/LostService";
 import { decorate, observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
-import "./Lost.css";
+import "./Lost.css"; // The same styles
 import config from "../config";
 import List from "@vkontakte/vkui/dist/components/List/List";
 import InfoRow from "@vkontakte/vkui/dist/components/InfoRow/InfoRow";
@@ -13,15 +12,16 @@ import Icon24Write from "@vkontakte/icons/dist/24/write";
 import Icon24Done from "@vkontakte/icons/dist/24/done";
 import Icon24Share from "@vkontakte/icons/dist/24/share";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
-import "./LostAnimalPanel.css";
+import "./FoundAnimalPanel.css";
+import FoundService from "../services/FoundService";
 import ProfileService from "../services/ProfileService";
 import GeocodingService from "../services/GeocodingService";
 import vk_dog from "../img/vk_dog.jpg";
 
-class LostAnimalPanel extends React.Component {
+class FoundAnimalPanel extends React.Component {
   constructor(props) {
     super(props);
-    this.lostService = new LostService();
+    this.foundService = new FoundService();
     this.profileService = new ProfileService();
     this.geocodingService = new GeocodingService();
   }
@@ -34,7 +34,7 @@ class LostAnimalPanel extends React.Component {
 
   componentDidMount() {
     this.props.userStore.getId().then((resultId) =>
-      this.lostService.getById(this.props.id).then(
+      this.foundService.getById(this.props.id).then(
         (result) => {
           runInAction(() => {
             this.animal = result;
@@ -95,7 +95,7 @@ class LostAnimalPanel extends React.Component {
   getShareText = () => {
     const { type_id } = this.animal;
     const breed =
-      this.animal.breed === "" ? "порода не указана" : this.animal.breed;
+      this.animal.breed === "" ? "Порода не указана" : this.animal.breed;
     // TODO getting address from coords
     return (
       `Потерян питомец: ${config.types[type_id - 1]}, ${breed}. ` +
@@ -110,14 +110,14 @@ class LostAnimalPanel extends React.Component {
   onClose = () => {
     const vkId = this.props.userStore.id;
     this.profileService
-      .closeLost(this.props.id, vkId)
+      .closeFound(this.props.id, vkId)
       .then(() => this.props.goBack());
   };
 
   render() {
     const { picture_id, type_id, description } = this.animal;
     const breed =
-      this.animal.breed === "" ? " Порода не указана" : this.animal.breed;
+      this.animal.breed === "" ? "Порода не указана" : this.animal.breed;
     const date = new Date(
       this.animal.date.replace(" ", "T")
     ).toLocaleDateString();
@@ -126,7 +126,7 @@ class LostAnimalPanel extends React.Component {
     return (
       <>
         <PanelHeader left={<PanelHeaderBack onClick={this.props.goBack} />}>
-          Потерянный питомец
+          Найденный питомец
         </PanelHeader>
         <Group separator="hide">
           <Div>
@@ -134,7 +134,7 @@ class LostAnimalPanel extends React.Component {
                 style={{ width: "100%" }}
                 src={
                   picture_id
-                    ? (config.baseUrl + `lost/img?id=${picture_id}`)
+                    ? config.baseUrl + `found/img?id=${picture_id}`
                     : vk_dog
                 }
                 alt={""}
@@ -209,7 +209,7 @@ class LostAnimalPanel extends React.Component {
           <Group>
             <List>
               <Cell>
-                <InfoRow header="Место пропажи">{this.address}</InfoRow>
+                <InfoRow header="Место находки">{this.address}</InfoRow>
               </Cell>
               <Cell>
                 <InfoRow header="Пол животного">
@@ -232,11 +232,11 @@ class LostAnimalPanel extends React.Component {
   }
 }
 
-decorate(LostAnimalPanel, {
+decorate(FoundAnimalPanel, {
   animal: observable,
   author: observable,
   address: observable,
   isMine: observable,
 });
 
-export default observer(LostAnimalPanel);
+export default observer(FoundAnimalPanel);

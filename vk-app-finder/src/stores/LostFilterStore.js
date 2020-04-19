@@ -25,7 +25,7 @@ class LostFilterStore {
       this.animals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
       this.onFetch();
-    })
+    }).catch(err => { console.log(err); });
   };
 }
 

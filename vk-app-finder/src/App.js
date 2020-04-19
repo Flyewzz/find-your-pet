@@ -21,6 +21,7 @@ import LostFilterStore from "./stores/LostFilterStore";
 import FoundPanel from "./panels/Found";
 import FoundFilterStore from "./stores/FoundFilterStore";
 import CreateFormFoundPanel from "./panels/CreateFormFoundPanel";
+import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 
 class App extends React.Component {
   constructor(props) {
@@ -39,7 +40,10 @@ class App extends React.Component {
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
-    this.modalBack = () => {
+    this.modalBack = (changed) => {
+      if (changed) {
+        this.lostFilterStore.animals = undefined;
+      }
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
     this.userStore = new UserStore();
@@ -74,7 +78,7 @@ class App extends React.Component {
   }
 
   openDestructive = (onAccept) => {
-    console.log('открыть попап кликнуто');
+    console.log('Открыть popup кликнуто');
     this.setState({
       popout:
         <Alert
@@ -127,7 +131,7 @@ class App extends React.Component {
   };
   toFound = (id) => {
     this.setState({
-      foundId: id,
+      id: id,
       foundPanel: 'found',
     });
   };
@@ -137,6 +141,12 @@ class App extends React.Component {
   toProfileLost = (id) => {
     this.setState({
       profilePanel: 'lost',
+      profileId: id,
+    });
+  };
+  toProfileFound = (id) => {
+    this.setState({
+      profilePanel: 'found',
       profileId: id,
     });
   };
@@ -217,7 +227,7 @@ class App extends React.Component {
                                   toMain={this.toMain}/>
           </Panel>
         </View>
-        <View popup={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
+        <View popout={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.lostFilterStore}
                         onClose={this.modalBack}/>
@@ -235,22 +245,23 @@ class App extends React.Component {
                              id={this.state.id}/>
           </Panel>
         </View>
-        <View popup={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
+        <View popout={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.lostFilterStore}
                         onClose={this.modalBack}/>
         }>
           <Panel id="messages">
-            <FoundPanel toLost={this.toFound}
-                        lostFilterStore={this.foundFilterStore}
+            <FoundPanel toFound={this.toFound}
+                        foundFilterStore={this.foundFilterStore}
                         mapStore={this.mapStore}
-                        openFilters={this.openFilters}/>
+                        openFilters={this.openFilters}
+                        />
           </Panel>
           <Panel id="found">
-            <LostAnimalPanel userStore={this.userStore}
+            <FoundAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
                              goBack={this.toFoundList}
-                             id={this.state.foundId}/>
+                             id={this.state.id}/>
           </Panel>
         </View>
         <View popout={this.state.popout} id="more" activePanel={this.state.profilePanel}>
@@ -260,10 +271,18 @@ class App extends React.Component {
                           goBack={this.toProfile}
                           toMainForm={this.toMainForm}
                           toMainFoundForm={this.toMainFoundForm}
-                          toLost={this.toProfileLost}/>
+                          toLost={this.toProfileLost}
+                          toFound={this.toProfileFound}
+                          />
           </Panel>
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
+                             openDestructive={this.openDestructive}
+                             goBack={this.toProfile}
+                             id={this.state.profileId}/>
+          </Panel>
+          <Panel id="found">
+            <FoundAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
                              goBack={this.toProfile}
                              id={this.state.profileId}/>

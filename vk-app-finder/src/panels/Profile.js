@@ -61,8 +61,7 @@ class ProfilePanel extends React.Component {
                        openDestructive={this.props.openDestructive}
                        toMainForm={this.props.toMainFoundForm}
                        goBack={this.props.goBack}
-                       toLost={this.props.toLost}/>}
-
+                       toFound={this.props.toFound}/>}
         </Group>
       </>
     );

@@ -17,24 +17,31 @@ class SearchFilter extends React.Component {
     this.breed = props.filterStore.fields.breed;
   }
 
+  changed = false;
+
   onSexChange = (e) => {
     this.sex = e.target.value;
+    this.changed = true;
   };
 
   onTypeChange = (e) => {
     this.type = e.target.value;
+    this.changed = true;
   };
 
   onBreedChange = (e) => {
     this.breed = e.target.value;
+    this.changed = true;
   };
 
   onAccept = () => {
-    const onFieldChange = this.props.filterStore.onFieldChange;
-    onFieldChange('sex', this.sex);
-    onFieldChange('type', this.type);
-    onFieldChange('breed', this.breed);
-    this.props.filterStore.fetch();
+    if (this.changed) {
+      const onFieldChange = this.props.filterStore.onFieldChange;
+      onFieldChange('sex', this.sex);
+      onFieldChange('type', this.type);
+      onFieldChange('breed', this.breed);
+      this.props.filterStore.fetch();
+    }
     this.props.onClose();
   };
 
