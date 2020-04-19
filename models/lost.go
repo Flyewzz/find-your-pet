@@ -10,7 +10,7 @@ type Lost struct {
 	StatusId    int     `json:"status_id"`
 	Date        string  `json:"date"`
 	Location    string  `json:"location,omitempty"`
-	PictureId   int     `json:"picture_id"`
+	PictureId   int     `json:"picture_id,omitempty"`
 	Latitude    float64 `json:"latitude,omitempty"`
 	Longitude   float64 `json:"longitude,omitempty"`
 }

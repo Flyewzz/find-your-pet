@@ -29,6 +29,7 @@ func NewLostControllerPg(itemsPerPage int, db *sql.DB) *LostControllerPg {
 func (lc *LostControllerPg) GetById(ctx context.Context, id int) (*models.Lost, error) {
 	closeId := ctx.Value("close_id").(int)
 	var lost models.Lost
+	var pictureId sql.NullInt32
 	err := lc.db.QueryRow("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, "+
 		"date, st_x(location) as latitude, "+
@@ -37,9 +38,13 @@ func (lc *LostControllerPg) GetById(ctx context.Context, id int) (*models.Lost, 
 		Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
 			&lost.Sex, &lost.Breed, &lost.Description,
 			&lost.StatusId, &lost.Date,
-			&lost.Latitude, &lost.Longitude, &lost.PictureId)
+			&lost.Latitude, &lost.Longitude, &pictureId)
 	if err != nil {
 		return nil, err
+	}
+	// If the user added a picture
+	if pictureId.Valid {
+		lost.PictureId = int(pictureId.Int32)
 	}
 	return &lost, nil
 }

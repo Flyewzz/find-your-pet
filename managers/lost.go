@@ -45,6 +45,10 @@ func (lam *LostAddingManager) Add(ctx context.Context, params *models.Lost,
 	lostIdCh <- lostId
 	select {
 	case file := <-fileCh:
+		// A client may don't send a picture
+		if file == nil {
+			break
+		}
 		_, err = lam.FileController.AddToLost(ctx, file, lostId)
 		if err != nil {
 			if errRoll := tx.Rollback(); errRoll != nil {

@@ -163,32 +163,35 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// It's a real file. The user sent it
 	file, header, err := r.FormFile("picture")
-	if err != nil {
+	// An empty file is not error
+	if err != nil && err != http.ErrMissingFile {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	extension := features.GetExtension(header.Filename)
-	defer file.Close()
-	// in MB
-	fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
-	if header.Size > fileMaxSize {
-		w.WriteHeader(http.StatusBadRequest)
-		type ErrStruct struct {
-			err string `json:"error"`
-		}
-		errMsg := ErrStruct{
-			err: fmt.Sprintf("File cannot be larger than %d MB",
-				fileMaxSize),
-		}
-		data, err := json.Marshal(errMsg)
-		if err != nil {
-			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+	var extension string
+	if err != http.ErrMissingFile {
+		extension = features.GetExtension(header.Filename)
+		defer file.Close()
+		// in MB
+		fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
+		if header.Size > fileMaxSize {
+			w.WriteHeader(http.StatusBadRequest)
+			type ErrStruct struct {
+				err string `json:"error"`
+			}
+			errMsg := ErrStruct{
+				err: fmt.Sprintf("File cannot be larger than %d MB",
+					fileMaxSize),
+			}
+			data, err := json.Marshal(errMsg)
+			if err != nil {
+				errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+				return
+			}
+			w.Write(data)
 			return
 		}
-		w.Write(data)
-		return
 	}
-
 	lostParams := &models.Lost{
 		TypeId:      typeId,
 		AuthorId:    authorId,
@@ -219,7 +222,23 @@ addLostId:
 			return
 		}
 	}
+	if err == http.ErrMissingFile {
+		select {
+		case err = <-errCh:
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+			return
+		default:
+			mFileCh <- nil
+		}
 
+		if err = <-errCh; err != nil {
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+			return
+		}
+
+		w.Write([]byte(strconv.Itoa(lostId)))
+		return
+	}
 	baseLostDirectoryPath := viper.GetString("lost.files.directory")
 	lostDirectoryPath := strconv.Itoa(lostId)
 	fullDirectoryPath := filepath.Join(baseLostDirectoryPath,

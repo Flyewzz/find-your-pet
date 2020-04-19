@@ -9,14 +9,19 @@ import (
 func ConvertRowsToLost(rows *sql.Rows) ([]models.Lost, error) {
 	var err error
 	var losts []models.Lost
+	var pictureId sql.NullInt32
 	for rows.Next() {
 		var lost models.Lost
 		err = rows.Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
 			&lost.Sex, &lost.Breed, &lost.Description,
 			&lost.StatusId, &lost.Date,
-			&lost.Latitude, &lost.Longitude, &lost.PictureId)
+			&lost.Latitude, &lost.Longitude, &pictureId)
 		if err != nil {
 			continue // !
+		}
+		// If the user added a picture
+		if pictureId.Valid {
+			lost.PictureId = int(pictureId.Int32)
 		}
 		losts = append(losts, lost)
 	}
