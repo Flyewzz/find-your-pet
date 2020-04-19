@@ -134,7 +134,7 @@ func (hd *HandlerData) AddFoundHandler(w http.ResponseWriter, r *http.Request) {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	// author_id is a temprorary parameter
+	// author_id is a temprorarily parameter
 	strAuthorId := params("vk_id")
 	authorId, err := strconv.Atoi(strAuthorId)
 	if err != nil {
@@ -163,32 +163,36 @@ func (hd *HandlerData) AddFoundHandler(w http.ResponseWriter, r *http.Request) {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	// It's a real file. The user sent it
+	// It's a real file. The user can send it
 	file, header, err := r.FormFile("picture")
-	if err != nil {
+	// An empty file is not error
+	if err != nil && err != http.ErrMissingFile {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	extension := features.GetExtension(header.Filename)
-	defer file.Close()
-	// in MB
-	fileMaxSize := viper.GetInt64("found.files.max_size") * 1024 * 1024
-	if header.Size > fileMaxSize {
-		w.WriteHeader(http.StatusBadRequest)
-		type ErrStruct struct {
-			err string `json:"error"`
-		}
-		errMsg := ErrStruct{
-			err: fmt.Sprintf("File cannot be larger than %d MB",
-				fileMaxSize),
-		}
-		data, err := json.Marshal(errMsg)
-		if err != nil {
-			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+	var extension string
+	if err != http.ErrMissingFile {
+		extension = features.GetExtension(header.Filename)
+		defer file.Close()
+		// in MB
+		fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
+		if header.Size > fileMaxSize {
+			w.WriteHeader(http.StatusBadRequest)
+			type ErrStruct struct {
+				err string `json:"error"`
+			}
+			errMsg := ErrStruct{
+				err: fmt.Sprintf("File cannot be larger than %d MB",
+					fileMaxSize),
+			}
+			data, err := json.Marshal(errMsg)
+			if err != nil {
+				errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+				return
+			}
+			w.Write(data)
 			return
 		}
-		w.Write(data)
-		return
 	}
 
 	foundParams := &models.Found{
@@ -220,6 +224,24 @@ addFoundId:
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 			return
 		}
+	}
+
+	if err == http.ErrMissingFile {
+		select {
+		case err = <-errCh:
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+			return
+		default:
+			mFileCh <- nil
+		}
+
+		if err = <-errCh; err != nil {
+			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+			return
+		}
+
+		w.Write([]byte(strconv.Itoa(foundId)))
+		return
 	}
 
 	baseFoundDirectoryPath := viper.GetString("found.files.directory")

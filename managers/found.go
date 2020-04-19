@@ -45,6 +45,10 @@ func (fam *FoundAddingManager) Add(ctx context.Context, params *models.Found,
 	foundIdCh <- foundId
 	select {
 	case file := <-fileCh:
+		// A client may don't send a picture
+		if file == nil {
+			break
+		}
 		_, err = fam.FileController.AddToFound(ctx, file, foundId)
 		if err != nil {
 			if errRoll := tx.Rollback(); errRoll != nil {

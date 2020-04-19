@@ -31,14 +31,19 @@ func ConvertRowsToLost(rows *sql.Rows) ([]models.Lost, error) {
 func ConvertRowsToFound(rows *sql.Rows) ([]models.Found, error) {
 	var err error
 	var founds []models.Found
+	var pictureId sql.NullInt32
 	for rows.Next() {
 		var found models.Found
 		err = rows.Scan(&found.Id, &found.TypeId, &found.AuthorId,
 			&found.Sex, &found.Breed, &found.Description,
 			&found.StatusId, &found.Date,
-			&found.Latitude, &found.Longitude, &found.PictureId)
+			&found.Latitude, &found.Longitude, &pictureId)
 		if err != nil {
 			continue // !
+		}
+		// If the user added a picture
+		if pictureId.Valid {
+			found.PictureId = int(pictureId.Int32)
 		}
 		founds = append(founds, found)
 	}

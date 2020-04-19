@@ -29,6 +29,7 @@ func NewFoundControllerPg(itemsPerPage int, db *sql.DB) *FoundControllerPg {
 func (fc *FoundControllerPg) GetById(ctx context.Context, id int) (*models.Found, error) {
 	closeId := ctx.Value("close_id").(int)
 	var found models.Found
+	var pictureId sql.NullInt32
 	err := fc.db.QueryRow("SELECT id, type_id, vk_id, sex, "+
 		"breed, description, status_id, "+
 		"date, st_x(location) as latitude, "+
@@ -37,9 +38,13 @@ func (fc *FoundControllerPg) GetById(ctx context.Context, id int) (*models.Found
 		Scan(&found.Id, &found.TypeId, &found.AuthorId,
 			&found.Sex, &found.Breed, &found.Description,
 			&found.StatusId, &found.Date,
-			&found.Latitude, &found.Longitude, &found.PictureId)
+			&found.Latitude, &found.Longitude, &pictureId)
 	if err != nil {
 		return nil, err
+	}
+	// Only if picture_id is not null
+	if pictureId.Valid {
+		found.PictureId = int(pictureId.Int32)
 	}
 	return &found, nil
 }

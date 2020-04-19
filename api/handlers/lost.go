@@ -132,7 +132,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	// author_id is a temprorary parameter
+	// author_id is a temprorarily parameter
 	strAuthorId := params("vk_id")
 	authorId, err := strconv.Atoi(strAuthorId)
 	if err != nil {
@@ -161,7 +161,7 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	// It's a real file. The user sent it
+	// It's a real file. The user can send it
 	file, header, err := r.FormFile("picture")
 	// An empty file is not error
 	if err != nil && err != http.ErrMissingFile {
