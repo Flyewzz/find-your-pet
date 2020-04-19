@@ -7,13 +7,13 @@ import Icon28Menu from '@vkontakte/icons/dist/28/menu';
 import Icon28User from '@vkontakte/icons/dist/28/user';
 import Icon28HomeOutline from '@vkontakte/icons/dist/28/home_outline';
 import Icon28ListCheckOutline from '@vkontakte/icons/dist/28/list_check_outline';
-import {Epic, Panel, PanelHeader} from "@vkontakte/vkui";
+import {Epic, Panel} from "@vkontakte/vkui";
 import MainPanel from "./panels/Main";
 import LostPanel from "./panels/Lost";
 import SearchFilter from "./panels/SearchFilter";
 import CreateFormPanel from "./panels/CreateFormPanel";
 import LostAnimalPanel from "./panels/LostAnimalPanel";
-import MapStateStore from "./stores/MapStateStore";
+import LostMapStore from "./stores/LostMapStore";
 import UserStore from "./stores/UserStore";
 import ProfilePanel from "./panels/Profile";
 import {Alert} from "@vkontakte/vkui";
@@ -22,6 +22,7 @@ import FoundPanel from "./panels/Found";
 import FoundFilterStore from "./stores/FoundFilterStore";
 import CreateFormFoundPanel from "./panels/CreateFormFoundPanel";
 import FoundAnimalPanel from "./panels/FoundAnimalPanel";
+import FoundMapStore from "./stores/FoundMapStore";
 
 class App extends React.Component {
   constructor(props) {
@@ -47,7 +48,8 @@ class App extends React.Component {
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
     this.userStore = new UserStore();
-    this.mapStore = new MapStateStore(this.userStore);
+    this.mapStore = new LostMapStore(this.userStore);
+    this.foundMapStore = new FoundMapStore(this.userStore);
     this.lostFilterStore = new LostFilterStore();
     this.foundFilterStore = new FoundFilterStore();
     this.openFilters = () => {
@@ -253,7 +255,7 @@ class App extends React.Component {
           <Panel id="messages">
             <FoundPanel toFound={this.toFound}
                         foundFilterStore={this.foundFilterStore}
-                        mapStore={this.mapStore}
+                        mapStore={this.foundMapStore}
                         openFilters={this.openFilters}
                         />
           </Panel>

@@ -1,6 +1,6 @@
 import {decorate, observable} from "mobx";
 
-class MapStateStore {
+class FoundMapStore {
   constructor(userStore) {
     userStore.getPosition().then(result => {
       if (result.available) {
@@ -14,10 +14,10 @@ class MapStateStore {
   zoom = 9;
 }
 
-decorate(MapStateStore, {
+decorate(FoundMapStore, {
   isMapView: observable,
   center: observable,
   zoom: observable,
 });
 
-export default MapStateStore;
+export default FoundMapStore;

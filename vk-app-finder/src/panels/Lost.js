@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardGrid, Div, Group, PanelHeader, Spinner } from "@vkontakte/vkui";
+import {Card, CardGrid, Div, Group, PanelHeader, Spinner} from "@vkontakte/vkui";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
 import {decorate, observable} from "mobx";
@@ -28,7 +28,7 @@ class LostPanel extends React.Component {
   }
 
   addresses = [];
-  
+
   componentDidMount() {
     this.props.lostFilterStore.animals = undefined;
     this.filterChanged = true;
@@ -68,7 +68,7 @@ class LostPanel extends React.Component {
         {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
         <AnimalCard onClick={() => this.props.toLost(animal.id)}
                     address={this.addresses[index]}
-                    key={animal.id} animal={animal} type={'lost'} />
+                    key={animal.id} animal={animal} type={'lost'}/>
       </React.Fragment>
     );
   };
@@ -82,10 +82,8 @@ class LostPanel extends React.Component {
     const animals = this.props.lostFilterStore.animals;
     const mapStyle = {
       display: this.props.mapStore.isMapView ? undefined : 'none',
-      height: '490px',
-      width: '100%',
     };
-
+    console.log(mapStyle.display);
     return (
       <>
         <PanelHeader>Потерялись</PanelHeader>
@@ -96,8 +94,8 @@ class LostPanel extends React.Component {
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 
-          { (animals === undefined && this.filterChanged == true) &&
-          <Spinner size="large" style={{ marginTop: 20, color: "rgb(83, 118, 164)" }} />
+          {(animals === undefined && this.filterChanged === true) &&
+          <Spinner size="large" style={{marginTop: 20, color: "rgb(83, 118, 164)"}}/>
           }
 
           {!this.props.mapStore.isMapView && animals
@@ -108,12 +106,18 @@ class LostPanel extends React.Component {
           </Placeholder>}
 
           <Div><YMaps>
-            <div className={'map__container'}>
-            <Icon28CancelOutline
-              onClick={() => { this.props.mapStore.isMapView = false } }
-              className={"cancel-icon"}
-            />
-              <Map style={mapStyle}
+            <div style={mapStyle} className={'map__container'}>
+              <Icon28CancelOutline
+                style={mapStyle}
+                onClick={() => {
+                  this.props.mapStore.isMapView = false;
+                }}
+                className={"cancel-icon"}
+              />
+              <Map style={{
+                height: '490px',
+                width: '100%',
+              }}
                    onBoundsChange={this.onBoundsChange}
                    state={{
                      center: this.props.mapStore.center,

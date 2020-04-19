@@ -81,8 +81,6 @@ class FoundPanel extends React.Component {
     const animals = this.props.foundFilterStore.animals;
     const mapStyle = {
       display: this.props.mapStore.isMapView ? undefined : 'none',
-      height: '490px',
-      width: '100%',
     };
 
     return (
@@ -102,12 +100,15 @@ class FoundPanel extends React.Component {
           </Placeholder>}
 
           <Div><YMaps>
-          <div className={'map__container'}>
+          <div style={mapStyle} className={'map__container'}>
             <Icon28CancelOutline
               onClick={() => { this.props.mapStore.isMapView = false } }
               className={"cancel-icon"}
             />
-              <Map style={mapStyle}
+              <Map style={{
+                height: '490px',
+                width: '100%',
+              }}
                    onBoundsChange={this.onBoundsChange}
                    state={{
                      center: this.props.mapStore.center,
