@@ -3,6 +3,7 @@ import Card from "@vkontakte/vkui/dist/components/Card/Card";
 import "./AnimalCard.css";
 import config from "../../config";
 import { Div } from "@vkontakte/vkui";
+import vk_dog from '../../img/vk_dog.jpg';
 
 const AnimalCard = (props) => {
   const animal = props.animal;
@@ -27,7 +28,8 @@ const AnimalCard = (props) => {
         </div>
         <img
           className={"animal-card__photo"}
-          src={config.baseUrl + `${type}/img?id=${animal.picture_id}`}
+          src={ animal.picture_id ? (config.baseUrl + `${type}/img?id=${animal.picture_id}`)
+                  : vk_dog}
           height="180px"
           alt={""}
         />

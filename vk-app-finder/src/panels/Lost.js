@@ -1,5 +1,5 @@
 import React from "react";
-import {Card, CardGrid, Div, Group, PanelHeader} from "@vkontakte/vkui";
+import { Card, CardGrid, Div, Group, PanelHeader, Spinner } from "@vkontakte/vkui";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
 import {decorate, observable} from "mobx";
@@ -27,8 +27,10 @@ class LostPanel extends React.Component {
   }
 
   addresses = [];
-
+  
   componentDidMount() {
+    this.props.lostFilterStore.animals = undefined;
+    this.filterChanged = true;
     this.props.lostFilterStore.fetch();
   }
 
@@ -87,14 +89,19 @@ class LostPanel extends React.Component {
       <>
         <PanelHeader>Потерялись</PanelHeader>
         <Group separator="hide">
+
           <FilterLine isMap={this.state.mapView}
                       filterStore={this.props.lostFilterStore}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 
+          { (animals === undefined && this.filterChanged == true) &&
+          <Spinner size="large" style={{ marginTop: 20, color: "rgb(83, 118, 164)" }} />
+          }
+
           {!this.props.mapStore.isMapView && animals
           && <CardGrid>{this.animalsToCards()}</CardGrid>}
-          {!this.props.mapStore.isMapView && !animals
+          {!this.props.mapStore.isMapView && (animals === null)
           && <Placeholder icon={<Icon56InfoOutline/>}>
             Ничего не найдено<br/>Попробуйте позже или измените фильтры
           </Placeholder>}

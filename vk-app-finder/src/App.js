@@ -40,7 +40,10 @@ class App extends React.Component {
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
-    this.modalBack = () => {
+    this.modalBack = (changed) => {
+      if (changed) {
+        this.lostFilterStore.animals = undefined;
+      }
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
     this.userStore = new UserStore();
@@ -212,7 +215,7 @@ class App extends React.Component {
                                   toMain={this.toMain}/>
           </Panel>
         </View>
-        <View popup={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
+        <View popout={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.lostFilterStore}
                         onClose={this.modalBack}/>
@@ -230,7 +233,7 @@ class App extends React.Component {
                              id={this.state.id}/>
           </Panel>
         </View>
-        <View popup={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
+        <View popout={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.lostFilterStore}
                         onClose={this.modalBack}/>
