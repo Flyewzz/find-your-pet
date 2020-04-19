@@ -6,7 +6,7 @@ import config from "../../config";
 import { Group, List } from "@vkontakte/vkui";
 import { Cell } from "@vkontakte/vkui/dist/es6";
 import { autorun } from "mobx";
-import vk_dog from '../../img/vk_dog.jpg';
+import getDefaultAnimal from '../default_animals/DefaultAnimals';
 
 
 const ProfileFoundCard = (props) => {
@@ -38,7 +38,7 @@ const ProfileFoundCard = (props) => {
           <img
             className={"profile__card__photo"}
             src={animal.picture_id ? (config.baseUrl + `found/img?id=${animal.picture_id}`)
-                : vk_dog }
+                : getDefaultAnimal(animal.type_id) }
             alt={""}
           />
         </div>

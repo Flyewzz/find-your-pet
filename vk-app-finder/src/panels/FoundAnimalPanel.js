@@ -16,7 +16,8 @@ import "./FoundAnimalPanel.css";
 import FoundService from "../services/FoundService";
 import ProfileService from "../services/ProfileService";
 import GeocodingService from "../services/GeocodingService";
-import vk_dog from "../img/vk_dog.jpg";
+import getDefaultAnimal from '../components/default_animals/DefaultAnimals';
+
 
 class FoundAnimalPanel extends React.Component {
   constructor(props) {
@@ -135,7 +136,7 @@ class FoundAnimalPanel extends React.Component {
                 src={
                   picture_id
                     ? config.baseUrl + `found/img?id=${picture_id}`
-                    : vk_dog
+                    : getDefaultAnimal(type_id)
                 }
                 alt={""}
               />
