@@ -174,25 +174,37 @@ class App extends React.Component {
       <Epic activeStory={this.state.activeStory} tabbar={
         <Tabbar>
           <TabbarItem
-            onClick={this.onStoryChange}
+            onClick={(e) => {
+              this.setState({mainPanel: 'main'});
+              this.onStoryChange(e);
+            }}
             selected={this.state.activeStory === 'main'}
             data-story="main"
             text="Главная"
           ><Icon28HomeOutline/></TabbarItem>
           <TabbarItem
-            onClick={this.onStoryChange}
+            onClick={(e) => {
+              this.setState({lostPanel: 'losts'});
+              this.onStoryChange(e);
+            }}
             selected={this.state.activeStory === 'lost'}
             data-story="lost"
             text="Потерялись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
-            onClick={this.onStoryChange}
+            onClick={(e) => {
+              this.setState({foundPanel: 'messages'});
+              this.onStoryChange(e);
+            }}
             selected={this.state.activeStory === 'messages'}
             data-story="messages"
             text="Нашлись"
           ><Icon28ListCheckOutline/></TabbarItem>
           <TabbarItem
-            onClick={this.onStoryChange}
+            onClick={(e) => {
+              this.setState({profilePanel: 'more'});
+              this.onStoryChange(e);
+            }}
             selected={this.state.activeStory === 'more'}
             data-story="more"
             text="Профиль"
