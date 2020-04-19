@@ -16,7 +16,8 @@ import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 import "./LostAnimalPanel.css";
 import ProfileService from "../services/ProfileService";
 import GeocodingService from "../services/GeocodingService";
-import vk_dog from "../img/vk_dog.jpg";
+import getDefaultAnimal from '../components/default_animals/DefaultAnimals';
+
 
 class LostAnimalPanel extends React.Component {
   constructor(props) {
@@ -135,7 +136,7 @@ class LostAnimalPanel extends React.Component {
                 src={
                   picture_id
                     ? (config.baseUrl + `lost/img?id=${picture_id}`)
-                    : vk_dog
+                    : getDefaultAnimal(type_id)
                 }
                 alt={""}
               />
