@@ -8,6 +8,7 @@ import './Lost.css';
 import {Map, Placemark, YMaps, ZoomControl} from 'react-yandex-maps';
 import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
+import Icon28CancelOutline from "@vkontakte/icons/dist/28/cancel_outline";
 import GeocodingService from "../services/GeocodingService";
 
 class LostPanel extends React.Component {
@@ -107,7 +108,11 @@ class LostPanel extends React.Component {
           </Placeholder>}
 
           <Div><YMaps>
-            <div>
+            <div className={'map__container'}>
+            <Icon28CancelOutline
+              onClick={() => { this.props.mapStore.isMapView = false } }
+              className={"cancel-icon"}
+            />
               <Map style={mapStyle}
                    onBoundsChange={this.onBoundsChange}
                    state={{

@@ -95,7 +95,7 @@ class FoundAnimalPanel extends React.Component {
   getShareText = () => {
     const { type_id } = this.animal;
     const breed =
-      this.animal.breed === "" ? "порода не указана" : this.animal.breed;
+      this.animal.breed === "" ? "Порода не указана" : this.animal.breed;
     // TODO getting address from coords
     return (
       `Потерян питомец: ${config.types[type_id - 1]}, ${breed}. ` +

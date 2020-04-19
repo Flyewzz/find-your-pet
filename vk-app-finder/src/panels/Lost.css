@@ -1,3 +1,16 @@
 #map {
     height: 490px;
 }
+
+.map__container {
+    position: relative;
+    height: auto;
+}
+
+.cancel-icon {
+    position: absolute;
+    cursor: pointer;
+    top: 5px;
+    right: 15px;
+    z-index: 10;
+}

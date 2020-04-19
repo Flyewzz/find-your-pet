@@ -6,6 +6,11 @@
 
 .filter__map {
     margin-right: 5px;
+    cursor: pointer;
+}
+
+.filter__button {
+    cursor: pointer;
 }
 
 .checked {
