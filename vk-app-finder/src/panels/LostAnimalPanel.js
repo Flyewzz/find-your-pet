@@ -130,7 +130,6 @@ class LostAnimalPanel extends React.Component {
         </PanelHeader>
         <Group separator="hide">
           <Div>
-            
               <img
                 style={{ width: "100%" }}
                 src={

@@ -134,7 +134,7 @@ class FoundAnimalPanel extends React.Component {
                 style={{ width: "100%" }}
                 src={
                   picture_id
-                    ? config.baseUrl + `lost/img?id=${picture_id}`
+                    ? config.baseUrl + `found/img?id=${picture_id}`
                     : vk_dog
                 }
                 alt={""}
