@@ -10,8 +10,10 @@
     flex-direction: column;
     align-content: start;
     justify-content: start;
-    margin: 0 auto 4px 3px;
+    margin: 0 auto 10px 3px;
     width: 60%;
+    max-height: 185px;
+    overflow: hidden;
 }
 
 .profile__cancel-icon {
@@ -51,7 +53,7 @@
   
   .profile__card__photo__container {
     position: relative;
-    height: auto;
+    /* height: 200px; */
     width: auto;
   }
   

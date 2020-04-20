@@ -19,10 +19,11 @@ const ProfileFoundCard = (props) => {
     <Card
       onClick={() => props.onClick(animal.id)}
       style={{
-        height: "max(180, auto)",
+        height: "200px",
         display: "flex",
         flexDirection: "column",
         alignItems: "stretch",
+        overflow: "hidden",
       }}
       className={"profile__card__container"}
       size="l"
