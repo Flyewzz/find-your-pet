@@ -4,6 +4,7 @@ import "./AnimalCard.css";
 import config from "../../config";
 import { Div } from "@vkontakte/vkui";
 import getDefaultAnimal from '../default_animals/DefaultAnimals';
+import getGenderInfo from '../gender/Genders';
 
 const AnimalCard = (props) => {
   const animal = props.animal;
@@ -14,9 +15,9 @@ const AnimalCard = (props) => {
   console.log(props.address);
   const type = props.type;
   const cardSize = (window.innerWidth > 550) ? 'm' : 'l'; // 'l' for mobiles
+  const gender = getGenderInfo(animal.sex);
 
   return (
-    
     <Card
       onClick={props.onClick}
       style={{ height: "max(315px, auto)" }}
@@ -37,8 +38,11 @@ const AnimalCard = (props) => {
         />
       </div>
       <Div className={"animal-card__data"}>
-        <p className={"animal-card__address"}>{props.address}</p>
+        <p className={"animal-card__address"}>{ props.address }</p>
         <p className={"animal-card__date"}>Дата {type === 'lost' ? 'пропажи' : 'находки'}: {date}</p>
+        <p className={"animal-card__gender"}>Пол: { gender.name } 
+        <img className={"animal-card__gender__picture"} src={ gender.picture } width='32' height='32'></img>
+        </p>
       </Div>
     </Card>
   );
