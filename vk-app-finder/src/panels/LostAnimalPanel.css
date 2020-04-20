@@ -14,3 +14,7 @@
 .author__action-button {
     padding-left: 0;
 }
+
+.author__info {
+    cursor: pointer;
+}

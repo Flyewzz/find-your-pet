@@ -93,6 +93,10 @@ class LostAnimalPanel extends React.Component {
     };
   };
 
+  getProfileLink() {
+    return `https://vk.com/id${this.animal.vk_id}`;
+  }
+  
   getShareText = () => {
     const { type_id } = this.animal;
     const breed =
@@ -163,9 +167,11 @@ class LostAnimalPanel extends React.Component {
           >
             {!this.isMine
               ? [
-                  <Cell before={<Avatar src={this.author.photo_50} />}>
-                    {this.author.first_name + " " + this.author.last_name}
-                  </Cell>,
+                  <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
+                    <Cell className={"author__info"} before={<Avatar src={this.author.photo_50} />}>
+                      {this.author.first_name + " " + this.author.last_name}
+                    </Cell>
+                  </a>,
                   <Cell
                     multiline={true}
                     description={this.writeHref().description}
