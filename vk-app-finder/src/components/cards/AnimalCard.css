@@ -44,3 +44,10 @@
   position: relative;
   height: auto;
 }
+
+.animal-card__gender__picture {
+  display: block;
+  margin-left: auto;
+  /* width: auto;
+  height: auto; */
+}

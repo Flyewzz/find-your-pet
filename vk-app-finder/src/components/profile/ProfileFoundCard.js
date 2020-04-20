@@ -18,19 +18,13 @@ const ProfileFoundCard = (props) => {
   return (
     <Card
       onClick={() => props.onClick(animal.id)}
-      style={{
-        height: "200px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        overflow: "hidden",
-      }}
-      className={"profile__card__container"}
+      className={"profile__card"}
       size="l"
       mode="shadow"
     >
       <div
         style={{ display: "flex", flexGrow: 1, height: "100%", width: "100%" }}
+        className={"profile__card__container"}
       >
         <div className={"profile__card__photo__container"}>
           <div className={"profile__card__photo__corner"}>
@@ -49,19 +43,21 @@ const ProfileFoundCard = (props) => {
               onClick={() => props.cancel(animal.id)}
               className={"profile__cancel-icon"}
             />
-            <div className={"profile__card__info_cell"}>
-              <span style={{ fontWeight: "bold" }}>Адрес: </span>
-              {props.address}
-            </div>
+            <div className={"profile__card__cells"}>
+              <div className={"profile__card__info_cell"}>
+                <span style={{ fontWeight: "bold" }}>Адрес: </span>
+                {props.address}
+              </div>
 
-            <div className={"profile__card__info_cell"}>
-              <span style={{ fontWeight: "bold" }}>Дата пропажи: </span>
-              {date}
-            </div>
+              <div className={"profile__card__info_cell"}>
+                <span style={{ fontWeight: "bold" }}>Дата пропажи: </span>
+                {date}
+              </div>
 
-            <div className={"profile__card__info_cell"}>
-              <span style={{ fontWeight: "bold" }}>Описание: </span>
-              {animal.description}
+              <div className={"profile__card__info_cell"}>
+                <span style={{ fontWeight: "bold" }}>Описание: </span>
+                {animal.description}
+              </div>
             </div>
           </List>
         </Group>
