@@ -36,6 +36,7 @@ class App extends React.Component {
       lostPanel: 'losts',
       foundPanel: 'messages',
       profilePanel: 'more',
+      profileTab: 'lost',
 
       popout: null,
     };
@@ -137,8 +138,17 @@ class App extends React.Component {
       foundPanel: 'found',
     });
   };
-  toProfile = () => {
-    this.setState({profilePanel: 'more'});
+  toProfileLostTab = () => {
+    this.setState({
+      profilePanel: 'more',
+      profileTab: 'lost',
+    });
+  };
+  toProfileFoundTab = () => {
+    this.setState({
+      profilePanel: 'more',
+      profileTab: 'found',
+    });
   };
   toProfileLost = (id) => {
     this.setState({
@@ -269,8 +279,9 @@ class App extends React.Component {
         <View popout={this.state.popout} id="more" activePanel={this.state.profilePanel}>
           <Panel id="more">
             <ProfilePanel userStore={this.userStore}
+                          activeTab={this.state.profileTab}
                           openDestructive={this.openDestructive}
-                          goBack={this.toProfile}
+                          goBack={this.toProfileMain}
                           toMainForm={this.toMainForm}
                           toMainFoundForm={this.toMainFoundForm}
                           toLost={this.toProfileLost}
@@ -280,13 +291,13 @@ class App extends React.Component {
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
-                             goBack={this.toProfile}
+                             goBack={this.toProfileLostTab}
                              id={this.state.profileId}/>
           </Panel>
           <Panel id="found">
             <FoundAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
-                             goBack={this.toProfile}
+                             goBack={this.toProfileFoundTab}
                              id={this.state.profileId}/>
           </Panel>
         </View>

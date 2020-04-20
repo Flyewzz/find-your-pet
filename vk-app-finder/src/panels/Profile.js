@@ -14,10 +14,9 @@ class ProfilePanel extends React.Component {
     this.state = {
       mapView: false,
       places: [],
-      activePanel: "main-panel",
       contextOpened: false,
       mode: "all",
-      activeTab: "lost",
+      activeTab: props.activeTab,
     };
 
     this.changeView = () => {
