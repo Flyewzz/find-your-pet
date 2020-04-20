@@ -13,13 +13,15 @@ const AnimalCard = (props) => {
     .replace(/\//g, ".");
   console.log(props.address);
   const type = props.type;
+  const cardSize = (window.innerWidth > 550) ? 'm' : 'l'; // 'l' for mobiles
 
   return (
+    
     <Card
       onClick={props.onClick}
       style={{ height: "max(315px, auto)" }}
       className="animal__card"
-      size="m"
+      size={cardSize}
       mode="shadow"
     >
       <div className={"animal-card__photo__container"}>
