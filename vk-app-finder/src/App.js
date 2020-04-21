@@ -281,7 +281,8 @@ class App extends React.Component {
             <ProfilePanel userStore={this.userStore}
                           activeTab={this.state.profileTab}
                           openDestructive={this.openDestructive}
-                          goBack={this.toProfileMain}
+                          goBackLost={this.toProfileLostTab}
+                          goBackFound={this.toProfileFoundTab}
                           toMainForm={this.toMainForm}
                           toMainFoundForm={this.toMainFoundForm}
                           toLost={this.toProfileLost}

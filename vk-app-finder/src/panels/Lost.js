@@ -11,6 +11,7 @@ import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
 import Icon28CancelOutline from "@vkontakte/icons/dist/28/cancel_outline";
 import GeocodingService from "../services/GeocodingService";
 
+
 class LostPanel extends React.Component {
   constructor(props) {
     super(props);
@@ -94,7 +95,7 @@ class LostPanel extends React.Component {
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 
-          {(animals === undefined && this.filterChanged === true) &&
+          {animals === undefined && this.filterChanged &&
           <Spinner size="large" style={{marginTop: 20, color: "rgb(83, 118, 164)"}}/>
           }
 

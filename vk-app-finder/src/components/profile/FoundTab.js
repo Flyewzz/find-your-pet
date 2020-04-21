@@ -1,5 +1,5 @@
 import React from "react";
-import { CardGrid } from "@vkontakte/vkui";
+import {CardGrid, Spinner} from "@vkontakte/vkui";
 import ProfileFoundCard from "./ProfileFoundCard";
 import { decorate, observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
@@ -18,6 +18,7 @@ class FoundTab extends React.Component {
 
   animals = null;
   addresses = [];
+  loading = true;
 
   componentDidMount() {
     this.props.userStore.getId().then((result) => this.fetchFound(result.id));
@@ -45,6 +46,8 @@ class FoundTab extends React.Component {
               .then((result) => this.updateAddress(index, result.address));
           });
         }
+
+        this.loading = false;
       },
       (error) => {
         console.log(error);
@@ -78,7 +81,10 @@ class FoundTab extends React.Component {
   render() {
     return (
       <CardGrid>
-        {!this.animals && (
+        {this.loading &&
+        <Spinner size="large" style={{marginTop: 20, color: "rgb(83, 118, 164)"}}/>
+        }
+        {!this.loading && !this.animals && (
           <Placeholder
             icon={<Icon56InfoOutline />}
             action={
@@ -100,6 +106,7 @@ class FoundTab extends React.Component {
 decorate(FoundTab, {
   animals: observable,
   addresses: observable,
+  loading: observable,
 });
 
 export default observer(FoundTab);
