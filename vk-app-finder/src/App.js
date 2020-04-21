@@ -259,7 +259,7 @@ class App extends React.Component {
         </View>
         <View popout={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
-                        filterStore={this.lostFilterStore}
+                        filterStore={this.foundFilterStore}
                         onClose={this.modalBack}/>
         }>
           <Panel id="messages">
