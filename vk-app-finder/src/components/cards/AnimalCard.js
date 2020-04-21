@@ -32,7 +32,6 @@ const AnimalCard = (props) => {
           className={"animal-card__photo"}
           src={animal.picture_id ? (config.baseUrl + `${type}/img?id=${animal.picture_id}`)
             : getDefaultAnimal(animal.type_id)}
-          height="205px"
           alt={""}
         />
       </div>
