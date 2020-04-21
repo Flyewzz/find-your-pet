@@ -39,8 +39,10 @@ const AnimalCard = (props) => {
         <p className={"animal-card__address"}>{props.address}</p>
         <p className={"animal-card__date"}>Дата {type === 'lost' ? 'пропажи' : 'находки'}: {date}</p>
         <p className={"animal-card__gender"}>Пол: {gender.name}
-          <img className={"animal-card__gender__picture"}
-               src={gender.picture} width='32' height='32' alt={''}/>
+          {gender.picture &&
+            <img className={"animal-card__gender__picture"}
+                src={gender.picture} width='32' height='32' alt={''}/>
+          }
         </p>
       </Div>
     </Card>
