@@ -19,8 +19,7 @@ const AnimalCard = (props) => {
   return (
     <Card
       onClick={props.onClick}
-      style={{height: "max(315px, auto)"}}
-      className="animal__card"
+      className="animal-card"
       size={cardSize}
       mode="shadow"
     >
