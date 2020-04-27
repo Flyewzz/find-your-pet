@@ -25,10 +25,10 @@ const AnimalCard = (props) => {
     >
       <div className={"animal-card__photo__container"}>
         <div className={"animal-card__photo__corner"}>
-          <div className={"animal-card__photo__breed"}>{breed}</div>
+          <div className={"animal-card__photo__breed animal-card__photo__breed--form-view"}>{breed}</div>
         </div>
         <img
-          className={"animal-card__photo"}
+          className={"animal-card__photo animal-card__photo--radius-border"}
           src={animal.picture_id ? (config.baseUrl + `${type}/img?id=${animal.picture_id}`)
             : getDefaultAnimal(animal.type_id)}
           alt={""}
