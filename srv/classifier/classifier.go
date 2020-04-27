@@ -30,7 +30,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
-	breed, err := client.RecognizeBreed(ctx, &pb.Image{Path: "/Users/alpha/Downloads/11093267_2.jpg"})
+	breed, err := client.RecognizeBreed(ctx, &pb.Image{Path: "{Path_to_image}"})
 	if err != nil {
 		log.Fatalf("could not get a breed: %v", err)
 	}
