@@ -1,9 +1,11 @@
 import React from "react";
-import { CellButton, Div, Group, Header, PanelHeader } from "@vkontakte/vkui";
-import { Cell, PanelHeaderBack, Separator } from "@vkontakte/vkui/dist/es6";
+import {
+  CellButton, Div, Group, Header, PanelHeader,
+} from "@vkontakte/vkui";
+import {Cell, PanelHeaderBack, Separator} from "@vkontakte/vkui/dist/es6";
 import LostService from "../services/LostService";
-import { decorate, observable, runInAction } from "mobx";
-import { observer } from "mobx-react";
+import {decorate, observable, runInAction} from "mobx";
+import {observer} from "mobx-react";
 import "./Lost.css";
 import config from "../config";
 import List from "@vkontakte/vkui/dist/components/List/List";
@@ -27,10 +29,10 @@ class LostAnimalPanel extends React.Component {
     this.geocodingService = new GeocodingService();
   }
 
-  animal = { date: "" };
+  animal = {date: ""};
   address = "";
   // TODO add default avatar
-  author = { first_name: "", last_name: "", photo_50: "" };
+  author = {first_name: "", last_name: "", photo_50: ""};
   isMine = false;
 
   componentDidMount() {
@@ -56,7 +58,7 @@ class LostAnimalPanel extends React.Component {
   }
 
   getAddress = () => {
-    const { latitude, longitude } = this.animal;
+    const {latitude, longitude} = this.animal;
     this.geocodingService
       .addressByCoords(longitude, latitude)
       .then((response) => {
@@ -96,9 +98,9 @@ class LostAnimalPanel extends React.Component {
   getProfileLink() {
     return `https://vk.com/id${this.animal.vk_id}`;
   }
-  
+
   getShareText = () => {
-    const { type_id } = this.animal;
+    const {type_id} = this.animal;
     const breed =
       this.animal.breed === "" ? "порода не указана" : this.animal.breed;
     // TODO getting address from coords
@@ -119,100 +121,121 @@ class LostAnimalPanel extends React.Component {
       .then(() => this.props.goBack());
   };
 
+  getHeader = () => {
+    const breed = this.animal.breed === '' ? ' Порода не указана' : this.animal.breed;
+    const type = config.types[this.animal.type_id - 1];
+    const width = document.documentElement.clientWidth;
+    if (width < 600) {
+      return (
+        <div style={{display: "flex", alignItems: "center"}}>
+          <Header style={{paddingBottom: "10px"}}>
+            {type + ", " + breed}
+          </Header>
+          <Div style={{
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            marginLeft: "auto",
+          }}
+               onClick={this.share}
+          >
+            {"Поделиться"}
+            <Icon24Share style={{marginLeft: "5px"}}/>
+          </Div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <Div className={'share-button'}
+               onClick={this.share}
+          >
+            {"Поделиться"}
+            <Icon24Share style={{marginLeft: "5px"}}/>
+          </Div>
+          <Header style={{paddingBottom: "10px", paddingTop: 0}}>
+            {type + ", " + breed}
+          </Header>
+        </div>
+      );
+    }
+  };
+
   render() {
-    const { picture_id, type_id, description } = this.animal;
-    const breed =
-      this.animal.breed === "" ? " Порода не указана" : this.animal.breed;
+    const {picture_id, type_id, description} = this.animal;
     const date = new Date(
-      this.animal.date.replace(" ", "T")
+      this.animal.date.replace(' ', 'T')
     ).toLocaleDateString();
-    const type = config.types[type_id - 1];
 
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack onClick={this.props.goBack} />}>
+        <PanelHeader left={<PanelHeaderBack onClick={this.props.goBack}/>}>
           Потерянный питомец
         </PanelHeader>
         <Group separator="hide">
           <Div>
-              <img
-                style={{ width: "100%" }}
-                src={
-                  picture_id
-                    ? (config.baseUrl + `lost/img?id=${picture_id}`)
-                    : getDefaultAnimal(type_id)
-                }
-                alt={""}
-              />
+            <img
+              style={{width: "100%"}}
+              src={
+                picture_id
+                  ? (config.baseUrl + `lost/img?id=${picture_id}`)
+                  : getDefaultAnimal(type_id)
+              }
+              alt={""}
+            />
           </Div>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <Header style={{ paddingBottom: "10px" }}>
-              {type + ", " + breed}
-            </Header>
-            <Div
-              onClick={this.share}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                marginLeft: "auto",
-              }}
-            >
-              {"Поделиться"}
-              <Icon24Share style={{ marginLeft: "5px" }} />
-            </Div>
-          </div>
+          {this.getHeader()}
           <Group
             header={!this.isMine && <Header mode={"secondary"}>Автор</Header>}
           >
             {!this.isMine
               ? [
-                  <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
-                    <Cell className={"author__info"} before={<Avatar src={this.author.photo_50} />}>
-                      {this.author.first_name + " " + this.author.last_name}
-                    </Cell>
-                  </a>,
-                  <Cell
-                    multiline={true}
-                    description={this.writeHref().description}
-                  >
-                    <CellButton
-                      href={this.writeHref().href}
-                      target={"_blank"}
-                      before={<Icon24Write />}
-                      className={"author__action-button"}
-                    >
-                      Написать
-                    </CellButton>
-                  </Cell>,
-                  <Cell
-                    multiline={true}
-                    description={
-                      "Или дайте ему знать, мы пришлем ему уведомление"
-                    }
-                  >
-                    <CellButton
-                      before={<Icon24Done />}
-                      className={"author__action-button"}
-                    >
-                      Я нашел!
-                    </CellButton>
-                  </Cell>,
-                ]
-              : [
-                  <CellButton before={<Icon24Write />}>
-                    Изменить объявление
-                  </CellButton>,
+                <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
+                  <Cell className={"author__info"} before={<Avatar src={this.author.photo_50}/>}>
+                    {this.author.first_name + " " + this.author.last_name}
+                  </Cell>
+                </a>,
+                <Cell
+                  multiline={true}
+                  description={this.writeHref().description}
+                >
                   <CellButton
-                    before={<Icon24Cancel />}
-                    onClick={() => this.props.openDestructive(this.onClose)}
-                    mode={"danger"}
+                    href={this.writeHref().href}
+                    target={"_blank"}
+                    before={<Icon24Write/>}
+                    className={"author__action-button"}
                   >
-                    Закрыть объявление
-                  </CellButton>,
-                ]}
+                    Написать
+                  </CellButton>
+                </Cell>,
+                <Cell
+                  multiline={true}
+                  description={
+                    "Или дайте ему знать, мы пришлем ему уведомление"
+                  }
+                >
+                  <CellButton
+                    before={<Icon24Done/>}
+                    className={"author__action-button"}
+                  >
+                    Я нашел!
+                  </CellButton>
+                </Cell>,
+              ]
+              : [
+                <CellButton before={<Icon24Write/>}>
+                  Изменить объявление
+                </CellButton>,
+                <CellButton
+                  before={<Icon24Cancel/>}
+                  onClick={() => this.props.openDestructive(this.onClose)}
+                  mode={"danger"}
+                >
+                  Закрыть объявление
+                </CellButton>,
+              ]}
           </Group>
-          <Separator />
+          <Separator/>
           <Group>
             <List>
               <Cell>

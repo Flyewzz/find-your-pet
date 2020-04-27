@@ -18,3 +18,13 @@
 .author__info {
     cursor: pointer;
 }
+
+.share-button {
+    cursor: pointer;
+    display: flex;
+    width: max-content;
+    align-items: center;
+    margin-left: auto;
+    padding-bottom: 0;
+    padding-top: 0;
+}
