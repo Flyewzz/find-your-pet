@@ -15,7 +15,7 @@ func CorsSetup() *cors.Cors {
 	}
 	return cors.New(cors.Options{
 		AllowedOrigins: []string{
-			"https://localhost:10888",
+			"*",
 		},
 		AllowedMethods: []string{
 			"HEAD",
