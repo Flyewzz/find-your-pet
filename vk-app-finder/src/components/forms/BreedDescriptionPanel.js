@@ -18,7 +18,7 @@ class BreedDescriptionPanel extends React.Component {
       };
 
       return (
-        <Button key={breed} onClick={onClick} mode={mode}>
+        <Button key={breed} style={{ cursor: 'pointer' }} onClick={onClick} mode={mode}>
           {breed}
         </Button>
       );
@@ -46,7 +46,7 @@ class BreedDescriptionPanel extends React.Component {
                     undefined : props.fields.description.value}
                   placeholder="Напишите все, что может помочь узнать вашего питомца"/>
         <Div style={{paddingLeft: 0}}>
-          <Button onClick={props.onSubmit} className={'create-form__submit'} size={'l'}>
+          <Button onClick={props.onSubmit} style={{ cursor: 'pointer' }} className={'create-form__submit'} size={'l'}>
             Завершить
           </Button>
         </Div>

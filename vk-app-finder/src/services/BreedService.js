@@ -16,10 +16,11 @@ class BreedService {
     const options = {
       method: 'POST',
       headers: headers,
-      body: {picture: base64}
+      body: JSON.stringify({picture: base64}),
     };
-    const request = new Request(url, options);
 
+    const request = new Request(url, options);
+    
     const response = await fetch(request);
     return response.json();
   };
