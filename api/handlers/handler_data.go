@@ -12,6 +12,7 @@ type HandlerData struct {
 	FoundController    interfaces.FoundController
 	FoundAddingManager *managers.FoundAddingManager
 	ProfileController  interfaces.ProfileController
+	breedClassifier    interfaces.BreedClassifier
 	DebugMode          bool
 }
 
@@ -19,7 +20,7 @@ func NewHandlerData(lc interfaces.LostController,
 	fc interfaces.FileController,
 	lam *managers.LostAddingManager, fnd interfaces.FoundController,
 	fam *managers.FoundAddingManager, pc interfaces.ProfileController,
-	isDebug bool) *HandlerData {
+	bc interfaces.BreedClassifier, isDebug bool) *HandlerData {
 	return &HandlerData{
 		LostController:     lc,
 		FileController:     fc,
@@ -27,6 +28,7 @@ func NewHandlerData(lc interfaces.LostController,
 		FoundController:    fnd,
 		FoundAddingManager: fam,
 		ProfileController:  pc,
+		breedClassifier:    bc,
 		DebugMode:          isDebug,
 	}
 }
