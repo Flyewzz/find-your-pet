@@ -28,4 +28,7 @@ func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 	r.HandleFunc("/profile/found", hd.ProfileFoundHandler).Methods("GET")
 	r.HandleFunc("/found", hd.ProfileFoundOpeningHandler).Methods("PUT")
 
+	// Breed classifier (Python)
+	r.HandleFunc("/breed", hd.BreedClassifierHandler).Methods("POST")
+
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/Kotyarich/find-your-pet/api/handlers"
 	"github.com/Kotyarich/find-your-pet/db"
 	"github.com/Kotyarich/find-your-pet/managers"
+	"github.com/Kotyarich/find-your-pet/srv/classifier"
 	"github.com/Kotyarich/find-your-pet/store/db/pg"
 	"github.com/spf13/viper"
 )
@@ -50,11 +51,12 @@ func PrepareHandlerData() *handlers.HandlerData {
 	profileController := pg.NewProfileControllerPg(
 		viper.GetInt("profile.lost.itemsPerPage"),
 		db)
+	breedClassifier := classifier.NewBreedClassifier()
 	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
 		log.Fatalln(err)
 	}
 	return handlers.NewHandlerData(lostController, FileController,
 		lostAddingManager, foundController, foundAddingManager,
-		profileController, debug)
+		profileController, breedClassifier, debug)
 }
