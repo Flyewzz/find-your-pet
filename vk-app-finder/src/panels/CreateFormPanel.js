@@ -41,7 +41,10 @@ const FirstFormPanel = (props) => {
         </FormLayoutGroup>
       </div>
       <Div style={{paddingLeft: 0}}>
-        <Button className={'create-form__submit'} onClick={props.toNext} size={'l'}>
+        <Button className={'create-form__submit'}
+                disabled={props.addressLoading || props.fields.longitude.value === ''}
+                onClick={props.toNext}
+                size={'l'}>
           Далее
         </Button>
       </Div>
@@ -59,6 +62,7 @@ class CreateFormPanel extends React.Component {
   }
 
   breeds = undefined;
+  addressLoading = false;
 
   onSubmit = () => {
     this.lostStore.submit(
@@ -70,15 +74,16 @@ class CreateFormPanel extends React.Component {
 
   onAddressChange = (data) => {
     const address = data.value;
+    this.addressLoading = true;
     this.geocodingService.getCoords(address).then(result => {
       const firstCandidate = result.candidates[0];
       // add some error here if candidate is undefined
       const location = firstCandidate.location;
       const longitude = location.x;
       const latitude = location.y;
-
       this.lostStore.form.fields.longitude.value = longitude;
       this.lostStore.form.fields.latitude.value = latitude;
+      this.addressLoading = false;
     });
   };
 
@@ -161,10 +166,17 @@ class CreateFormPanel extends React.Component {
           <FormStatus mode={'error'}>
             {this.lostStore.form.meta.error}
           </FormStatus>}
-
+          {this.state.stage === 0 && this.addressLoading &&
+          <FormStatus>
+            <Spinner/>
+            <div style={{width: '100%', textAlign: 'center'}}>
+              Не уходите, мы проверяем адрес
+            </div>
+          </FormStatus>}
           {this.state.stage === 0
           && <FirstFormPanel onTypeChange={this.onTypeChange}
                              fields={fields}
+                             addressLoading={this.addressLoading}
                              toNext={this.submitFirst}
                              onSexChange={this.onSexChange}
                              onAddressChange={this.onAddressChange}/>}
@@ -205,6 +217,7 @@ class CreateFormPanel extends React.Component {
 
 decorate(CreateFormPanel, {
   breeds: observable,
+  addressLoading: observable,
 });
 
 export default observer(CreateFormPanel);
