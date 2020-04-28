@@ -20,10 +20,9 @@ function getGenderInfo(gender) {
                 picture: female,
             }
         case 'n/a':
-            // Temporarily
             return {
                 name: 'Не определен',
-                picture: male,
+                picture: null,
             };
    }
 }

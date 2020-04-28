@@ -19,17 +19,16 @@ const AnimalCard = (props) => {
   return (
     <Card
       onClick={props.onClick}
-      style={{height: "max(315px, auto)"}}
-      className="animal__card"
+      className="animal-card"
       size={cardSize}
       mode="shadow"
     >
       <div className={"animal-card__photo__container"}>
         <div className={"animal-card__photo__corner"}>
-          <div className={"animal-card__photo__breed"}>{breed}</div>
+          <div className={"animal-card__photo__breed animal-card__photo__breed--form-view"}>{breed}</div>
         </div>
         <img
-          className={"animal-card__photo"}
+          className={"animal-card__photo animal-card__photo--radius-border"}
           src={animal.picture_id ? (config.baseUrl + `${type}/img?id=${animal.picture_id}`)
             : getDefaultAnimal(animal.type_id)}
           alt={""}
@@ -39,8 +38,10 @@ const AnimalCard = (props) => {
         <p className={"animal-card__address"}>{props.address}</p>
         <p className={"animal-card__date"}>Дата {type === 'lost' ? 'пропажи' : 'находки'}: {date}</p>
         <p className={"animal-card__gender"}>Пол: {gender.name}
-          <img className={"animal-card__gender__picture"}
-               src={gender.picture} width='32' height='32' alt={''}/>
+          {gender.picture &&
+            <img className={"animal-card__gender__picture"}
+                src={gender.picture} width='32' height='32' alt={''}/>
+          }
         </p>
       </Div>
     </Card>
