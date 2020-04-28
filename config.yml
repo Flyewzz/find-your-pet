@@ -25,4 +25,4 @@ profile:
   found:
     itemsPerPage: 9
 breed_srv:
-  address: localhost:50051
+  address: http://localhost:5000/breed

@@ -23,7 +23,7 @@ func (bc *BreedClassifier) GetBreeds(image string) ([]string, error) {
 	// Set up a connection to the server.
 	log.Println("Attempting to connect to the breed classifier server...")
 	conn, err := grpc.Dial(bc.address, grpc.WithInsecure(), grpc.WithBlock(),
-		grpc.WithTimeout(5*time.Second))
+		grpc.WithTimeout(10*time.Second))
 	if err != nil {
 		if err == context.DeadlineExceeded {
 			log.Printf("Timeout error: %v", err)
