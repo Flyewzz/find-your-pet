@@ -51,7 +51,7 @@ func PrepareHandlerData() *handlers.HandlerData {
 	profileController := pg.NewProfileControllerPg(
 		viper.GetInt("profile.lost.itemsPerPage"),
 		db)
-	breedClassifier := classifier.NewBreedClassifier()
+	breedClassifier := classifier.NewBreedClassifier(viper.GetString("breed_srv.address"))
 	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
 		log.Fatalln(err)

@@ -24,3 +24,5 @@ profile:
         itemsPerPage: 9
     found:
         itemsPerPage: 9
+breed_srv:
+    address: localhost:50051

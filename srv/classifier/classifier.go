@@ -9,27 +9,27 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	address = "localhost:50051"
-)
-
 type BreedClassifier struct {
+	address string
 }
 
-func NewBreedClassifier() *BreedClassifier {
-	return &BreedClassifier{}
+func NewBreedClassifier(address string) *BreedClassifier {
+	return &BreedClassifier{
+		address: address,
+	}
 }
 
 func (bc *BreedClassifier) GetBreeds(image string) ([]string, error) {
 	// Set up a connection to the server.
 	log.Println("Attempting to connect to the breed classifier server...")
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock(),
+	conn, err := grpc.Dial(bc.address, grpc.WithInsecure(), grpc.WithBlock(),
 		grpc.WithTimeout(5*time.Second))
 	if err != nil {
 		if err == context.DeadlineExceeded {
 			log.Printf("Timeout error: %v", err)
+		} else {
+			log.Printf("did not connect: %v", err)
 		}
-		log.Printf("did not connect: %v", err)
 		return nil, err
 	}
 	log.Println("*** Breed client is OK ***")
