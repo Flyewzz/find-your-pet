@@ -11,8 +11,15 @@ class BreedService {
   getBreeds = async (image) => {
     const base64 = await this.__toBase64(image);
     const url = config.baseUrl + 'breed';
-    const options = {method: 'POST', body: {picture: base64}};
+    const headers = {'Content-type': 'application/json'};
+
+    const options = {
+      method: 'POST',
+      headers: headers,
+      body: {picture: base64}
+    };
     const request = new Request(url, options);
+
     const response = await fetch(request);
     return response.json();
   };
