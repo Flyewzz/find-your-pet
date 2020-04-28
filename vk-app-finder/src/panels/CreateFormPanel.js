@@ -1,23 +1,64 @@
 import React from "react";
 import {
-  PanelHeader, Input, FormLayoutGroup, FormLayout, Button, Select
+  PanelHeader, FormLayoutGroup, FormLayout, Button, Select, FormStatus
 } from "@vkontakte/vkui";
 import {observer} from 'mobx-react';
-import {PanelHeaderBack} from "@vkontakte/vkui/dist/es6";
+import {PanelHeaderBack, Spinner} from "@vkontakte/vkui/dist/es6";
 import AddressInput from "../components/forms/AddressInput";
 import ImageLoader from "../components/forms/ImageLoader";
 import './CreateFormPanel.css';
-import Textarea from "@vkontakte/vkui/dist/components/Textarea/Textarea";
 import FormLabel from "../components/forms/FormLabel";
 import LostStore from "../stores/LostStore";
 import GeocodingService from "../services/GeocodingService";
+import Div from "@vkontakte/vkui/dist/components/Div/Div";
+import BreedDescriptionPanel from "../components/forms/BreedDescriptionPanel";
+import {decorate, observable, runInAction} from "mobx";
+import BreedService from "../services/BreedService";
+
+const FirstFormPanel = (props) => {
+  return (
+    <>
+      <AddressInput title={'Местро пропажи*'}
+                    onAddressChange={props.onAddressChange}
+                    placeholder={'Введите адрес'}/>
+
+      <div className={'selects-wrapper'}>
+        <FormLayoutGroup className={'half-width'}>
+          <FormLabel text={'Вид животного*'}/>
+          <Select onChange={props.onTypeChange} value={props.fields.typeId.value}>
+            <option value={1} defaultChecked>Собака</option>
+            <option value={2}>Кошка</option>
+            <option value={3}>Другой</option>
+          </Select>
+        </FormLayoutGroup>
+        <FormLayoutGroup className={'half-width'}>
+          <FormLabel text={'Пол животного*'}/>
+          <Select onChange={props.onSexChange} value={props.fields.sex.value}>
+            <option value={'n/a'}>Не определен</option>
+            <option value={'m'}>Мужской</option>
+            <option value={'f'}>Женский</option>
+          </Select>
+        </FormLayoutGroup>
+      </div>
+      <Div style={{paddingLeft: 0}}>
+        <Button className={'create-form__submit'} onClick={props.toNext} size={'l'}>
+          Далее
+        </Button>
+      </Div>
+    </>
+  );
+};
 
 class CreateFormPanel extends React.Component {
   constructor(props) {
     super(props);
     this.lostStore = new LostStore(props.userStore);
     this.geocodingService = new GeocodingService();
+    this.breedService = new BreedService();
+    this.state = {stage: 0}
   }
+
+  breeds = undefined;
 
   onSubmit = () => {
     this.lostStore.submit(
@@ -54,11 +95,57 @@ class CreateFormPanel extends React.Component {
   };
 
   onBreedChange = (breed) => {
-    this.lostStore.form.fields.breed.value = breed.target.value;
+    runInAction(() => {
+      this.lostStore.form.fields.breed.value = breed.target.value;
+    });
+  };
+
+  onBreedChoose = (breed) => {
+    runInAction(() => {
+      this.lostStore.form.fields.breed.value = breed;
+    });
   };
 
   onDescriptionChange = (description) => {
     this.lostStore.form.fields.description.value = description.target.value;
+  };
+
+  back = () => {
+    if (this.state.stage > 0) {
+      this.setState({stage: this.state.stage - 1});
+    } else {
+      this.props.toMain();
+    }
+  };
+
+  submitFirst = () => {
+    const form = this.lostStore.form;
+    if (form.fields.latitude.value === '') {
+      form.meta.error = 'Необходимо ввести корректный адрес пропажи.';
+      form.meta.isValid = false;
+    } else {
+      form.meta.error = '';
+      form.meta.isValid = true;
+      this.setState({stage: 1});
+    }
+  };
+
+  submitSecond = () => {
+    const image = this.lostStore.form.fields.picture.value;
+    if (image !== null) {
+      this.breeds = undefined;
+      this.breedService.getBreeds(image).then(
+        (result) => {
+          this.breeds = result.breeds;
+        }, (error) => {
+          console.log(error);
+          this.breeds = 'error';
+        }
+      )
+    } else {
+      this.breeds = null;
+    }
+    this.setState({stage: 2});
   };
 
   render() {
@@ -66,48 +153,58 @@ class CreateFormPanel extends React.Component {
 
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack onClick={this.props.toMain}/>}>
+        <PanelHeader left={<PanelHeaderBack onClick={this.back}/>}>
           Я потерял
         </PanelHeader>
         <FormLayout separator="hide">
-          <AddressInput title={'Местро пропажи'}
-                        onAddressChange={this.onAddressChange}
-                        placeholder={'Введите адрес'}/>
+          {this.state.stage === 0 && !this.lostStore.form.meta.isValid &&
+          <FormStatus mode={'error'}>
+            {this.lostStore.form.meta.error}
+          </FormStatus>}
 
-          <div className={'selects-wrapper'}>
-            <FormLayoutGroup className={'half-width'}>
-              <FormLabel text={'Вид животного'}/>
-              <Select onChange={this.onTypeChange} value={fields.typeId.value}>
-                <option value={1} defaultChecked>Собака</option>
-                <option value={2}>Кошка</option>
-                <option value={3}>Другой</option>
-              </Select>
-            </FormLayoutGroup>
-            <FormLayoutGroup className={'half-width'}>
-              <FormLabel text={'Пол животного'}/>
-              <Select onChange={this.onSexChange} value={fields.sex.value}>
-                <option value={'n/a'}>Не определен</option>
-                <option value={'m'}>Мужской</option>
-                <option value={'f'}>Женский</option>
-              </Select>
-            </FormLayoutGroup>
-          </div>
+          {this.state.stage === 0
+          && <FirstFormPanel onTypeChange={this.onTypeChange}
+                             fields={fields}
+                             toNext={this.submitFirst}
+                             onSexChange={this.onSexChange}
+                             onAddressChange={this.onAddressChange}/>}
 
-          <ImageLoader onPictureSet={this.onPictureSet}/>
-          <FormLayoutGroup top={'Порода'}>
-            <Input defaultValue={fields.breed.value === '' ? undefined : fields.breed.value}
-                   onChange={this.onBreedChange}
-                   placeholder={'Введите породу'}/>
-          </FormLayoutGroup>
-          <Textarea top="Описание"
-                    onChange={this.onDescriptionChange}
-                    defaultValue={fields.description.value === '' ? undefined : fields.description.value}
-                    placeholder="Напишите все, что может помочь узнать вашего питомца"/>
-          <Button onClick={this.onSubmit} className={'create-form__submit'} size={'l'}>Завершить</Button>
+          {this.state.stage === 1 && <>
+            <ImageLoader onPictureSet={this.onPictureSet}/>
+            <Div style={{paddingLeft: 0}}>
+              <Button onClick={this.submitSecond} size={'l'}>
+                Далее
+              </Button>
+            </Div>
+          </>}
+
+          {this.state.stage === 2 && this.breeds === 'error' &&
+          <FormStatus>
+            {'Нам не удалось распознать породу животного'}
+          </FormStatus>}
+
+          {this.state.stage === 2 && this.breeds === undefined &&
+          <FormStatus>
+            <Spinner/>
+            {'Пара секунд, мы пытаемся распознать породу животного'}
+          </FormStatus>}
+
+          {this.state.stage === 2 && <>
+            <BreedDescriptionPanel onBreedChange={this.onBreedChange}
+                                   onBreedChoose={this.onBreedChoose}
+                                   onDescriptionChange={this.onDescriptionChange}
+                                   onSubmit={this.onSubmit}
+                                   breeds={this.breeds}
+                                   fields={fields}/>
+          </>}
         </FormLayout>
       </>
     );
   }
 }
+
+decorate(CreateFormPanel, {
+  breeds: observable,
+});
 
 export default observer(CreateFormPanel);

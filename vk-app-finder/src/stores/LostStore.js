@@ -73,7 +73,6 @@ class LostStore extends GenericFormStore {
         );
     } catch (error) {
       runInAction(() => {
-        console.log(error);
         this.form.meta.isValid = false;
         this.form.meta.error = error;
       })
