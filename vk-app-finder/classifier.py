@@ -56,7 +56,8 @@ def Xception_predict_breed (img_path):
     bottleneck_feature = extract_Xception(path_to_tensor(img_path))
     ## get a vector of predicted values
     predicted_vector = Xception_model.predict(bottleneck_feature)
-    return dog_names[np.argmax(predicted_vector)]
+    top_predictions = np.argpartition(predicted_vector.flatten(), -4)[-3:]
+    return [dog_names[i] for i in top_predictions]
     
 
 
