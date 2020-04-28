@@ -3,7 +3,6 @@ import ReactCrop from 'react-image-crop';
 import Icon24Camera from '@vkontakte/icons/dist/24/camera';
 import 'react-image-crop/dist/ReactCrop.css';
 import {Div, File, FormLayoutGroup} from "@vkontakte/vkui";
-import FormLabel from "./FormLabel";
 import FormStatus from "@vkontakte/vkui/dist/components/FormStatus/FormStatus";
 
 class ImageLoader extends PureComponent {
@@ -114,13 +113,15 @@ class ImageLoader extends PureComponent {
                      onChange={this.onCropChange}/>
           <div style={{marginTop: '15px', width: '100%', textAlign: 'center'}}
                className={'form__label'}>
-            {'Выберите область изображения, на которой лучше всего видно Вашего питомца'}
+            {'Выберите область изображения, на которой лучше всего видно найденного питомца'}
           </div>
         </Div>}
         <File accept="image/*"
               controlSize={'xl'}
               before={<Icon24Camera/>}
-              onChange={this.onSelectFile}/>
+              onChange={this.onSelectFile}>
+          Выберите изображение
+        </File>
 
         {false && (
           <img alt="Crop" style={{maxWidth: '100%'}} src={croppedImageUrl}/>

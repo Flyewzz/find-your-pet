@@ -201,7 +201,9 @@ class CreateFormPanel extends React.Component {
           {this.state.stage === 2 && this.breeds === undefined &&
           <FormStatus>
             <Spinner/>
-            {'Пара секунд, мы пытаемся распознать породу животного'}
+            <div style={{textAlign: 'center', width: '100%'}}>
+              {'Пара секунд, мы пытаемся распознать породу животного'}
+            </div>
           </FormStatus>}
 
           {this.state.stage === 2 && <>
