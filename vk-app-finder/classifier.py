@@ -4,7 +4,9 @@ from glob import glob
 from extract_bottleneck_features import *
 from tqdm import tqdm
 
-
+from io import BytesIO
+import base64
+from PIL import Image
 
 DATA_PATH = '/Users/alpha/Projects/Technopark/find-your-pet/vk-app-finder/breeds'
 
@@ -13,7 +15,9 @@ dog_names = [item[20:-1] for item in sorted(glob(DATA_PATH + "/train/*/"))]
 
 def path_to_tensor(img_path):
     # loads RGB image as PIL.Image.Image type
-    img = tf.keras.preprocessing.image.load_img(img_path, target_size=(224, 224))
+    # img = tf.keras.preprocessing.image.load_img(img_path, target_size=(224, 224))
+    img = tf.keras.preprocessing.image.load_img(BytesIO(base64.b64decode(img_path)),
+                                            target_size=(224, 224))
     # convert PIL.Image.Image type to 3D tensor with shape (224, 224, 3)
     x = tf.keras.preprocessing.image.img_to_array(img)
     # convert 3D tensor to 4D tensor with shape (1, 224, 224, 3) and return 4D tensor
