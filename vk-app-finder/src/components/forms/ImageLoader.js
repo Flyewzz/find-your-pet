@@ -4,13 +4,14 @@ import Icon24Camera from '@vkontakte/icons/dist/24/camera';
 import 'react-image-crop/dist/ReactCrop.css';
 import {Div, File, FormLayoutGroup} from "@vkontakte/vkui";
 import FormLabel from "./FormLabel";
+import FormStatus from "@vkontakte/vkui/dist/components/FormStatus/FormStatus";
 
 class ImageLoader extends PureComponent {
   state = {
     src: null,
     crop: {
       unit: '%',
-      width: 40,
+      width: 60,
       aspect: 5 / 3,
     },
   };
@@ -89,23 +90,36 @@ class ImageLoader extends PureComponent {
 
   render() {
     const {crop, croppedImageUrl, src} = this.state;
+    const imageWrapperStyles = {
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      display: 'block',
+      width: 'max-content'
+    };
 
     return (
       <FormLayoutGroup>
-        <FormLabel text={'Фотография животного'}/>
+        <FormStatus header="Фотография животного">
+          Фотография поможет другим узнать животное, а мы попробуем подсказать его породу.
+        </FormStatus>
         {src && <Div>
           <ReactCrop src={src}
                      crop={crop}
                      ruleOfThirds
+                     keepSelection
+                     style={imageWrapperStyles}
+                     imageStyle={{maxHeight: '345px', width: 'auto'}}
                      onImageLoaded={this.onImageLoaded}
                      onComplete={this.onCropComplete}
                      onChange={this.onCropChange}/>
-          <div className={'form__label'}>
+          <div style={{marginTop: '15px', width: '100%', textAlign: 'center'}}
+               className={'form__label'}>
             {'Выберите область изображения, на которой лучше всего видно Вашего питомца'}
           </div>
         </Div>}
         <File accept="image/*"
-              before={<Icon24Camera/>} size="l"
+              controlSize={'xl'}
+              before={<Icon24Camera/>}
               onChange={this.onSelectFile}/>
 
         {false && (
