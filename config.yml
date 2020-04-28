@@ -1,28 +1,28 @@
 port: 5555
 db:
-    host: localhost
-    user: postgres
-    password: postgres
-    database: postgres
-    max_connections: 50
+  host: localhost
+  user: postgres
+  password: postgres
+  database: postgres
+  max_connections: 50
 lost:
-    itemsPerPage: 9
-    files:
-        directory: ./files/lost
-        max_size: 10 # MB
-    open_id: 1
-    close_id: 2
+  itemsPerPage: 9
+  files:
+    directory: ./files/lost
+    max_size: 10 # MB
+  open_id: 1
+  close_id: 2
 found:
-    itemsPerPage: 9
-    files:
-            directory: ./files/found
-            max_size: 10 # MB
-    open_id: 1
-    close_id: 2
+  itemsPerPage: 9
+  files:
+    directory: ./files/found
+    max_size: 10 # MB
+  open_id: 1
+  close_id: 2
 profile:
-    lost:
-        itemsPerPage: 9
-    found:
-        itemsPerPage: 9
+  lost:
+    itemsPerPage: 9
+  found:
+    itemsPerPage: 9
 breed_srv:
-    address: localhost:50051
+  address: localhost:50051
