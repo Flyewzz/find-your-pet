@@ -19,6 +19,7 @@ const FirstFormPanel = (props) => {
   return (
     <>
       <AddressInput title={'Местро пропажи*'}
+                    defaultValue={props.address}
                     onAddressChange={props.onAddressChange}
                     placeholder={'Введите адрес'}/>
 
@@ -62,6 +63,7 @@ class CreateFormPanel extends React.Component {
   }
 
   breeds = undefined;
+  address = '';
   addressLoading = false;
 
   onSubmit = () => {
@@ -73,9 +75,9 @@ class CreateFormPanel extends React.Component {
   };
 
   onAddressChange = (data) => {
-    const address = data.value;
+    this.address = data.value;
     this.addressLoading = true;
-    this.geocodingService.getCoords(address).then(result => {
+    this.geocodingService.getCoords(this.address).then(result => {
       const firstCandidate = result.candidates[0];
       // add some error here if candidate is undefined
       const location = firstCandidate.location;
@@ -176,6 +178,7 @@ class CreateFormPanel extends React.Component {
           {this.state.stage === 0
           && <FirstFormPanel onTypeChange={this.onTypeChange}
                              fields={fields}
+                             address={this.address}
                              addressLoading={this.addressLoading}
                              toNext={this.submitFirst}
                              onSexChange={this.onSexChange}
@@ -218,6 +221,7 @@ class CreateFormPanel extends React.Component {
 
 decorate(CreateFormPanel, {
   breeds: observable,
+  address: observable,
   addressLoading: observable,
 });
 
