@@ -30,6 +30,7 @@ class SearchFilter extends React.Component {
   };
 
   onBreedChange = (e) => {
+    this.props.filterStore.fields.breed = e.target.value;
     this.breed = e.target.value;
     this.changed = true;
   };
@@ -61,7 +62,7 @@ class SearchFilter extends React.Component {
               <FormLayoutGroup className={'half-width'}>
                 <FormLabel text={'Вид животного'}/>
                 <Select onChange={this.onTypeChange}
-                        value={this.type}>
+                        value={this.props.filterStore.fields.type}>
                   <option value={0}>Любой</option>
                   <option value={1}>Собака</option>
                   <option value={2}>Кошка</option>
@@ -71,7 +72,7 @@ class SearchFilter extends React.Component {
               <FormLayoutGroup className={'half-width'}>
                 <FormLabel text={'Пол животного'}/>
                 <Select onChange={this.onSexChange}
-                        value={this.sex}>
+                        value={this.props.filterStore.fields.sex}>
                   <option value={0}>Любой</option>
                   <option value={'n/a'}>Не определен</option>
                   <option value={'m'}>Мужской</option>
@@ -81,7 +82,7 @@ class SearchFilter extends React.Component {
             </div>
             <FormLayoutGroup top={'Порода'}>
               <Input onChange={this.onBreedChange}
-                     value={this.breed}
+                     value={this.props.filterStore.fields.breed}
                      placeholder={'Введите породу'}/>
             </FormLayoutGroup>
           </FormLayout>

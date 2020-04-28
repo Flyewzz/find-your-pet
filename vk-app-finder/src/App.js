@@ -23,6 +23,7 @@ import FoundFilterStore from "./stores/FoundFilterStore";
 import CreateFormFoundPanel from "./panels/CreateFormFoundPanel";
 import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 import FoundMapStore from "./stores/FoundMapStore";
+import {observer} from "mobx-react";
 
 class App extends React.Component {
   constructor(props) {
@@ -81,7 +82,6 @@ class App extends React.Component {
   }
 
   openDestructive = (onAccept) => {
-    console.log('Открыть popup кликнуто');
     this.setState({
       popout:
         <Alert
@@ -307,5 +307,5 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default observer(App);
 

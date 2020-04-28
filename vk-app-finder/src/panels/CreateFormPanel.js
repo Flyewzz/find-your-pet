@@ -43,7 +43,6 @@ const FirstFormPanel = (props) => {
       <Div style={{paddingLeft: 0}}>
         <Button className={'create-form__submit'}
                 disabled={props.addressLoading || props.fields.longitude.value === ''}
-                // disabled={false && (props.addressLoading || props.fields.longitude.value === '')}
                 onClick={props.toNext}
                 size={'l'}>
           Далее
@@ -154,28 +153,6 @@ class CreateFormPanel extends React.Component {
     this.setState({stage: 2});
   };
 
-  getBreedsPanel = (breeds, fields) => {
-    if (breeds === undefined) {
-      return (<FormStatus>
-            <Spinner/>
-            {'Подождите, мы пытаемся распознать породу животного'}
-          </FormStatus>);
-    } else if (breeds === 'error') {
-        return (<FormStatus>
-                    {'Нам не удалось распознать породу животного'}
-                  </FormStatus>);
-    }
-
-    return (
-      <BreedDescriptionPanel onBreedChange={this.onBreedChange}
-                                        onBreedChoose={this.onBreedChoose}
-                                        onDescriptionChange={this.onDescriptionChange}
-                                        onSubmit={this.onSubmit}
-                                        breeds={this.breeds}
-                                        fields={fields}/>
-    );
-  }
-
   render() {
     const fields = this.lostStore.form.fields;
 
@@ -213,7 +190,25 @@ class CreateFormPanel extends React.Component {
             </Div>
           </>}
 
-          {this.state.stage === 2 && this.getBreedsPanel(this.breeds, fields)}
+          {this.state.stage === 2 && this.breeds === 'error' &&
+          <FormStatus>
+            {'Нам не удалось распознать породу животного'}
+          </FormStatus>}
+
+          {this.state.stage === 2 && this.breeds === undefined &&
+          <FormStatus>
+            <Spinner/>
+            {'Пара секунд, мы пытаемся распознать породу животного'}
+          </FormStatus>}
+
+          {this.state.stage === 2 && <>
+            <BreedDescriptionPanel onBreedChange={this.onBreedChange}
+                                   onBreedChoose={this.onBreedChoose}
+                                   onDescriptionChange={this.onDescriptionChange}
+                                   onSubmit={this.onSubmit}
+                                   breeds={this.breeds}
+                                   fields={fields}/>
+          </>}
 
         </FormLayout>
       </>

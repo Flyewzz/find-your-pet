@@ -1,26 +1,82 @@
 import React from 'react';
-import {Search, Div} from "@vkontakte/vkui";
+import {Search, Div, Button} from "@vkontakte/vkui";
 import Icon28SlidersOutline from '@vkontakte/icons/dist/28/sliders_outline';
 import Icon28PlaceOutline from '@vkontakte/icons/dist/28/place_outline';
 import Icon28CancelOutline from "@vkontakte/icons/dist/28/cancel_outline";
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
+import config from '../../config';
 import './FilterLine.css'
+import {observer} from "mobx-react";
 
-
-const FilterLine = (props) => {
-  const className = props.isMap? 'checked': '';
-
+const ActiveFilter = (props) => {
   return (
-    <Div className={'filter__wrapper'}>
-      { props.isMap &&
-          <Icon28CancelOutline
-          onClick={() => {  } }
-          className={"cancel-icon"}
-        /> }
-      <Search type="text" placeholder="Найти..." />
-      <Icon28PlaceOutline onClick={props.changeView} className={'filter__map ' + className}/>
-      <Icon28SlidersOutline onClick={props.openFilters} className={'filter__button'} />
-    </Div>
+    <Button className={'active-filter'}
+            onClick={props.onClick}
+            mode={'outline'}
+            after={<Icon24Cancel/>}>
+      {props.child}
+    </Button>
   );
 };
 
-export default FilterLine;
+const getActiveFilters = (store) => {
+  const activeFilters = [];
+
+  if (store.fields.type !== '0') {
+    const onClick = () => {
+      store.fields.type = '0';
+      store.fetch();
+    };
+    activeFilters.push(
+      <ActiveFilter child={config.types[+store.fields.type - 1]}
+                    onClick={onClick}/>
+    );
+  }
+  if (store.fields.sex !== '0') {
+    const onClick = () => {
+      store.fields.sex = '0';
+      store.fetch();
+    };
+    activeFilters.push(
+      <ActiveFilter child={store.fields.sex === 'm' ? 'Мужской' : 'Женский'}
+                    onClick={onClick}/>
+    );
+  }
+  if (store.fields.breed !== '') {
+    const onClick = () => {
+      store.fields.breed = '';
+      store.fetch();
+    };
+    activeFilters.push(
+      <ActiveFilter child={store.fields.breed}
+                    onClick={onClick}/>
+    );
+  }
+
+  return activeFilters;
+};
+
+const FilterLine = (props) => {
+  const className = props.isMap ? 'checked' : '';
+
+  return (
+    <>
+      <Div className={'filter__wrapper'}>
+        {props.isMap &&
+        <Icon28CancelOutline
+          onClick={() => {
+          }}
+          className={"cancel-icon"}
+        />}
+        <Search type="text" placeholder="Найти..."/>
+        <Icon28PlaceOutline onClick={props.changeView} className={'filter__map ' + className}/>
+        <Icon28SlidersOutline onClick={props.openFilters} className={'filter__button'}/>
+      </Div>
+      <Div style={{marginTop: 0, paddingTop: 0}}>
+        {getActiveFilters(props.filterStore)}
+      </Div>
+    </>
+  );
+};
+
+export default observer(FilterLine);

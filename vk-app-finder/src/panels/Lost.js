@@ -29,6 +29,7 @@ class LostPanel extends React.Component {
   }
 
   addresses = [];
+  lostFilterStore = this.props.lostFilterStore;
 
   componentDidMount() {
     this.props.lostFilterStore.animals = undefined;
@@ -129,7 +130,6 @@ class LostPanel extends React.Component {
               </Map>
             </div>
           </YMaps></Div>
-
         </Group>
       </>
     );
@@ -139,6 +139,7 @@ class LostPanel extends React.Component {
 
 decorate(LostPanel, {
   addresses: observable,
+  lostFilterStore: observable,
 });
 
 export default observer(LostPanel);

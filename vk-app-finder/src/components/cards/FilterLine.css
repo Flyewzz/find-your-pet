@@ -16,3 +16,7 @@
 .checked {
     color: var(--tabbar_active_icon);
 }
+
+.active-filter {
+    margin-right: 10pt;
+}
