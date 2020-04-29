@@ -52,7 +52,5 @@ def Xception_predict_breed (img_path):
         model = create_model()
         predicted_vector = model.predict(bottleneck_feature)
         return dog_names[np.argmax(predicted_vector)]
-    
-
 
 
