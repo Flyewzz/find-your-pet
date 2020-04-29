@@ -235,7 +235,10 @@ class App extends React.Component {
           </Panel>
           <Panel id="new_found">
             <CreateFormFoundPanel userStore={this.userStore}
-                                  toProfile={this.toProfileMain}
+                                  toProfile={() => {
+                                    this.toProfileFoundTab();
+                                    this.toProfileMain();
+                                  }}
                                   toMain={this.toMain}/>
           </Panel>
         </View>
