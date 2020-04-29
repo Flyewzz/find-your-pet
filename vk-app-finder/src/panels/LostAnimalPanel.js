@@ -187,43 +187,40 @@ class LostAnimalPanel extends React.Component {
           {this.getHeader()}
           <Group
             header={!this.isMine && <Header mode={"secondary"}>Автор</Header>}>
-            {!this.isMine ? [
-              <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
-                <Cell className={"author__info"} before={<Avatar src={this.author.photo_50}/>}>
-                  {this.author.first_name + " " + this.author.last_name}
-                </Cell>
-              </a>,
-              <Cell multiline={true}
-                    description={this.writeHref().description}>
-                <CellButton href={this.writeHref().href}
-                            target={"_blank"}
-                            before={<Icon24Write/>}
-                            className={"author__action-button"}>
-                  Написать
-                </CellButton>
-              </Cell>,
-              <Cell
-                multiline={true}
-                description={
-                  "Или дайте ему знать, мы пришлем ему уведомление"
-                }>
-                <CellButton
-                  before={<Icon24Done/>}
-                  className={"author__action-button"}>
-                  Я нашел!
-                </CellButton>
-              </Cell>,
-            ] : [
-              {/*<CellButton before={<Icon24Write/>}>*/},
-              {/*Изменить объявление*/},
-              {/*</CellButton>,*/},
+            {!this.isMine ? <>
+                <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
+                  <Cell className={"author__info"} before={<Avatar src={this.author.photo_50}/>}>
+                    {this.author.first_name + " " + this.author.last_name}
+                  </Cell>
+                </a>,
+                <Cell multiline={true}
+                      description={this.writeHref().description}>
+                  <CellButton href={this.writeHref().href}
+                              target={"_blank"}
+                              before={<Icon24Write/>}
+                              className={"author__action-button"}>
+                    Написать
+                  </CellButton>
+                </Cell>,
+                <Cell
+                  multiline={true}
+                  description={
+                    "Или дайте ему знать, мы пришлем ему уведомление"
+                  }>
+                  <CellButton
+                    before={<Icon24Done/>}
+                    className={"author__action-button"}>
+                    Я нашел!
+                  </CellButton>
+                </Cell>,
+              </> :
               <CellButton
                 before={<Icon24Cancel/>}
                 onClick={() => this.props.openDestructive(this.onClose)}
                 mode={"danger"}>
                 Закрыть объявление
-              </CellButton>,
-            ]}
+              </CellButton>
+            }
           </Group>
           <Separator/>
           <Group>

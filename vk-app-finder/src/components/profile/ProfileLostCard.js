@@ -1,10 +1,9 @@
 import React from "react";
 import Card from "@vkontakte/vkui/dist/components/Card/Card";
 import "./ProfileLostCard.css";
-import Icon28CancelOutline from "@vkontakte/icons/dist/28/cancel_outline";
+import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
 import config from "../../config";
 import { Group, List } from "@vkontakte/vkui";
-import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 import getDefaultAnimal from "../default_animals/DefaultAnimals";
 
 const ProfileLostCard = (props) => {
@@ -41,7 +40,7 @@ const ProfileLostCard = (props) => {
         </div>
         <Group className={"profile__card__details"}>
           <List className={"profile__attributes_list"}>
-            <Icon24Dismiss
+            <Icon24DismissDark
               onClick={() => props.cancel(animal.id)}
               className={"profile__cancel-icon"}
             />

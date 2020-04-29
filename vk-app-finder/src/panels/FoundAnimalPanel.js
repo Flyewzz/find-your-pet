@@ -191,9 +191,6 @@ class FoundAnimalPanel extends React.Component {
                 </CellButton>
               </Cell>,
             ] : [
-              {/*<CellButton before={<Icon24Write />}>*/},
-              {/*Изменить объявление*/},
-              {/*</CellButton>,*/},
               <CellButton
                 before={<Icon24Cancel/>}
                 onClick={() => this.props.openDestructive(this.onClose)}
