@@ -51,6 +51,7 @@ def Xception_predict_breed (img_path):
     with gph_1.as_default():
         model = create_model()
         predicted_vector = model.predict(bottleneck_feature)
-        return dog_names[np.argmax(predicted_vector)]
+        top_predictions = np.argpartition(predicted_vector.flatten(), -4)[-3:]
+        return [dog_names[i] for i in top_predictions]
 
 
