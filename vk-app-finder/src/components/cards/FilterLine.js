@@ -37,10 +37,9 @@ const getActiveFilters = (store) => {
       store.fields.sex = '0';
       store.fetch();
     };
-    activeFilters.push(
-      <ActiveFilter child={store.fields.sex === 'm' ? 'Мужской' : 'Женский'}
-                    onClick={onClick}/>
-    );
+    const sex = store.fields.sex;
+    const text = sex === 'm' ? 'Мужской' : sex === 'f' ? 'Женский' : 'Пол не определен';
+    activeFilters.push(<ActiveFilter child={text} onClick={onClick}/>);
   }
   if (store.fields.breed !== '') {
     const onClick = () => {
