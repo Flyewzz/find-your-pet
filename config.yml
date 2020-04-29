@@ -25,4 +25,4 @@ profile:
   found:
     itemsPerPage: 9
 breed_srv:
-  address: http://localhost:5000/breed
+  address: http://vps819611.ovh.net/breed

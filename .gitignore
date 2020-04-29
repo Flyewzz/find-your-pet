@@ -1,0 +1,5 @@
+log.txt
+files/*
+build/*
+build
+db/backup/*
