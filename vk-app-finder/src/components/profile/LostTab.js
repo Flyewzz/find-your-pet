@@ -1,5 +1,5 @@
 import React from "react";
-import { CardGrid } from "@vkontakte/vkui";
+import {CardGrid, Spinner} from "@vkontakte/vkui";
 import ProfileLostCard from "./ProfileLostCard";
 import { decorate, observable, runInAction } from "mobx";
 import { observer } from "mobx-react";
@@ -19,6 +19,7 @@ class LostTab extends React.Component {
 
   animals = null;
   addresses = [];
+  loading = true;
 
   componentDidMount() {
     this.props.userStore.getId().then((result) => this.fetchLost(result.id));
@@ -46,6 +47,8 @@ class LostTab extends React.Component {
               .then((result) => this.updateAddress(index, result.address));
           });
         }
+
+        this.loading = false;
       },
       (error) => {
         alert(error);
@@ -79,7 +82,10 @@ class LostTab extends React.Component {
   render() {
     return (
       <CardGrid>
-        {!this.animals && (
+        {this.loading &&
+        <Spinner size="large" style={{marginTop: 20, color: "rgb(83, 118, 164)"}}/>
+        }
+        {!this.loading && !this.animals && (
           <Placeholder
             icon={<Icon56InfoOutline />}
             action={
@@ -101,6 +107,7 @@ class LostTab extends React.Component {
 decorate(LostTab, {
   animals: observable,
   addresses: observable,
+  loading: observable,
 });
 
 export default observer(LostTab);
