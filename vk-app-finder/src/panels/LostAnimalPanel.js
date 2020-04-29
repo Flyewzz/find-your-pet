@@ -125,7 +125,7 @@ class LostAnimalPanel extends React.Component {
     const breed = this.animal.breed === '' ? ' Порода не указана' : this.animal.breed;
     const type = config.types[this.animal.type_id - 1];
     const width = document.documentElement.clientWidth;
-    if (width < 600) {
+    if (width > 600) {
       return (
         <div style={{display: "flex", alignItems: "center"}}>
           <Header style={{paddingBottom: "10px"}}>
@@ -186,54 +186,44 @@ class LostAnimalPanel extends React.Component {
           </Div>
           {this.getHeader()}
           <Group
-            header={!this.isMine && <Header mode={"secondary"}>Автор</Header>}
-          >
-            {!this.isMine
-              ? [
-                <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
-                  <Cell className={"author__info"} before={<Avatar src={this.author.photo_50}/>}>
-                    {this.author.first_name + " " + this.author.last_name}
-                  </Cell>
-                </a>,
-                <Cell
-                  multiline={true}
-                  description={this.writeHref().description}
-                >
-                  <CellButton
-                    href={this.writeHref().href}
-                    target={"_blank"}
-                    before={<Icon24Write/>}
-                    className={"author__action-button"}
-                  >
-                    Написать
-                  </CellButton>
-                </Cell>,
-                <Cell
-                  multiline={true}
-                  description={
-                    "Или дайте ему знать, мы пришлем ему уведомление"
-                  }
-                >
-                  <CellButton
-                    before={<Icon24Done/>}
-                    className={"author__action-button"}
-                  >
-                    Я нашел!
-                  </CellButton>
-                </Cell>,
-              ]
-              : [
-                <CellButton before={<Icon24Write/>}>
-                  Изменить объявление
-                </CellButton>,
+            header={!this.isMine && <Header mode={"secondary"}>Автор</Header>}>
+            {!this.isMine ? [
+              <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
+                <Cell className={"author__info"} before={<Avatar src={this.author.photo_50}/>}>
+                  {this.author.first_name + " " + this.author.last_name}
+                </Cell>
+              </a>,
+              <Cell multiline={true}
+                    description={this.writeHref().description}>
+                <CellButton href={this.writeHref().href}
+                            target={"_blank"}
+                            before={<Icon24Write/>}
+                            className={"author__action-button"}>
+                  Написать
+                </CellButton>
+              </Cell>,
+              <Cell
+                multiline={true}
+                description={
+                  "Или дайте ему знать, мы пришлем ему уведомление"
+                }>
                 <CellButton
-                  before={<Icon24Cancel/>}
-                  onClick={() => this.props.openDestructive(this.onClose)}
-                  mode={"danger"}
-                >
-                  Закрыть объявление
-                </CellButton>,
-              ]}
+                  before={<Icon24Done/>}
+                  className={"author__action-button"}>
+                  Я нашел!
+                </CellButton>
+              </Cell>,
+            ] : [
+              {/*<CellButton before={<Icon24Write/>}>*/},
+              {/*Изменить объявление*/},
+              {/*</CellButton>,*/},
+              <CellButton
+                before={<Icon24Cancel/>}
+                onClick={() => this.props.openDestructive(this.onClose)}
+                mode={"danger"}>
+                Закрыть объявление
+              </CellButton>,
+            ]}
           </Group>
           <Separator/>
           <Group>

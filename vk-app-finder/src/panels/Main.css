@@ -13,8 +13,25 @@
 }
 
 .main__button {
-    margin-top: 200pt;
+    margin-top: 230pt;
     margin-right: 10pt;
     min-width: 120px;
     box-shadow: -4px -4px;
+}
+
+@media screen and (max-width: 550px) {
+    .main__wrapper {
+        background-position: right -20px bottom 110px;
+        background-size: 198% 79%;
+        background-repeat: no-repeat;
+    }
+
+    .main__welcome-text {
+        font-size: x-large;
+    }
+
+    .main__buttons-group {
+        position: absolute;
+        bottom: 110px;
+    }
 }
