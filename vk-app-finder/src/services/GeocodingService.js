@@ -12,6 +12,7 @@ class GeocodingService {
   auth = async () => {
     const clientId = config.clientID;
     const clientSecret = config.clientSecret;
+    console.log(clientId);
     const url = `https://www.arcgis.com/sharing/oauth2/token?client_id=${clientId}&grant_type=client_credentials&client_secret=${clientSecret}&f=json`;
     const options = {method: 'GET'};
     const request = new Request(url, options);
@@ -30,10 +31,11 @@ class GeocodingService {
   };
 
   getCoords = async (address) => {
-    return this.auth().then((result) => {
-      const token = result.access_token;
-      return this._coordsRequest(address, token);
-    });
+    // return this.auth().then((result) => {
+    //   const token = result.access_token;
+    const token = config.arcGisToken;
+    return this._coordsRequest(address, token);
+    // });
   };
 
   addressByCoords = async (long, lat) => {
