@@ -8,7 +8,7 @@ from io import BytesIO
 import base64
 from PIL import Image
 
-DATA_PATH = '/home/flyewzz/projects/breed_classifier/find-your-pet/breeds'
+DATA_PATH = '/home/gamma/projects/find-your-pet/breeds'
 
 # load list of dog names
 dog_names = [item[20:-1] for item in sorted(glob(DATA_PATH + "/train/*/"))]
@@ -43,15 +43,16 @@ def create_model():
     Xception_model.load_weights('Saved_Models/weights.best.Xception.hdf5')
     return Xception_model
 
+model = create_model()
+
 def Xception_predict_breed (img_path):
     # extract the bottle neck features
-    gph_1 = tf.get_default_graph()
+    # gph_1 = tf.get_default_graph()
     bottleneck_feature = extract_Xception(path_to_tensor(img_path))
     ## get a vector of predicted values
-    with gph_1.as_default():
-        model = create_model()
-        predicted_vector = model.predict(bottleneck_feature)
-        top_predictions = np.argpartition(predicted_vector.flatten(), -4)[-3:]
-        return [dog_names[i] for i in top_predictions]
+    # with gph_1.as_default():
+    predicted_vector = model.predict(bottleneck_feature)
+    top_predictions = np.argpartition(predicted_vector.flatten(), -4)[-3:]
+    return [dog_names[i] for i in top_predictions]
 
 
