@@ -192,7 +192,7 @@ class LostAnimalPanel extends React.Component {
                   <Cell className={"author__info"} before={<Avatar src={this.author.photo_50}/>}>
                     {this.author.first_name + " " + this.author.last_name}
                   </Cell>
-                </a>,
+                </a>
                 <Cell multiline={true}
                       description={this.writeHref().description}>
                   <CellButton href={this.writeHref().href}
@@ -201,7 +201,7 @@ class LostAnimalPanel extends React.Component {
                               className={"author__action-button"}>
                     Написать
                   </CellButton>
-                </Cell>,
+                </Cell>
                 <Cell
                   multiline={true}
                   description={
@@ -212,7 +212,7 @@ class LostAnimalPanel extends React.Component {
                     className={"author__action-button"}>
                     Я нашел!
                   </CellButton>
-                </Cell>,
+                </Cell>
               </> :
               <CellButton
                 before={<Icon24Cancel/>}

@@ -17,7 +17,7 @@ import BreedDescriptionPanel from "../components/forms/BreedDescriptionPanel";
 const FirstFormPanel = (props) => {
   return (
     <>
-      <AddressInput title={'Местро пропажи*'}
+      <AddressInput title={'Место находки*'}
                     defaultValue={props.address}
                     onAddressChange={props.onAddressChange}
                     placeholder={'Введите адрес'}/>
@@ -219,7 +219,6 @@ class CreateFormFoundPanel extends React.Component {
     );
   }
 }
-
 
 decorate(CreateFormFoundPanel, {
   breeds: observable,

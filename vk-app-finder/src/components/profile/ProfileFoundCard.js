@@ -3,7 +3,7 @@ import Card from "@vkontakte/vkui/dist/components/Card/Card";
 import "./ProfileFoundCard.css";
 import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
 import config from "../../config";
-import { Group, List } from "@vkontakte/vkui";
+import {Group, List} from "@vkontakte/vkui";
 import getDefaultAnimal from '../default_animals/DefaultAnimals';
 
 
@@ -11,7 +11,7 @@ const ProfileFoundCard = (props) => {
   const animal = props.animal;
   const breed = animal.breed === "" ? "Порода не указана" : animal.breed;
   const date = new Date(animal.date.replace(" ", "T")).toLocaleDateString()
-  .replace(/\//g, '.');
+    .replace(/\//g, '.');
 
   return (
     <Card
@@ -21,7 +21,7 @@ const ProfileFoundCard = (props) => {
       mode="shadow"
     >
       <div
-        style={{ display: "flex", flexGrow: 1, height: "100%", width: "100%" }}
+        style={{display: "flex", flexGrow: 1, height: "100%", width: "100%"}}
         className={"profile__card__container"}
       >
         <div className={"profile__card__photo__container"}>
@@ -31,7 +31,7 @@ const ProfileFoundCard = (props) => {
           <img
             className={"profile__card__photo"}
             src={animal.picture_id ? (config.baseUrl + `found/img?id=${animal.picture_id}`)
-                : getDefaultAnimal(animal.type_id) }
+              : getDefaultAnimal(animal.type_id)}
             alt={""}
           />
         </div>
@@ -43,17 +43,17 @@ const ProfileFoundCard = (props) => {
             />
             <div className={"profile__card__cells"}>
               <div className={"profile__card__info_cell"}>
-                <span style={{ fontWeight: "bold" }}>Адрес: </span>
+                <span style={{fontWeight: "bold"}}>Адрес: </span>
                 {props.address}
               </div>
 
               <div className={"profile__card__info_cell"}>
-                <span style={{ fontWeight: "bold" }}>Дата пропажи: </span>
+                <span style={{fontWeight: "bold"}}>Дата создания объявления: </span>
                 {date}
               </div>
 
               <div className={"profile__card__info_cell"}>
-                <span style={{ fontWeight: "bold" }}>Описание: </span>
+                <span style={{fontWeight: "bold"}}>Описание: </span>
                 {animal.description}
               </div>
             </div>

@@ -36,7 +36,8 @@
 
 .profile__card__info_cell {
   width: 90%;
-  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .profile__attributes_list {
@@ -77,7 +78,7 @@
   img.profile__card__photo {
     height: 100%;
     width: 100%;
-    margin: 0px;
+    margin: 0;
   }
   .profile__card__photo__container {
     height: 100%;
@@ -88,7 +89,7 @@
     height: auto;
   }
   .profile__attributes_list {
-    margin-top: 0px;
+    margin-top: 0;
   }
   .profile__card__details {
     /* visibility: hidden; */
@@ -96,13 +97,13 @@
     max-height: 110px !important;
     height: auto;
     overflow: hidden;
-    margin: 0px 12px 13px !important;
+    margin: 0 12px 13px !important;
   }
   .profile__card__photo__corner {
     margin: 1px -1px !important;
   }
   .profile__card__photo {
-    margin: 0px;
+    margin: 0;
   }
   .profile__card__cells {
     /* width: 100%; */

@@ -187,7 +187,7 @@ class FoundAnimalPanel extends React.Component {
                 <CellButton
                   before={<Icon24Done/>}
                   className={"author__action-button"}>
-                  Я нашел!
+                  Это мой питомец/я знаю хозяина!
                 </CellButton>
               </Cell>,
             ] : [
