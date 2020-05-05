@@ -24,6 +24,7 @@ import CreateFormFoundPanel from "./panels/CreateFormFoundPanel";
 import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 import FoundMapStore from "./stores/FoundMapStore";
 import {observer} from "mobx-react";
+import ScreenSpinner from "@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner";
 
 class App extends React.Component {
   constructor(props) {
@@ -40,6 +41,7 @@ class App extends React.Component {
       profileTab: 'lost',
 
       popout: null,
+      formPopout: null,
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
@@ -105,6 +107,13 @@ class App extends React.Component {
 
   closePopout = () => {
     this.setState({popout: null});
+  };
+
+  openScreenSpinner = () => {
+    this.setState({formPopout: <ScreenSpinner/>})
+  };
+  closeScreenSpinner = () => {
+    this.setState({formPopout: null})
   };
 
   toCreateLostForm = () => {
@@ -223,7 +232,7 @@ class App extends React.Component {
           ><Icon28User/></TabbarItem>
         </Tabbar>
       }>
-        <View id="main" activePanel={this.state.mainPanel}>
+        <View popout={this.state.formPopout} id="main" activePanel={this.state.mainPanel}>
           <Panel id="main">
             <MainPanel toCreateFoundForm={this.toCreateFoundForm}
                        toCreateLostForm={this.toCreateLostForm}/>
@@ -231,6 +240,8 @@ class App extends React.Component {
           <Panel id="new_lost">
             <CreateFormPanel userStore={this.userStore}
                              toProfile={this.toProfileMain}
+                             openPopout={this.openScreenSpinner}
+                             closePopout={this.closeScreenSpinner}
                              toMain={this.toMain}/>
           </Panel>
           <Panel id="new_found">
@@ -239,6 +250,8 @@ class App extends React.Component {
                                     this.toProfileFoundTab();
                                     this.toProfileMain();
                                   }}
+                                  openPopout={this.openScreenSpinner}
+                                  closePopout={this.closeScreenSpinner}
                                   toMain={this.toMain}/>
           </Panel>
         </View>

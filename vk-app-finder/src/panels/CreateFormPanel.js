@@ -67,10 +67,12 @@ class CreateFormPanel extends React.Component {
   addressLoading = false;
 
   onSubmit = () => {
+    this.props.openPopout();
     this.lostStore.submit(
       (result) => {
         console.log('res:' + result);
         this.props.toProfile();
+        this.props.closePopout();
       })
   };
 
