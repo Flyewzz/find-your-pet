@@ -82,7 +82,7 @@ class FoundPanel extends React.Component {
   render() {
     const animals = this.props.foundFilterStore.animals;
     const mapStyle = {
-      display: this.props.mapStore.isMapView ? undefined : 'none',
+      display: this.props.mapStore.isMapView && animals ? undefined : 'none',
     };
 
     return (

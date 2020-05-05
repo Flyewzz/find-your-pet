@@ -83,7 +83,7 @@ class LostPanel extends React.Component {
   render() {
     const animals = this.props.lostFilterStore.animals;
     const mapStyle = {
-      display: this.props.mapStore.isMapView ? undefined : 'none',
+      display: this.props.mapStore.isMapView && animals ? undefined : 'none',
     };
     console.log(mapStyle.display);
     return (
