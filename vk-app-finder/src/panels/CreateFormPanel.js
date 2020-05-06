@@ -146,7 +146,6 @@ class CreateFormPanel extends React.Component {
       this.breedService.getBreeds(image).then(
         (result) => {
           this.breeds = result;
-          console.log(this.breeds);
         }, (error) => {
           console.log(error);
           this.breeds = 'error';

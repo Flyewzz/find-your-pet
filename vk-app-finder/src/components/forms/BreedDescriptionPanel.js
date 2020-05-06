@@ -3,15 +3,13 @@ import React from "react";
 import Textarea from "@vkontakte/vkui/dist/components/Textarea/Textarea";
 import Div from "@vkontakte/vkui/dist/components/Div/Div";
 import {observer} from "mobx-react";
-import {decorate, observable} from "mobx";
-import {Spinner} from "@vkontakte/vkui/dist/es6";
 
 class BreedDescriptionPanel extends React.Component {
-  breeds = this.props.breeds;
-
   breedsToButtons = () => {
     const currentBreed = this.props.fields.breed.value;
-    return this.breeds.map(breed => {
+    const breeds = this.props.breeds;
+
+    return breeds.map(breed => {
       const mode = breed === currentBreed ? 'primary' : 'outline';
       const onClick = () => {
         this.props.fields.breed.value = breed;
@@ -27,10 +25,11 @@ class BreedDescriptionPanel extends React.Component {
 
   render() {
     const props = this.props;
-    console.log(this.breeds);
+    const breeds = this.props.breeds;
+
     return (
       <FormLayout>
-        {this.breeds !== undefined && this.breeds !== 'error' && this.breeds !== null &&
+        {breeds !== undefined && breeds !== 'error' && breeds !== null &&
         <FormLayoutGroup top={'Возможно, это порода животного?'}>
           {this.breedsToButtons()}
         </FormLayoutGroup>}
@@ -54,9 +53,5 @@ class BreedDescriptionPanel extends React.Component {
     );
   }
 }
-
-decorate(BreedDescriptionPanel, {
-  breeds: observable,
-});
 
 export default observer(BreedDescriptionPanel);
