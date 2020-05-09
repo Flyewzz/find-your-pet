@@ -1,6 +1,5 @@
 import React from "react";
 import Card from "@vkontakte/vkui/dist/components/Card/Card";
-import "./ProfileFoundCard.css";
 import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
 import config from "../../config";
 import {Group, List} from "@vkontakte/vkui";
@@ -18,12 +17,8 @@ const ProfileFoundCard = (props) => {
       onClick={() => props.onClick(animal.id)}
       className={"profile__card"}
       size="l"
-      mode="shadow"
-    >
-      <div
-        style={{display: "flex", flexGrow: 1, height: "100%", width: "100%"}}
-        className={"profile__card__container"}
-      >
+      mode="shadow">
+      <div className={"profile__card__container"}>
         <div className={"profile__card__photo__container"}>
           <div className={"profile__card__photo__corner"}>
             <div className={"profile__card__photo__breed"}>{breed}</div>
@@ -53,8 +48,9 @@ const ProfileFoundCard = (props) => {
               </div>
 
               <div className={"profile__card__info_cell"}>
-                <span style={{fontWeight: "bold"}}>Описание: </span>
-                {animal.description}
+                <span className={'profile__card__info__description'}>
+                  <b>{'Описание: '}</b>{animal.description}
+                </span>
               </div>
             </div>
           </List>

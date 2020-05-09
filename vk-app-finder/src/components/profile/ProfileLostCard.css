@@ -7,6 +7,7 @@
 }
 
 .profile__card__container {
+  display: flex;
   flex-direction: row;
 }
 
@@ -36,8 +37,6 @@
 
 .profile__card__info_cell {
   width: 90%;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .profile__attributes_list {
@@ -70,6 +69,44 @@
   width: auto;
 }
 
+.profile__card__info__description {
+  display: block;
+  /* hide text when we have more than N lines */
+  overflow: hidden;
+  /* for setting absolutely positioned ellisis '…' */
+  position: relative;
+  line-height: 1em;
+  /* max-height = line-height × line number, 1.2 × 3 = 3.6 */
+  max-height: 5em;
+  text-align: justify;
+  /* place for ellipsis '…' */
+}
+
+/* creating ellipsis … */
+.profile__card__info__description:before {
+  content: "…";
+  position: absolute;
+  background-color: var(--background_content);
+  z-index: 100;
+  /* ellipsis move to right bottom corner */
+  right: 0;
+  bottom: 0;
+}
+
+/* hide ellipsis if we have text not more that maximum line numbers */
+.profile__card__info__description:after {
+  content: "";
+  position: absolute;
+  /* move to the right bottom corner */
+  right: 0;
+  /* setting width и height */
+  width: 1em;
+  height: 1em;
+  margin-top: 0.2em;
+  /* hide ellipsis using white background */
+  background: white;
+}
+
 @media screen and (max-width: 550px) {
   .profile__card {
     height: auto;
@@ -82,7 +119,6 @@
   }
   .profile__card__photo__container {
     height: 100%;
-    /* margin: 0 auto; */
   }
   .profile__card__container {
     flex-direction: column;
@@ -92,10 +128,7 @@
     margin-top: 0;
   }
   .profile__card__details {
-    /* visibility: hidden; */
-    width: 100% !important;
-    max-height: 110px !important;
-    height: auto;
+    width: 100%;
     overflow: hidden;
     margin: 0 12px 13px !important;
   }
@@ -105,8 +138,7 @@
   .profile__card__photo {
     margin: 0;
   }
-  .profile__card__cells {
-    /* width: 100%; */
-    max-height: 50px;
+  .profile__card__info__description {
+    max-height: 2em;
   }
 }

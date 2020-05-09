@@ -18,12 +18,8 @@ const ProfileLostCard = (props) => {
       onClick={() => props.onClick(animal.id)}
       className={"profile__card"}
       size="l"
-      mode="shadow"
-    >
-      <div
-        className={"profile__card__container"}
-        style={{display: "flex", flexGrow: 1, height: "100%", width: "100%"}}
-      >
+      mode="shadow">
+      <div className={"profile__card__container"}>
         <div className={"profile__card__photo__container"}>
           <div className={"profile__card__photo__corner"}>
             <div className={"profile__card__photo__breed"}>{breed}</div>
@@ -56,8 +52,9 @@ const ProfileLostCard = (props) => {
               </div>
 
               <div className={"profile__card__info_cell"}>
-                <span style={{fontWeight: "bold"}}>Описание: </span>
-                {animal.description}
+                <span className={'profile__card__info__description'}>
+                  <b>{'Описание: '}</b>{animal.description}
+                </span>
               </div>
             </div>
           </List>
