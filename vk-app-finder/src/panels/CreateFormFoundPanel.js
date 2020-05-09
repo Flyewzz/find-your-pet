@@ -66,6 +66,10 @@ class CreateFormFoundPanel extends React.Component {
   addressLoading = false;
 
   onSubmit = () => {
+    if (!this.lostStore.check()) {
+      return;
+    }
+
     this.props.openPopout();
     this.lostStore.submit(
       (result) => {
@@ -197,6 +201,11 @@ class CreateFormFoundPanel extends React.Component {
           {this.state.stage === 2 && this.breeds === 'error' &&
           <FormStatus>
             {'Нам не удалось распознать породу животного'}
+          </FormStatus>}
+
+          {this.state.stage === 2 && this.breeds !== 'error' && !this.lostStore.form.meta.isValid &&
+          <FormStatus mode={'error'}>
+            {this.lostStore.form.meta.error}
           </FormStatus>}
 
           {this.state.stage === 2 && this.breeds === undefined &&

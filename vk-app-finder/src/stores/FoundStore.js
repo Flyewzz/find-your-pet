@@ -59,6 +59,14 @@ class FoundStore extends GenericFormStore {
     },
   };
 
+  check = () => {
+    const {description, picture} = this.form.fields;
+    this.form.meta.isValid = false;
+    this.form.meta.error = 'Вы не загрузили фото и не добавили описание.' +
+      ' Как другим узнать найденного Вами питомца?';
+    return !(description.value === '' && picture.value === null);
+  };
+
   submit = (callback) => {
     try {
         this.lostService.create(
