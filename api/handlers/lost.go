@@ -54,6 +54,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	query := arguments.Get("query")
 	lost := &models.Lost{
 		TypeId:      typeId,
 		Sex:         sex,
@@ -65,7 +66,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	mapCloseId := make(map[string]interface{})
 	mapCloseId["close_id"] = viper.GetInt("lost.close_id")
 	ctx := context.WithValue(context.Background(), "params", mapCloseId)
-	losts, err := hd.LostController.Search(ctx, lost)
+	losts, err := hd.LostController.Search(ctx, lost, query)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Not found", http.StatusNotFound)

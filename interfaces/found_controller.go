@@ -9,7 +9,7 @@ import (
 type FoundController interface {
 	GetById(ctx context.Context, id int) (*models.Found, error)
 	Add(ctx context.Context, params *models.Found) (int, error)
-	Search(ctx context.Context, params *models.Found) ([]models.Found, error)
+	Search(ctx context.Context, params *models.Found, query string) ([]models.Found, error)
 
 	GetItemsPerPageCount() int
 }
