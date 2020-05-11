@@ -1,4 +1,4 @@
 log.txt
-files/*
+files
 build
-db/backup/*
+db/backup

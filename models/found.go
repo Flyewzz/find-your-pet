@@ -13,4 +13,5 @@ type Found struct {
 	PictureId   int     `json:"picture_id,omitempty"`
 	Latitude    float64 `json:"latitude,omitempty"`
 	Longitude   float64 `json:"longitude,omitempty"`
+	Address     string  `json:"address"`
 }
