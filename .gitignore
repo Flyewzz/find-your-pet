@@ -1,5 +1,4 @@
 log.txt
-files/*
-build/*
+files
 build
-.DS_Store
+db/backup
