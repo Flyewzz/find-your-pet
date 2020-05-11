@@ -249,7 +249,7 @@ func (lc *LostControllerPg) SearchByTextQuery(query string) ([]models.Lost, erro
 	sqlQuery := `SELECT id, type_id, vk_id, sex, breed, description, status_id,
                  date, st_x(location) as latitude, st_y(location) as longitude, 
 				 picture_id FROM lost 
-				 WHERE textsearchable_index_col @@ to_tsquery($1)`
+				 WHERE textsearchable_index_col @@ to_tsquery('russian', $1)`
 	rows, err := lc.db.Query(sqlQuery, query)
 	if err != nil {
 		return nil, err

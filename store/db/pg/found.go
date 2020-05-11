@@ -249,7 +249,7 @@ func (fc *FoundControllerPg) SearchByTextQuery(query string) ([]models.Found, er
 	sqlQuery := `SELECT id, type_id, vk_id, sex, breed, description, status_id,
                  date, st_x(location) as latitude, st_y(location) as longitude, 
 				 picture_id FROM found 
-				 WHERE textsearchable_index_col @@ to_tsquery($1)`
+				 WHERE textsearchable_index_col @@ to_tsquery('russian', $1)`
 	rows, err := fc.db.Query(sqlQuery, query)
 	if err != nil {
 		return nil, err
