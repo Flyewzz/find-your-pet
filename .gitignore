@@ -2,3 +2,4 @@ log.txt
 files
 build
 db/backup
+.DS_Store
