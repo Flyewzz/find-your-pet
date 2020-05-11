@@ -25,6 +25,10 @@ func (hd *HandlerData) BreedClassifierHandler(w http.ResponseWriter, r *http.Req
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
-	data, _ := json.Marshal(breeds)
+	data, err := json.Marshal(breeds)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
 	w.Write(data)
 }

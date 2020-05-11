@@ -12,6 +12,6 @@
             "program": "${workspaceRoot}/",
             "env": {"DEBUG": true},
             "args": []
-        }
+        },
     ]
 }
