@@ -2,4 +2,4 @@ log.txt
 files/*
 build/*
 build
-db/backup/*
+.DS_Store

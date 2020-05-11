@@ -36,6 +36,7 @@ func (hd *HandlerData) FoundHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	sex := arguments.Get("sex")
 	breed := arguments.Get("breed")
+	address := arguments.Get("address")
 	description := arguments.Get("description")
 	var latitude, longitude float64
 	strLatitude := arguments.Get("latitude")
@@ -62,6 +63,7 @@ func (hd *HandlerData) FoundHandler(w http.ResponseWriter, r *http.Request) {
 		Description: description,
 		Latitude:    latitude,
 		Longitude:   longitude,
+		Address:     address,
 	}
 	mapCloseId := make(map[string]interface{})
 	mapCloseId["close_id"] = viper.GetInt("found.close_id")

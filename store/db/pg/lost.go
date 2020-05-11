@@ -84,13 +84,14 @@ typeId int,
 
 func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, query string) ([]models.Lost, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
+	searchRequiredQuery := "SELECT id, type_id, " +
+		"vk_id, sex, " +
+		"breed, description, status_id, " +
+		"date, st_x(location) as latitude, " +
+		"st_y(location) as longitude, picture_id FROM lost "
 	// Get everything without parameters to search
 	if features.CheckEmptyLost(params, query) {
-		rows, err := lc.db.Query("SELECT id, type_id, "+
-			"vk_id, sex, "+
-			"breed, description, status_id, "+
-			"date, st_x(location) as latitude, "+
-			"st_y(location) as longitude, picture_id FROM lost "+
+		rows, err := lc.db.Query(searchRequiredQuery+
 			"WHERE status_id != $1 ORDER BY date DESC",
 			ctxParams["close_id"].(int))
 		if err != nil {
@@ -106,6 +107,7 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		return nil, err
 	}
 	ctxParams["tx"] = tx
+	ctxParams["query"] = searchRequiredQuery
 	ctx = context.WithValue(context.Background(), "params", ctxParams)
 	searchManager := search.NewSearchManager()
 
@@ -150,7 +152,7 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		addResultToSearchManager(&result, searchManager)
 	}
 	if query != "" {
-		result, err := lc.SearchByTextQuery(query)
+		result, err := lc.SearchByTextQuery(ctx, query)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
 				return nil, rollErr
@@ -178,11 +180,9 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Lost, error) {
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
+	searchRequiredQuery := params["query"].(string)
 	closeId := params["close_id"].(int)
-	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, date, "+
-		"st_x(location) as latitude, st_y(location) as longitude, "+
-		"picture_id FROM lost "+
+	rows, err := tx.Query(searchRequiredQuery+
 		"WHERE type_id = $1 AND status_id != $2", typeId, closeId)
 	if err != nil {
 		return nil, err
@@ -195,11 +195,9 @@ func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]mod
 func (lc *LostControllerPg) SearchBySex(ctx context.Context, sex string) ([]models.Lost, error) {
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
+	searchRequiredQuery := params["query"].(string)
 	closeId := params["close_id"].(int)
-	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, date, "+
-		"st_x(location) as latitude, st_y(location) as longitude, "+
-		"picture_id FROM lost "+
+	rows, err := tx.Query(searchRequiredQuery+
 		"WHERE LOWER(sex) = $1 AND status_id != $2", strings.ToLower(sex), closeId)
 	if err != nil {
 		return nil, err
@@ -212,11 +210,9 @@ func (lc *LostControllerPg) SearchBySex(ctx context.Context, sex string) ([]mode
 func (lc *LostControllerPg) SearchByBreed(ctx context.Context, breed string) ([]models.Lost, error) {
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
+	searchRequiredQuery := params["query"].(string)
 	closeId := params["close_id"].(int)
-	rows, err := tx.Query("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, st_y(location) as longitude, "+
-		"picture_id FROM lost "+
+	rows, err := tx.Query(searchRequiredQuery+
 		"WHERE LOWER(breed) LIKE '%' || $1 || '%' "+
 		"AND status_id != $2", strings.ToLower(breed), closeId)
 	if err != nil {
@@ -228,33 +224,38 @@ func (lc *LostControllerPg) SearchByBreed(ctx context.Context, breed string) ([]
 }
 
 // A direction is needed to specify a date (must be less or greater or equal)
-func (lc *LostControllerPg) SearchByDate(date, direction string) ([]models.Lost, error) {
+func (lc *LostControllerPg) SearchByDate(ctx context.Context, date, direction string) ([]models.Lost, error) {
 	if direction != "<" && direction != ">" && direction != "=" {
 		return nil, errs.IncorrectDirection
 	}
-	sqlQuery := fmt.Sprintf("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, st_y(location) as longitude, "+
-		"picture_id FROM lost "+
-		"WHERE date %s $1", direction)
-	rows, err := lc.db.Query(sqlQuery, date)
+	params := ctx.Value("params").(map[string]interface{})
+	tx := params["tx"].(*sql.Tx)
+	searchRequiredQuery := params["query"].(string)
+	closeId := params["close_id"].(int)
+	sqlQuery := fmt.Sprintf(searchRequiredQuery+
+		"WHERE date %s $1 AND status_id != $2", direction)
+	rows, err := tx.Query(sqlQuery, date, closeId)
 	if err != nil {
 		return nil, err
 	}
 	losts, err := db.ConvertRowsToLost(rows)
+	rows.Close()
 	return losts, err
 }
 
-func (lc *LostControllerPg) SearchByTextQuery(query string) ([]models.Lost, error) {
-	sqlQuery := `SELECT id, type_id, vk_id, sex, breed, description, status_id,
-                 date, st_x(location) as latitude, st_y(location) as longitude, 
-				 picture_id FROM lost 
-				 WHERE textsearchable_index_col @@ to_tsquery('russian', $1)`
-	rows, err := lc.db.Query(sqlQuery, query)
+func (lc *LostControllerPg) SearchByTextQuery(ctx context.Context, query string) ([]models.Lost, error) {
+	params := ctx.Value("params").(map[string]interface{})
+	tx := params["tx"].(*sql.Tx)
+	searchRequiredQuery := params["query"].(string)
+	closeId := params["close_id"].(int)
+	sqlQuery := searchRequiredQuery + `WHERE textsearchable_index_col @@ to_tsquery('russian', $1) 
+	AND status_id = $2`
+	rows, err := tx.Query(sqlQuery, query, closeId)
 	if err != nil {
 		return nil, err
 	}
 	losts, err := db.ConvertRowsToLost(rows)
+	rows.Close()
 	return losts, err
 }
 
