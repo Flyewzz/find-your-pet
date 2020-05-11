@@ -248,7 +248,7 @@ func (fc *FoundControllerPg) SearchByTextQuery(ctx context.Context, query string
 	closeId := params["close_id"].(int)
 	sqlQuery := searchRequiredQuery +
 		`WHERE textsearchable_index_col @@ to_tsquery('russian', $1) 
-		 AND status = $2`
+		 AND status_id != $2`
 	rows, err := tx.Query(sqlQuery, query, closeId)
 	if err != nil {
 		return nil, err
