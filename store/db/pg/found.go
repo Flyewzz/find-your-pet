@@ -82,10 +82,10 @@ typeId int,
 	date, place string, typeId int,
 */
 
-func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found) ([]models.Found, error) {
+func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, query string) ([]models.Found, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
 	// Get everything without parameters to search
-	if features.CheckEmptyFound(params) {
+	if features.CheckEmptyFound(params, query) {
 		rows, err := fc.db.Query("SELECT id, type_id, "+
 			"vk_id, sex, "+
 			"breed, description, status_id, "+
@@ -141,6 +141,16 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found) (
 	}
 	if params.Breed != "" {
 		result, err := fc.SearchByBreed(ctx, params.Breed)
+		if err != nil {
+			if rollErr := tx.Rollback(); rollErr != nil {
+				return nil, rollErr
+			}
+			return nil, err
+		}
+		addResultToSearchManager(&result, searchManager)
+	}
+	if query != "" {
+		result, err := fc.SearchByTextQuery(query)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
 				return nil, rollErr
@@ -228,6 +238,19 @@ func (fc *FoundControllerPg) SearchByDate(date, direction string) ([]models.Foun
 		"picture_id FROM found "+
 		"WHERE date %s $1", direction)
 	rows, err := fc.db.Query(sqlQuery, date)
+	if err != nil {
+		return nil, err
+	}
+	founds, err := db.ConvertRowsToFound(rows)
+	return founds, err
+}
+
+func (fc *FoundControllerPg) SearchByTextQuery(query string) ([]models.Found, error) {
+	sqlQuery := `SELECT id, type_id, vk_id, sex, breed, description, status_id,
+                 date, st_x(location) as latitude, st_y(location) as longitude, 
+				 picture_id FROM found 
+				 WHERE textsearchable_index_col @@ to_tsquery($1)`
+	rows, err := fc.db.Query(sqlQuery, query)
 	if err != nil {
 		return nil, err
 	}

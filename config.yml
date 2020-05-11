@@ -1,4 +1,4 @@
-port: 5555
+port: 8080
 db:
   host: localhost
   user: postgres
@@ -25,4 +25,4 @@ profile:
   found:
     itemsPerPage: 9
 breed_srv:
-  address: http://localhost:5000/breed
+  address: http://shumak.fail/breed

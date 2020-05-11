@@ -82,10 +82,10 @@ typeId int,
 	date, place string, typeId int,
 */
 
-func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost) ([]models.Lost, error) {
+func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, query string) ([]models.Lost, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
 	// Get everything without parameters to search
-	if features.CheckEmptyLost(params) {
+	if features.CheckEmptyLost(params, query) {
 		rows, err := lc.db.Query("SELECT id, type_id, "+
 			"vk_id, sex, "+
 			"breed, description, status_id, "+
@@ -141,6 +141,16 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost) ([]
 	}
 	if params.Breed != "" {
 		result, err := lc.SearchByBreed(ctx, params.Breed)
+		if err != nil {
+			if rollErr := tx.Rollback(); rollErr != nil {
+				return nil, rollErr
+			}
+			return nil, err
+		}
+		addResultToSearchManager(&result, searchManager)
+	}
+	if query != "" {
+		result, err := lc.SearchByTextQuery(query)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
 				return nil, rollErr
@@ -228,6 +238,19 @@ func (lc *LostControllerPg) SearchByDate(date, direction string) ([]models.Lost,
 		"picture_id FROM lost "+
 		"WHERE date %s $1", direction)
 	rows, err := lc.db.Query(sqlQuery, date)
+	if err != nil {
+		return nil, err
+	}
+	losts, err := db.ConvertRowsToLost(rows)
+	return losts, err
+}
+
+func (lc *LostControllerPg) SearchByTextQuery(query string) ([]models.Lost, error) {
+	sqlQuery := `SELECT id, type_id, vk_id, sex, breed, description, status_id,
+                 date, st_x(location) as latitude, st_y(location) as longitude, 
+				 picture_id FROM lost 
+				 WHERE textsearchable_index_col @@ to_tsquery($1)`
+	rows, err := lc.db.Query(sqlQuery, query)
 	if err != nil {
 		return nil, err
 	}
