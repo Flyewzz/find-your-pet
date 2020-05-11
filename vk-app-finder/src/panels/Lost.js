@@ -80,6 +80,12 @@ class LostPanel extends React.Component {
     this.props.mapStore.zoom = e.get('target').getZoom();
   };
 
+  onSearchInput = (e) => {
+    const value = e.target.value;
+    this.props.lostFilterStore.fields.query = value;
+    this.props.lostFilterStore.fetch();
+  };
+
   render() {
     const animals = this.props.lostFilterStore.animals;
     const mapStyle = {
@@ -92,6 +98,8 @@ class LostPanel extends React.Component {
         <Group separator="hide">
 
           <FilterLine isMap={this.state.mapView}
+                      onChange={this.onSearchInput}
+                      query={this.props.lostFilterStore.fields.query}
                       filterStore={this.props.lostFilterStore}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>

@@ -1,7 +1,7 @@
 import config from '../config';
 
 class LostService {
-  get = async (type, sex, breed) => {
+  get = async (type, sex, breed, query) => {
     let url = config.baseUrl + 'losts?';
     if (type !== '0') {
       url += '&type_id=' + type;
@@ -11,6 +11,9 @@ class LostService {
     }
     if (breed !== '') {
       url += '&breed=' + breed;
+    }
+    if (query !== '') {
+      url += '&query=' + query;
     }
     const options = {method: 'GET'};
     const request = new Request(url, options);

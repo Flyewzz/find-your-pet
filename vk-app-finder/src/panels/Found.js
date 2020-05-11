@@ -79,6 +79,12 @@ class FoundPanel extends React.Component {
     this.props.mapStore.zoom = e.get('target').getZoom();
   };
 
+  onSearchInput = (e) => {
+    const value = e.target.value;
+    this.props.foundFilterStore.fields.query = value;
+    this.props.foundFilterStore.fetch();
+  };
+
   render() {
     const animals = this.props.foundFilterStore.animals;
     const mapStyle = {
@@ -90,6 +96,8 @@ class FoundPanel extends React.Component {
         <PanelHeader>Нашлись</PanelHeader>
         <Group separator="hide">
           <FilterLine isMap={this.state.mapView}
+                      onChange={this.onSearchInput}
+                      query={this.props.lostFilterStore.fields.query}
                       filterStore={this.props.foundFilterStore}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>

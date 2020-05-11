@@ -57,6 +57,7 @@ const getActiveFilters = (store) => {
 
 const FilterLine = (props) => {
   const className = props.isMap ? 'checked' : '';
+  console.log('ffff: ' + props.query);
 
   return (
     <>
@@ -67,7 +68,10 @@ const FilterLine = (props) => {
           }}
           className={"cancel-icon"}
         />}
-        <Search type="text" placeholder="Найти..."/>
+        <Search onChange={props.onChange}
+                value={props.query}
+                type="text"
+                placeholder="Найти..."/>
         <Icon28PlaceOutline onClick={props.changeView} className={'filter__map ' + className}/>
         <Icon28SlidersOutline onClick={props.openFilters} className={'filter__button'}/>
       </Div>

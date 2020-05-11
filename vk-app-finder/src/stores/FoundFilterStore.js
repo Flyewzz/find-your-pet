@@ -12,6 +12,7 @@ class FoundFilterStore {
     type: '0',
     sex: '0',
     breed: '',
+    query: '',
   };
 
   animals = null;
@@ -21,8 +22,8 @@ class FoundFilterStore {
   };
 
   fetch = async () => {
-    const {type, sex, breed} = this.fields;
-    return this.foundService.get(type, sex, breed).then(result => {
+    const {type, sex, breed, query} = this.fields;
+    return this.foundService.get(type, sex, breed, query).then(result => {
       this.animals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
       this.onFetch();
