@@ -97,7 +97,7 @@ class FoundPanel extends React.Component {
         <Group separator="hide">
           <FilterLine isMap={this.state.mapView}
                       onChange={this.onSearchInput}
-                      query={this.props.lostFilterStore.fields.query}
+                      query={this.props.foundFilterStore.fields.query}
                       filterStore={this.props.foundFilterStore}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
