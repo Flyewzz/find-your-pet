@@ -20,15 +20,11 @@ type LostControllerPg struct {
 	searchRequiredQuery string
 }
 
-func NewLostControllerPg(itemsPerPage int, db *sql.DB) *LostControllerPg {
+func NewLostControllerPg(itemsPerPage int, db *sql.DB, query string) *LostControllerPg {
 	return &LostControllerPg{
-		itemsPerPage: itemsPerPage,
-		db:           db,
-		searchRequiredQuery: "SELECT id, type_id, " +
-			"vk_id, sex, " +
-			"breed, description, status_id, " +
-			"date, st_x(location) as latitude, " +
-			"st_y(location) as longitude, picture_id, address FROM lost ",
+		itemsPerPage:        itemsPerPage,
+		db:                  db,
+		searchRequiredQuery: query,
 	}
 }
 

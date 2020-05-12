@@ -21,6 +21,7 @@ func NewHandlerData(lc interfaces.LostController,
 	lam *managers.LostAddingManager, fnd interfaces.FoundController,
 	fam *managers.FoundAddingManager, pc interfaces.ProfileController,
 	bc interfaces.BreedClassifier, isDebug bool) *HandlerData {
+
 	return &HandlerData{
 		LostController:     lc,
 		FileController:     fc,

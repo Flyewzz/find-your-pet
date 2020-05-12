@@ -39,18 +39,30 @@ func PrepareHandlerData() *handlers.HandlerData {
 		log.Fatalf("Error with connection to the database: %v\n", err)
 	}
 	db.SetMaxOpenConns(viper.GetInt("db.max_connections"))
-	lostController := pg.NewLostControllerPg(viper.GetInt("lost.itemsPerPage"), db)
+
+	queryLost := "SELECT id, type_id, " +
+		"vk_id, sex, " +
+		"breed, description, status_id, " +
+		"date, st_x(location) as latitude, " +
+		"st_y(location) as longitude, picture_id, address FROM lost "
+
+	queryFound := `SELECT id, type_id, vk_id, sex, 
+				   breed, description, status_id, date, 
+				   st_x(location) as latitude, st_y(location) as longitude, 
+				   picture_id, address FROM found `
+
+	lostController := pg.NewLostControllerPg(viper.GetInt("lost.itemsPerPage"), db, queryLost)
 	FileController := pg.NewFileControllerPg(db)
 	lostAddingManager :=
 		managers.NewLostAddingManager(db, lostController, FileController)
 
-	foundController := pg.NewFoundControllerPg(viper.GetInt("found.itemsPerPage"), db)
+	foundController := pg.NewFoundControllerPg(viper.GetInt("found.itemsPerPage"), db, queryFound)
 	foundAddingManager :=
 		managers.NewFoundAddingManager(db, foundController, FileController)
 
 	profileController := pg.NewProfileControllerPg(
 		viper.GetInt("profile.lost.itemsPerPage"),
-		db)
+		db, queryLost, queryFound)
 	breedClassifier := http_breed_classifier.NewBreedClassifier(viper.GetString("breed_srv.address"))
 	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {

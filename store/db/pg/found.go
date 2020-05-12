@@ -20,14 +20,11 @@ type FoundControllerPg struct {
 	searchRequiredQuery string
 }
 
-func NewFoundControllerPg(itemsPerPage int, db *sql.DB) *FoundControllerPg {
+func NewFoundControllerPg(itemsPerPage int, db *sql.DB, query string) *FoundControllerPg {
 	return &FoundControllerPg{
-		itemsPerPage: itemsPerPage,
-		db:           db,
-		searchRequiredQuery: `SELECT id, type_id, vk_id, sex, 
-							  breed, description, status_id, date, 
-							  st_x(location) as latitude, st_y(location) as longitude, 
-							  picture_id, address FROM found `,
+		itemsPerPage:        itemsPerPage,
+		db:                  db,
+		searchRequiredQuery: query,
 	}
 }
 

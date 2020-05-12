@@ -13,22 +13,23 @@ import (
 type ProfileControllerPg struct {
 	itemsPerPage int
 	db           *sql.DB
+	queryLost    string
+	queryFound   string
 }
 
-func NewProfileControllerPg(pages int, db *sql.DB) *ProfileControllerPg {
+func NewProfileControllerPg(pages int, db *sql.DB, queryLost, queryFound string) *ProfileControllerPg {
 	return &ProfileControllerPg{
 		itemsPerPage: pages,
 		db:           db,
+		queryLost:    queryLost,
+		queryFound:   queryFound,
 	}
 }
 
 func (pc *ProfileControllerPg) GetLost(ctx context.Context, userId int) ([]models.Lost, error) {
 	closeId := ctx.Value("close_id")
 	rows, err := pc.db.Query(
-		"SELECT id, type_id, vk_id, sex, "+
-			"breed, description, status_id, "+
-			"date, st_x(location) as latitude, "+
-			"st_y(location) as longitude, picture_id FROM lost "+
+		pc.queryLost+
 			"WHERE vk_id = $1 AND status_id != $2", userId, closeId)
 	if err != nil {
 		return nil, err
@@ -68,10 +69,7 @@ func (pc *ProfileControllerPg) SetLostOpening(
 func (pc *ProfileControllerPg) GetFound(ctx context.Context, userId int) ([]models.Found, error) {
 	closeId := ctx.Value("close_id")
 	rows, err := pc.db.Query(
-		"SELECT id, type_id, vk_id, sex, "+
-			"breed, description, status_id, "+
-			"date, st_x(location) as latitude, "+
-			"st_y(location) as longitude, picture_id FROM found "+
+		pc.queryFound+
 			"WHERE vk_id = $1 AND status_id != $2", userId, closeId)
 	if err != nil {
 		return nil, err
