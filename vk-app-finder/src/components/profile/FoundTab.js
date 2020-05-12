@@ -1,51 +1,32 @@
 import React from "react";
 import {CardGrid, Spinner} from "@vkontakte/vkui";
 import ProfileFoundCard from "./ProfileFoundCard";
-import { decorate, observable, runInAction } from "mobx";
-import { observer } from "mobx-react";
+import {decorate, observable, runInAction} from "mobx";
+import {observer} from "mobx-react";
 import ProfileService from "../../services/ProfileService";
 import Icon56InfoOutline from "@vkontakte/icons/dist/56/info_outline";
 import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
 import Button from "@vkontakte/vkui/dist/components/Button/Button";
-import GeocodingService from "../../services/GeocodingService";
 
 class FoundTab extends React.Component {
   constructor(props) {
     super(props);
     this.profileService = new ProfileService();
-    this.geocodingService = new GeocodingService();
   }
 
   animals = null;
-  addresses = [];
   loading = true;
 
   componentDidMount() {
     this.props.userStore.getId().then((result) => this.fetchFound(result.id));
   }
 
-  updateAddress = (index, result) => {
-    const city = result.City === "" ? result.District : result.City;
-    const address = result.MetroArea === "" ? result.Address : result.MetroArea;
-    this.addresses[index] = city + (address === "" ? "" : ", " + address);
-  };
-
   fetchFound = (id) => {
     this.profileService.getFound(id).then(
       (result) => {
         runInAction(() => {
           this.animals = result.payload;
-          this.addresses =
-            result.payload === null ? [] : this.animals.map(() => "");
         });
-        if (this.animals !== null) {
-          this.animals.forEach((value, index) => {
-            const { longitude, latitude } = value;
-            this.geocodingService
-              .addressByCoords(longitude, latitude)
-              .then((result) => this.updateAddress(index, result.address));
-          });
-        }
 
         this.loading = false;
       },
@@ -63,7 +44,7 @@ class FoundTab extends React.Component {
   };
 
   animalsToCards = () => {
-    return this.animals.map((animal, index) => (
+    return this.animals.map((animal) => (
       <ProfileFoundCard
         onClick={() => {
           this.props.toFound(animal.id);
@@ -73,7 +54,6 @@ class FoundTab extends React.Component {
         }}
         key={animal.id}
         animal={animal}
-        address={this.addresses[index]}
       />
     ));
   };
@@ -86,10 +66,10 @@ class FoundTab extends React.Component {
         }
         {!this.loading && !this.animals && (
           <Placeholder
-            icon={<Icon56InfoOutline />}
+            icon={<Icon56InfoOutline/>}
             action={
               <Button onClick={this.props.toMainForm} size="l"
-              style={{cursor: 'pointer'}}>
+                      style={{cursor: 'pointer'}}>
                 Cоздать объявление
               </Button>
             }
@@ -105,7 +85,6 @@ class FoundTab extends React.Component {
 
 decorate(FoundTab, {
   animals: observable,
-  addresses: observable,
   loading: observable,
 });
 

@@ -43,7 +43,7 @@ const ProfileLostCard = (props) => {
             <div className={"profile__card__cells"}>
               <div className={"profile__card__info_cell"}>
                 <span style={{fontWeight: "bold"}}>Адрес: </span>
-                {props.address}
+                {animal.address}
               </div>
 
               <div className={"profile__card__info_cell"}>
