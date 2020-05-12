@@ -155,6 +155,7 @@ func (hd *HandlerData) AddFoundHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	description := params("description")
 	strLatitude := params("latitude")
+	address := params("address")
 	latitude, err := strconv.ParseFloat(strLatitude, 64)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
@@ -206,6 +207,7 @@ func (hd *HandlerData) AddFoundHandler(w http.ResponseWriter, r *http.Request) {
 		Description: description,
 		Latitude:    latitude,
 		Longitude:   longitude,
+		Address:     address,
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	foundIdCh := make(chan int)
