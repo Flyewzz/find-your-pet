@@ -21,11 +21,16 @@ class FoundFilterStore {
     this.fields[key] = value;
   };
 
-  fetch = async () => {
+  fetch = async (page) => {
     const {type, sex, breed, query} = this.fields;
-    return this.foundService.get(type, sex, breed, query).then(result => {
-      this.animals = (result.payload !== null && result.payload.length === 0)
+    return this.foundService.get(type, sex, breed, query, page).then(result => {
+      const animals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
+      if (this.animals === null && animals !== null) {
+        this.animals = []
+      }
+      this.animals.push(...animals);
+      return result;
     })
   };
 }
