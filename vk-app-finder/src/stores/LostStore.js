@@ -46,6 +46,11 @@ class LostStore extends GenericFormStore {
         error: null,
         rule: 'required'
       },
+      address: {
+        value: '',
+        error: null,
+        rule: 'required',
+      },
       picture: {
         value: null,
         error: null,
@@ -77,6 +82,7 @@ class LostStore extends GenericFormStore {
           this.form.fields.latitude.value,
           this.form.fields.longitude.value,
           this.form.fields.picture.value,
+          this.form.fields.address.value,
           callback
         );
     } catch (error) {

@@ -62,7 +62,6 @@ class CreateFormFoundPanel extends React.Component {
   }
 
   breeds = undefined;
-  address = '';
   addressLoading = false;
 
   onSubmit = () => {
@@ -80,9 +79,9 @@ class CreateFormFoundPanel extends React.Component {
   };
 
   onAddressChange = (data) => {
-    this.address = data.value;
+    this.lostStore.form.fields.address.value = data.value;
     this.addressLoading = true;
-    this.geocodingService.getCoords(this.address).then(result => {
+    this.geocodingService.getCoords(data.value).then(result => {
       const firstCandidate = result.candidates[0];
       // add some error here if candidate is undefined
       const location = firstCandidate.location;
@@ -183,7 +182,7 @@ class CreateFormFoundPanel extends React.Component {
           {this.state.stage === 0
           && <FirstFormPanel onTypeChange={this.onTypeChange}
                              fields={fields}
-                             address={this.address}
+                             address={fields.address.value}
                              addressLoading={this.addressLoading}
                              toNext={this.submitFirst}
                              onSexChange={this.onSexChange}
@@ -233,7 +232,6 @@ class CreateFormFoundPanel extends React.Component {
 
 decorate(CreateFormFoundPanel, {
   breeds: observable,
-  address: observable,
   addressLoading: observable,
 });
 

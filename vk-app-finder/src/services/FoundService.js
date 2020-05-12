@@ -30,7 +30,7 @@ class FoundService {
   };
 
   create = (type, authorId, sex, breed, description,
-            latitude, longitude, picture, callback) => {
+            latitude, longitude, picture, address, callback) => {
     const formData = new FormData();
 
     formData.append("type_id", type);
@@ -41,6 +41,7 @@ class FoundService {
     formData.append("description", description);
     formData.append("latitude", latitude);
     formData.append("longitude", longitude);
+    formData.append("address", address);
 
     const request = new XMLHttpRequest();
     request.open("POST", config.baseUrl + 'found');
