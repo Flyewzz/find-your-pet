@@ -15,14 +15,19 @@ import (
 )
 
 type FoundControllerPg struct {
-	itemsPerPage int
-	db           *sql.DB
+	itemsPerPage        int
+	db                  *sql.DB
+	searchRequiredQuery string
 }
 
 func NewFoundControllerPg(itemsPerPage int, db *sql.DB) *FoundControllerPg {
 	return &FoundControllerPg{
 		itemsPerPage: itemsPerPage,
 		db:           db,
+		searchRequiredQuery: `SELECT id, type_id, vk_id, sex, 
+							  breed, description, status_id, date, 
+							  st_x(location) as latitude, st_y(location) as longitude, 
+							  picture_id, address FROM found `,
 	}
 }
 
@@ -30,15 +35,12 @@ func (fc *FoundControllerPg) GetById(ctx context.Context, id int) (*models.Found
 	closeId := ctx.Value("close_id").(int)
 	var found models.Found
 	var pictureId sql.NullInt32
-	err := fc.db.QueryRow("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, "+
-		"st_y(location) as longitude, picture_id FROM found "+
+	err := fc.db.QueryRow(fc.searchRequiredQuery+
 		"WHERE id = $1 AND status_id != $2", id, closeId).
 		Scan(&found.Id, &found.TypeId, &found.AuthorId,
 			&found.Sex, &found.Breed, &found.Description,
 			&found.StatusId, &found.Date,
-			&found.Latitude, &found.Longitude, &pictureId)
+			&found.Latitude, &found.Longitude, &pictureId, &found.Address)
 	if err != nil {
 		return nil, err
 	}
@@ -64,14 +66,14 @@ func (fc *FoundControllerPg) Add(ctx context.Context, params *models.Found) (int
 	var id int = 0
 	// status_id = 1 (Not found). Temporarily
 	query := fmt.Sprintf("INSERT INTO found(type_id, vk_id, sex, "+
-		"breed, description, status_id, location) "+
+		"breed, description, status_id, location, address) "+
 		"VALUES($1, $2, $3, $4, $5, 1, "+
-		"st_GeomFromText('point(%f %f)', 4326)) RETURNING id",
+		"st_GeomFromText('point(%f %f)', 4326), $6) RETURNING id",
 		params.Latitude, params.Longitude)
 
 	err := tx.QueryRow(query,
 		params.TypeId, params.AuthorId, params.Sex,
-		params.Breed, params.Description).Scan(&id)
+		params.Breed, params.Description, params.Address).Scan(&id)
 	return id, err
 }
 
@@ -84,13 +86,10 @@ typeId int,
 
 func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, query string) ([]models.Found, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
-	searchRequiredQuery := `SELECT id, type_id, vk_id, sex, 
-		breed, description, status_id, date, 
-		st_x(location) as latitude, st_y(location) as longitude, 
-		picture_id FROM found `
+
 	// Get everything without parameters to search
 	if features.CheckEmptyFound(params, query) {
-		rows, err := fc.db.Query(searchRequiredQuery+
+		rows, err := fc.db.Query(fc.searchRequiredQuery+
 			"WHERE status_id != $1 ORDER BY date DESC",
 			ctxParams["close_id"].(int))
 		if err != nil {
@@ -106,7 +105,7 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 		return nil, err
 	}
 	ctxParams["tx"] = tx
-	ctxParams["query"] = searchRequiredQuery
+	ctxParams["query"] = fc.searchRequiredQuery
 	ctx = context.WithValue(context.Background(), "params", ctxParams)
 	searchManager := search.NewSearchManager()
 

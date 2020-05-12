@@ -15,14 +15,20 @@ import (
 )
 
 type LostControllerPg struct {
-	itemsPerPage int
-	db           *sql.DB
+	itemsPerPage        int
+	db                  *sql.DB
+	searchRequiredQuery string
 }
 
 func NewLostControllerPg(itemsPerPage int, db *sql.DB) *LostControllerPg {
 	return &LostControllerPg{
 		itemsPerPage: itemsPerPage,
 		db:           db,
+		searchRequiredQuery: "SELECT id, type_id, " +
+			"vk_id, sex, " +
+			"breed, description, status_id, " +
+			"date, st_x(location) as latitude, " +
+			"st_y(location) as longitude, picture_id, address FROM lost ",
 	}
 }
 
@@ -30,15 +36,12 @@ func (lc *LostControllerPg) GetById(ctx context.Context, id int) (*models.Lost, 
 	closeId := ctx.Value("close_id").(int)
 	var lost models.Lost
 	var pictureId sql.NullInt32
-	err := lc.db.QueryRow("SELECT id, type_id, vk_id, sex, "+
-		"breed, description, status_id, "+
-		"date, st_x(location) as latitude, "+
-		"st_y(location) as longitude, picture_id FROM lost "+
+	err := lc.db.QueryRow(lc.searchRequiredQuery+
 		"WHERE id = $1 AND status_id != $2", id, closeId).
 		Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
 			&lost.Sex, &lost.Breed, &lost.Description,
 			&lost.StatusId, &lost.Date,
-			&lost.Latitude, &lost.Longitude, &pictureId)
+			&lost.Latitude, &lost.Longitude, &pictureId, &lost.Address)
 	if err != nil {
 		return nil, err
 	}
@@ -64,14 +67,14 @@ func (lc *LostControllerPg) Add(ctx context.Context, params *models.Lost) (int, 
 	var id int = 0
 	// status_id = 1 (Not found). Temporarily
 	query := fmt.Sprintf("INSERT INTO lost(type_id, vk_id, sex, "+
-		"breed, description, status_id, location) "+
+		"breed, description, status_id, location, address) "+
 		"VALUES($1, $2, $3, $4, $5, 1, "+
-		"st_GeomFromText('point(%f %f)', 4326)) RETURNING id",
+		"st_GeomFromText('point(%f %f)', 4326), $6) RETURNING id",
 		params.Latitude, params.Longitude)
 
 	err := tx.QueryRow(query,
 		params.TypeId, params.AuthorId, params.Sex,
-		params.Breed, params.Description).Scan(&id)
+		params.Breed, params.Description, params.Address).Scan(&id)
 	return id, err
 }
 
@@ -84,14 +87,9 @@ typeId int,
 
 func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, query string) ([]models.Lost, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
-	searchRequiredQuery := "SELECT id, type_id, " +
-		"vk_id, sex, " +
-		"breed, description, status_id, " +
-		"date, st_x(location) as latitude, " +
-		"st_y(location) as longitude, picture_id FROM lost "
 	// Get everything without parameters to search
 	if features.CheckEmptyLost(params, query) {
-		rows, err := lc.db.Query(searchRequiredQuery+
+		rows, err := lc.db.Query(lc.searchRequiredQuery+
 			"WHERE status_id != $1 ORDER BY date DESC",
 			ctxParams["close_id"].(int))
 		if err != nil {
@@ -107,7 +105,7 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		return nil, err
 	}
 	ctxParams["tx"] = tx
-	ctxParams["query"] = searchRequiredQuery
+	ctxParams["query"] = lc.searchRequiredQuery
 	ctx = context.WithValue(context.Background(), "params", ctxParams)
 	searchManager := search.NewSearchManager()
 

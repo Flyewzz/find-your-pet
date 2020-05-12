@@ -15,7 +15,7 @@ func ConvertRowsToLost(rows *sql.Rows) ([]models.Lost, error) {
 		err = rows.Scan(&lost.Id, &lost.TypeId, &lost.AuthorId,
 			&lost.Sex, &lost.Breed, &lost.Description,
 			&lost.StatusId, &lost.Date,
-			&lost.Latitude, &lost.Longitude, &pictureId)
+			&lost.Latitude, &lost.Longitude, &pictureId, &lost.Address)
 		if err != nil {
 			continue // !
 		}
@@ -37,7 +37,7 @@ func ConvertRowsToFound(rows *sql.Rows) ([]models.Found, error) {
 		err = rows.Scan(&found.Id, &found.TypeId, &found.AuthorId,
 			&found.Sex, &found.Breed, &found.Description,
 			&found.StatusId, &found.Date,
-			&found.Latitude, &found.Longitude, &pictureId)
+			&found.Latitude, &found.Longitude, &pictureId, &found.Address)
 		if err != nil {
 			continue // !
 		}
