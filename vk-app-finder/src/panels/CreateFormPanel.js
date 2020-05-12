@@ -82,7 +82,7 @@ class CreateFormPanel extends React.Component {
   onAddressChange = (data) => {
     this.lostStore.form.fields.address.value = data.value;
     this.addressLoading = true;
-    this.geocodingService.getCoords(data.valueOf).then(result => {
+    this.geocodingService.getCoords(data.value).then(result => {
       const firstCandidate = result.candidates[0];
       // add some error here if candidate is undefined
       const location = firstCandidate.location;

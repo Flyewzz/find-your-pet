@@ -23,12 +23,8 @@ class LostPanel extends React.Component {
       const current = props.mapStore.isMapView;
       props.mapStore.isMapView = !current;
     };
-
-    this.geocodingService = new GeocodingService();
-    this.props.lostFilterStore.onFetch = this.computeAddresses;
   }
 
-  addresses = [];
   lostFilterStore = this.props.lostFilterStore;
 
   componentDidMount() {
@@ -36,26 +32,6 @@ class LostPanel extends React.Component {
     this.filterChanged = true;
     this.props.lostFilterStore.fetch();
   }
-
-  computeAddresses = () => {
-    const store = this.props.lostFilterStore;
-    this.addresses = store.animals === null ? [] : store.animals.map(() => '');
-
-    if (store.animals !== null) {
-      store.animals.forEach((value, index) => {
-        const {longitude, latitude} = value;
-        this.geocodingService.addressByCoords(longitude, latitude).then(
-          result => this.updateAddress(index, result.address)
-        );
-      });
-    }
-  };
-
-  updateAddress = (index, result) => {
-    const city = result.City === '' ? result.District : result.City;
-    const address = result.MetroArea === '' ? result.Address : result.MetroArea;
-    this.addresses[index] = city + (address === '' ? '' : ', ' + address);
-  };
 
   createMarkers = () => {
     return this.props.lostFilterStore.animals.map(value =>
@@ -69,7 +45,6 @@ class LostPanel extends React.Component {
       <React.Fragment key={1}>
         {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
         <AnimalCard onClick={() => this.props.toLost(animal.id)}
-                    address={this.addresses[index]}
                     key={animal.id} animal={animal} type={'lost'}/>
       </React.Fragment>
     );
@@ -91,7 +66,7 @@ class LostPanel extends React.Component {
     const mapStyle = {
       display: this.props.mapStore.isMapView && animals ? undefined : 'none',
     };
-    console.log(mapStyle.display);
+
     return (
       <>
         <PanelHeader>Потерялись</PanelHeader>
@@ -143,11 +118,5 @@ class LostPanel extends React.Component {
     );
   }
 }
-
-
-decorate(LostPanel, {
-  addresses: observable,
-  lostFilterStore: observable,
-});
 
 export default observer(LostPanel);

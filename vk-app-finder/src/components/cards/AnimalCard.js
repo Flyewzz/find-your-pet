@@ -35,7 +35,7 @@ const AnimalCard = (props) => {
         />
       </div>
       <Div className={"animal-card__data"}>
-        <p className={"animal-card__address"}>{props.address}</p>
+        <p className={"animal-card__address"}>{animal.address}</p>
         <p className={"animal-card__date"}>Дата: {date}</p>
         <p className={"animal-card__gender"}>Пол: {gender.name}
           {gender.picture &&

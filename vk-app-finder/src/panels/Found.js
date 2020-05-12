@@ -23,38 +23,13 @@ class FoundPanel extends React.Component {
       const current = props.mapStore.isMapView;
       props.mapStore.isMapView = !current;
     };
-
-    this.geocodingService = new GeocodingService();
-    this.props.foundFilterStore.onFetch = this.computeAddresses;
   }
-
-  addresses = [];
 
   componentDidMount() {
     this.props.foundFilterStore.animals = undefined;
     this.filterChanged = true;
     this.props.foundFilterStore.fetch();
   }
-
-  computeAddresses = () => {
-    const store = this.props.foundFilterStore;
-    this.addresses = store.animals === null ? [] : store.animals.map(() => '');
-
-    if (store.animals !== null) {
-      store.animals.forEach((value, index) => {
-        const {longitude, latitude} = value;
-        this.geocodingService.addressByCoords(longitude, latitude).then(
-          result => this.updateAddress(index, result.address)
-        );
-      });
-    }
-  };
-
-  updateAddress = (index, result) => {
-    const city = result.City === '' ? result.District : result.City;
-    const address = result.MetroArea === '' ? result.Address : result.MetroArea;
-    this.addresses[index] = city + (address === '' ? '' : ', ' + address);
-  };
 
   createMarkers = () => {
     return this.props.foundFilterStore.animals.map(value =>
@@ -68,7 +43,6 @@ class FoundPanel extends React.Component {
       <React.Fragment key={1}>
         {!(index % 2) && <Card key={-animal.id} size="l" styles={{height: 0}}/>}
         <AnimalCard onClick={() => this.props.toFound(animal.id)}
-                    address={this.addresses[index]}
                     key={animal.id} animal={animal} type={'found'} />
       </React.Fragment>
     );
@@ -139,9 +113,5 @@ class FoundPanel extends React.Component {
     );
   }
 }
-
-decorate(FoundPanel, {
-  addresses: observable,
-});
 
 export default observer(FoundPanel);

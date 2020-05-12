@@ -25,7 +25,6 @@ class LostFilterStore {
     return this.lostService.get(type, sex, breed, query).then(result => {
       this.animals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
-      this.onFetch();
     });
   };
 }
