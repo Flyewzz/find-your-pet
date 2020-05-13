@@ -27,6 +27,7 @@ class FoundPanel extends React.Component {
   componentDidMount() {
     this.props.foundFilterStore.animals = undefined;
     this.filterChanged = true;
+    this.props.foundFilterStore.clearPage();
     this.props.foundFilterStore.fetch();
   }
 

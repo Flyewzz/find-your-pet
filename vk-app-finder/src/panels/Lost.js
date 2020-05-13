@@ -29,6 +29,7 @@ class LostPanel extends React.Component {
   componentDidMount() {
     this.props.lostFilterStore.animals = undefined;
     this.filterChanged = true;
+    this.props.lostFilterStore.clearPage();
     this.props.lostFilterStore.fetch();
   }
 
