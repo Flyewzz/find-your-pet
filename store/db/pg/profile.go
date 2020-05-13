@@ -30,7 +30,7 @@ func (pc *ProfileControllerPg) GetLost(ctx context.Context, userId int) ([]model
 	closeId := ctx.Value("close_id")
 	rows, err := pc.db.Query(
 		pc.queryLost+
-			"WHERE vk_id = $1 AND status_id != $2", userId, closeId)
+			"WHERE vk_id = $1 AND status_id != $2 ORDER BY date DESC", userId, closeId)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (pc *ProfileControllerPg) GetFound(ctx context.Context, userId int) ([]mode
 	closeId := ctx.Value("close_id")
 	rows, err := pc.db.Query(
 		pc.queryFound+
-			"WHERE vk_id = $1 AND status_id != $2", userId, closeId)
+			"WHERE vk_id = $1 AND status_id != $2 ORDER BY date DESC", userId, closeId)
 	if err != nil {
 		return nil, err
 	}
