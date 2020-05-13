@@ -79,7 +79,7 @@ class FoundAnimalPanel extends React.Component {
     const breed =
       this.animal.breed === "" ? "Порода не указана" : this.animal.breed;
     return (
-      `Потерян питомец: ${config.types[type_id - 1]}, ${breed}. ` +
+      `Найден питомец: ${config.types[type_id - 1]}, ${breed}. ` +
       `Адрес: ${this.animal.address}. ${config.appUrl}`
     );
   };
