@@ -55,6 +55,7 @@ class FoundPanel extends React.Component {
 
   onSearchInput = (e) => {
     this.props.foundFilterStore.fields.query = e.target.value;
+    this.props.foundFilterStore.clearPage();
     this.props.foundFilterStore.fetch();
   };
 

@@ -78,10 +78,9 @@ class FoundAnimalPanel extends React.Component {
     const {type_id} = this.animal;
     const breed =
       this.animal.breed === "" ? "Порода не указана" : this.animal.breed;
-    // TODO getting address from coords
     return (
       `Потерян питомец: ${config.types[type_id - 1]}, ${breed}. ` +
-      `Адрес: ${this.address}. ${config.appUrl}`
+      `Адрес: ${this.animal.address}. ${config.appUrl}`
     );
   };
 
@@ -156,17 +155,7 @@ class FoundAnimalPanel extends React.Component {
                             className={"author__action-button"}>
                   Написать
                 </CellButton>
-              </Cell>,
-              <Cell multiline={true}
-                    description={
-                      "Или дайте ему знать, мы пришлем ему уведомление"
-                    }>
-                <CellButton
-                  before={<Icon24Done/>}
-                  className={"author__action-button"}>
-                  Это мой питомец/я знаю хозяина!
-                </CellButton>
-              </Cell>,
+              </Cell>
             ] : [
               <CellButton
                 before={<Icon24Cancel/>}

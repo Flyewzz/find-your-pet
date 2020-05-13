@@ -80,10 +80,9 @@ class LostAnimalPanel extends React.Component {
     const {type_id} = this.animal;
     const breed =
       this.animal.breed === "" ? "порода не указана" : this.animal.breed;
-    // TODO getting address from coords
     return (
       `Потерян питомец: ${config.types[type_id - 1]}, ${breed}. ` +
-      `Адрес: ${this.address}. ${config.appUrl}`
+      `Адрес: ${this.animal.address}. ${config.appUrl}`
     );
   };
 
@@ -177,17 +176,6 @@ class LostAnimalPanel extends React.Component {
                               before={<Icon24Write/>}
                               className={"author__action-button"}>
                     Написать
-                  </CellButton>
-                </Cell>
-                <Cell
-                  multiline={true}
-                  description={
-                    "Или дайте ему знать, мы пришлем ему уведомление"
-                  }>
-                  <CellButton
-                    before={<Icon24Done/>}
-                    className={"author__action-button"}>
-                    Я нашел!
                   </CellButton>
                 </Cell>
               </> :

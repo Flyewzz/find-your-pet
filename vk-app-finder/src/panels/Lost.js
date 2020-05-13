@@ -57,6 +57,7 @@ class LostPanel extends React.Component {
 
   onSearchInput = (e) => {
     this.props.lostFilterStore.fields.query = e.target.value;
+    this.props.lostFilterStore.clearPage();
     this.props.lostFilterStore.fetch();
   };
 
