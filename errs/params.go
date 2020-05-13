@@ -3,5 +3,5 @@ package errs
 import "github.com/pkg/errors"
 
 var (
-	IncorrectGender = errors.New("The gender is incorrect")
+	IncorrectGender = errors.New("A gender is incorrect")
 )

@@ -178,14 +178,25 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 	results := features.ConvertInterfaceElementsToLost((*resultSet).ToSlice())
 	countOfElements := len(results)
 	startIndex := (page - 1) * lc.pageCapacity
-	endIndex := (startIndex + lc.pageCapacity) - 1
-	if countOfElements > endIndex {
-		// Check for exist of the next page
-		hasMore := (countOfElements > (page * lc.pageCapacity))
-		// Get a page of results
-		return results[startIndex:(endIndex + 1)], hasMore, nil
+
+	if startIndex >= countOfElements {
+		return nil, false, errs.IncorrectPageNumber
 	}
-	return nil, false, errs.IncorrectPageNumber
+
+	endIndex := (startIndex + lc.pageCapacity) - 1
+	var hasMore bool
+	// if a page is incomplete
+	if endIndex >= countOfElements {
+		endIndex = countOfElements - 1
+		// An incomplete page is the last page
+		hasMore = false
+		return results[startIndex:], hasMore, nil
+	}
+	// Check for exist of the next page
+	hasMore = (countOfElements > (page * lc.pageCapacity))
+	// Get a page of results
+	return results[startIndex:(endIndex + 1)], hasMore, nil
+	// return nil, false, errs.IncorrectPageNumber
 }
 
 func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Lost, error) {
