@@ -24,13 +24,12 @@ class LostPanel extends React.Component {
     };
   }
 
-  page = 1;
   lostFilterStore = this.props.lostFilterStore;
 
   componentDidMount() {
     this.props.lostFilterStore.animals = undefined;
     this.filterChanged = true;
-    this.props.lostFilterStore.fetch(this.page);
+    this.props.lostFilterStore.fetch();
   }
 
   createMarkers = () => {
@@ -57,11 +56,12 @@ class LostPanel extends React.Component {
 
   onSearchInput = (e) => {
     this.props.lostFilterStore.fields.query = e.target.value;
-    this.props.lostFilterStore.fetch(this.page);
+    this.props.lostFilterStore.fetch();
   };
 
   fetchNext = () => {
-    this.props.lostFilterStore.fetch(++this.page);
+    this.lostFilterStore.incPage();
+    this.props.lostFilterStore.fetch();
   };
 
   render() {

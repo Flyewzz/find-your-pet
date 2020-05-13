@@ -24,12 +24,10 @@ class FoundPanel extends React.Component {
     };
   }
 
-  page = 1;
-
   componentDidMount() {
     this.props.foundFilterStore.animals = undefined;
     this.filterChanged = true;
-    this.props.foundFilterStore.fetch(this.page);
+    this.props.foundFilterStore.fetch();
   }
 
   createMarkers = () => {
@@ -56,11 +54,12 @@ class FoundPanel extends React.Component {
 
   onSearchInput = (e) => {
     this.props.foundFilterStore.fields.query = e.target.value;
-    this.props.foundFilterStore.fetch(this.page);
+    this.props.foundFilterStore.fetch();
   };
 
   fetchNext = () => {
-    this.props.foundFilterStore.fetch(++this.page);
+    this.props.foundFilterStore.incPage();
+    this.props.foundFilterStore.fetch();
   };
 
   render() {

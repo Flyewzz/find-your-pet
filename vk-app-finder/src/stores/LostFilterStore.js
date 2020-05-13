@@ -16,14 +16,22 @@ class LostFilterStore {
 
   animals = null;
   hasMore = true;
+  page = 1;
 
   onFieldChange = (key, value) => {
     this.fields[key] = value;
   };
 
-  fetch = async (page) => {
+  incPage = () => {this.page++};
+
+  clearPage = () => {
+    this.page = 1;
+    this.animals = null;
+  };
+
+  fetch = async () => {
     const {type, sex, breed, query} = this.fields;
-    return this.lostService.get(type, sex, breed, query, page).then(result => {
+    return this.lostService.get(type, sex, breed, query, this.page).then(result => {
       const newAnimals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
       if ((this.animals === null || this.animals === undefined) && newAnimals !== null) {

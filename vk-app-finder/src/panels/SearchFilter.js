@@ -41,6 +41,7 @@ class SearchFilter extends React.Component {
       onFieldChange('sex', this.sex);
       onFieldChange('type', this.type);
       onFieldChange('breed', this.breed);
+      this.props.filterStore.clearPage();
       this.props.filterStore.fetch();
     }
     this.props.onClose();
