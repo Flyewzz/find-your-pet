@@ -26,7 +26,7 @@ class LostFilterStore {
 
   clearPage = () => {
     this.page = 1;
-    this.animals = null;
+    this.animals = undefined;
   };
 
   fetch = async () => {
