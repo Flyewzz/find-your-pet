@@ -57,7 +57,6 @@ const getActiveFilters = (store) => {
 
 const FilterLine = (props) => {
   const className = props.isMap ? 'checked' : '';
-  console.log('ffff: ' + props.query);
 
   return (
     <>

@@ -4,6 +4,7 @@ import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
 import config from "../../config";
 import {Group, List} from "@vkontakte/vkui";
 import getDefaultAnimal from '../default_animals/DefaultAnimals';
+import LinesEllipsis from 'react-lines-ellipsis'
 
 
 const ProfileFoundCard = (props) => {
@@ -48,9 +49,15 @@ const ProfileFoundCard = (props) => {
               </div>
 
               <div className={"profile__card__info_cell"}>
-                <span className={'profile__card__info__description'}>
-                  <b>{'Описание: '}</b>{animal.description}
-                </span>
+                <span style={{fontWeight: "bold"}}>Описание: </span>
+                <LinesEllipsis
+                  text={animal.description}
+                  maxLine='2'
+                  ellipsis='...'
+                  trimRight
+                  basedOn='letters'
+                  componenr={<span/>}
+                />
               </div>
             </div>
           </List>
