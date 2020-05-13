@@ -44,6 +44,7 @@ class LostFilterStore {
           animals.push(...newAnimals);
           this.animals = animals;
         }
+        // noinspection JSUnresolvedVariable
         this.hasMore = result.has_more;
         return result;
       },

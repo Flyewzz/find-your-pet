@@ -27,10 +27,12 @@ class LostPanel extends React.Component {
   lostFilterStore = this.props.lostFilterStore;
 
   componentDidMount() {
-    this.props.lostFilterStore.animals = undefined;
-    this.filterChanged = true;
-    this.props.lostFilterStore.clearPage();
-    this.props.lostFilterStore.fetch();
+    if (this.props.needFetch) {
+      this.props.lostFilterStore.animals = undefined;
+      this.filterChanged = true;
+      this.props.lostFilterStore.clearPage();
+      this.props.lostFilterStore.fetch();
+    }
   }
 
   createMarkers = () => {

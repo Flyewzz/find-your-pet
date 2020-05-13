@@ -62,7 +62,7 @@ const getActiveFilters = (store, filter) => {
 };
 
 const FilterLine = (props) => {
-  const className = props.isMap ? 'checked' : '';
+  const className = props.isMap ? ' checked' : '';
   console.log(props.filter);
 
   return (
@@ -78,7 +78,7 @@ const FilterLine = (props) => {
                 value={props.query}
                 type="text"
                 placeholder="Найти..."/>
-        <Icon28PlaceOutline onClick={props.changeView} className={'filter__map ' + className}/>
+        <Icon28PlaceOutline onClick={props.changeView} className={'filter__map' + className}/>
         <Icon28SlidersOutline onClick={props.openFilters} className={'filter__button'}/>
       </Div>
       <Div style={{marginTop: 0, paddingTop: 0}}>

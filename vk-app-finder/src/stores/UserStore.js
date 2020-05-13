@@ -6,6 +6,7 @@ class UserStore {
   constructor() {
     bridge.send("VKWebAppGetUserInfo", {}).then(
       result => {
+        // noinspection JSUnresolvedVariable
         this.id = result.id;
       }
     );

@@ -1,5 +1,4 @@
 import {decorate, observable} from "mobx";
-import LostService from "../services/LostService";
 import FoundService from "../services/FoundService";
 
 class FoundFilterStore {
@@ -45,6 +44,7 @@ class FoundFilterStore {
           animals.push(...newAnimals);
           this.animals = animals;
         }
+        // noinspection JSUnresolvedVariable
         this.hasMore = result.has_more;
         return result;
       },

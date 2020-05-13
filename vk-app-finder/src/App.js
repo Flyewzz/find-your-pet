@@ -42,6 +42,9 @@ class App extends React.Component {
       profilePanel: 'more',
       profileTab: 'lost',
 
+      needLostFetch: true,
+      needFoundFetch: true,
+
       popout: null,
       formPopout: null,
     };
@@ -126,9 +129,10 @@ class App extends React.Component {
   toMain = () => {
     this.setState({mainPanel: 'main'});
   };
-  toLostList = () => {
+  toLostList = (needFetch=true) => {
     this.setState({
       lostPanel: 'losts',
+      needLostFetch: needFetch,
     });
   };
   toLost = (id) => {
@@ -137,9 +141,10 @@ class App extends React.Component {
       lostPanel: 'lost',
     });
   };
-  toFoundList = () => {
+  toFoundList = (needFetch=true) => {
     this.setState({
       foundPanel: 'messages',
+      needFoundFetch: needFetch,
     });
   };
   toFound = (id) => {
@@ -266,13 +271,14 @@ class App extends React.Component {
             <LostPanel toLost={this.toLost}
                        lostFilterStore={this.lostFilterStore}
                        filter={this.lostFilter}
+                       needFetch={this.state.needLostFetch}
                        mapStore={this.mapStore}
                        openFilters={this.openFilters}/>
           </Panel>
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
-                             goBack={this.toLostList}
+                             goBack={() => {this.toLostList(false)}}
                              id={this.state.id}/>
           </Panel>
         </View>
@@ -286,13 +292,14 @@ class App extends React.Component {
             <FoundPanel toFound={this.toFound}
                         foundFilterStore={this.foundFilterStore}
                         filter={this.foundFilter}
+                        needFetch={this.state.needFoundFetch}
                         mapStore={this.foundMapStore}
                         openFilters={this.openFilters}/>
           </Panel>
           <Panel id="found">
             <FoundAnimalPanel userStore={this.userStore}
                               openDestructive={this.openDestructive}
-                              goBack={this.toFoundList}
+                              goBack={() => {this.toFoundList(false)}}
                               id={this.state.id}/>
           </Panel>
         </View>
