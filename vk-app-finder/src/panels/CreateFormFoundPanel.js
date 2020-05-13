@@ -82,8 +82,8 @@ class CreateFormFoundPanel extends React.Component {
     this.lostStore.form.fields.address.value = data.value;
     this.addressLoading = true;
     this.geocodingService.getCoords(data.value).then(result => {
+      // noinspection JSUnresolvedVariable
       const firstCandidate = result.candidates[0];
-      // add some error here if candidate is undefined
       const location = firstCandidate.location;
       const longitude = location.x;
       const latitude = location.y;
