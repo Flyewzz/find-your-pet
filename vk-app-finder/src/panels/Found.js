@@ -2,7 +2,6 @@ import React from "react";
 import {Card, CardGrid, Div, Footer, Group, PanelHeader, Spinner} from "@vkontakte/vkui";
 import AnimalCard from "../components/cards/AnimalCard";
 import FilterLine from "../components/cards/FilterLine";
-import {decorate, observable} from "mobx";
 import {observer} from "mobx-react";
 import './Lost.css';
 import {Map, Placemark, YMaps, ZoomControl} from 'react-yandex-maps';
@@ -25,15 +24,12 @@ class FoundPanel extends React.Component {
     };
   }
 
-  hasMore = true;
   page = 1;
 
   componentDidMount() {
     this.props.foundFilterStore.animals = undefined;
     this.filterChanged = true;
-    this.props.foundFilterStore.fetch(this.page).then(response => {
-      this.hasMore = response.hasMore;
-    });
+    this.props.foundFilterStore.fetch(this.page);
   }
 
   createMarkers = () => {
@@ -60,15 +56,11 @@ class FoundPanel extends React.Component {
 
   onSearchInput = (e) => {
     this.props.foundFilterStore.fields.query = e.target.value;
-    this.props.foundFilterStore.fetch(this.page).then(response => {
-      this.hasMore = response.hasMore;
-    });
+    this.props.foundFilterStore.fetch(this.page);
   };
 
   fetchNext = () => {
-    this.props.foundFilterStore.fetch(++this.page).then(response => {
-      this.hasMore = response.hasMore;
-    });
+    this.props.foundFilterStore.fetch(++this.page);
   };
 
   render() {
@@ -95,7 +87,7 @@ class FoundPanel extends React.Component {
           {!this.props.mapStore.isMapView && animals
           && <CardGrid>
             <InfiniteScroll dataLength={animals.length}
-                            hasMore={this.hasMore}
+                            hasMore={this.props.foundFilterStore.hasMore}
                             next={this.fetchNext}
                             style={{overflow: 'hidden'}}
                             loader={<Spinner size="large"
@@ -106,7 +98,7 @@ class FoundPanel extends React.Component {
               {this.animalsToCards()}
             </InfiniteScroll>
           </CardGrid>}
-          {!this.props.mapStore.isMapView && animals && !this.hasMore &&
+          {!this.props.mapStore.isMapView && animals && !this.props.foundFilterStore.hasMore &&
           <Footer>Больше ничего не найдено</Footer>}
           {!this.props.mapStore.isMapView && animals === null
           && <Placeholder icon={<Icon56InfoOutline/>}>
@@ -140,9 +132,5 @@ class FoundPanel extends React.Component {
     );
   }
 }
-
-decorate(FoundPanel, {
-  hasMore: observable,
-});
 
 export default observer(FoundPanel);

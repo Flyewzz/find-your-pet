@@ -8,7 +8,6 @@ import {Map, Placemark, YMaps, ZoomControl} from 'react-yandex-maps';
 import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
 import Icon28CancelOutline from "@vkontakte/icons/dist/28/cancel_outline";
-import {decorate, observable} from "mobx";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 
@@ -25,16 +24,13 @@ class LostPanel extends React.Component {
     };
   }
 
-  hasMore = true;
   page = 1;
   lostFilterStore = this.props.lostFilterStore;
 
   componentDidMount() {
     this.props.lostFilterStore.animals = undefined;
     this.filterChanged = true;
-    this.props.lostFilterStore.fetch(this.page).then(response => {
-      this.hasMore = response.hasMore;
-    });
+    this.props.lostFilterStore.fetch(this.page);
   }
 
   createMarkers = () => {
@@ -61,15 +57,11 @@ class LostPanel extends React.Component {
 
   onSearchInput = (e) => {
     this.props.lostFilterStore.fields.query = e.target.value;
-    this.props.lostFilterStore.fetch(this.page).then(response => {
-      this.hasMore = response.hasMore;
-    });
+    this.props.lostFilterStore.fetch(this.page);
   };
 
   fetchNext = () => {
-    this.props.lostFilterStore.fetch(++this.page).then(response => {
-      this.hasMore = response.hasMore;
-    });
+    this.props.lostFilterStore.fetch(++this.page);
   };
 
   render() {
@@ -97,7 +89,7 @@ class LostPanel extends React.Component {
           {!this.props.mapStore.isMapView && animals
           && <CardGrid>
             <InfiniteScroll dataLength={animals.length}
-                            hasMore={this.hasMore}
+                            hasMore={this.lostFilterStore.hasMore}
                             next={this.fetchNext}
                             style={{overflow: 'hidden'}}
                             loader={<Spinner size="large"
@@ -108,7 +100,7 @@ class LostPanel extends React.Component {
               {this.animalsToCards()}
             </InfiniteScroll>
           </CardGrid>}
-          {!this.props.mapStore.isMapView && animals && !this.hasMore &&
+          {!this.props.mapStore.isMapView && animals && !this.lostFilterStore.hasMore &&
           <Footer>Больше ничего не найдено</Footer>}
           {!this.props.mapStore.isMapView && (animals === null)
           && <Placeholder icon={<Icon56InfoOutline/>}>
@@ -143,9 +135,5 @@ class LostPanel extends React.Component {
     );
   }
 }
-
-decorate(LostPanel, {
-  hasMore: observable,
-});
 
 export default observer(LostPanel);

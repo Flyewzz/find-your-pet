@@ -15,6 +15,7 @@ class FoundFilterStore {
     query: '',
   };
 
+  hasMore = true;
   animals = null;
 
   onFieldChange = (key, value) => {
@@ -24,12 +25,17 @@ class FoundFilterStore {
   fetch = async (page) => {
     const {type, sex, breed, query} = this.fields;
     return this.foundService.get(type, sex, breed, query, page).then(result => {
-      const animals = (result.payload !== null && result.payload.length === 0)
+      const newAnimals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
-      if (this.animals === null && animals !== null) {
+      if ((this.animals === null || this.animals === undefined) && newAnimals !== null) {
         this.animals = []
       }
-      this.animals.push(...animals);
+      if (this.animals !== null && this.animals !== undefined) {
+        const animals = this.animals;
+        animals.push(...newAnimals);
+        this.animals = animals;
+      }
+      this.hasMore = result.has_more;
       return result;
     })
   };
@@ -38,6 +44,7 @@ class FoundFilterStore {
 decorate(FoundFilterStore, {
   fields: observable,
   animals: observable,
+  hasMore: observable,
 });
 
 export default FoundFilterStore;
