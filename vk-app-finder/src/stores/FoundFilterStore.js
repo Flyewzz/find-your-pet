@@ -23,7 +23,9 @@ class FoundFilterStore {
     this.fields[key] = value;
   };
 
-  incPage = () => {this.page++};
+  incPage = () => {
+    this.page++
+  };
 
   clearPage = () => {
     this.page = 1;
@@ -33,19 +35,23 @@ class FoundFilterStore {
   fetch = async () => {
     const {type, sex, breed, query} = this.fields;
     return this.foundService.get(type, sex, breed, query, this.page).then(result => {
-      const newAnimals = (result.payload !== null && result.payload.length === 0)
-        ? null : result.payload;
-      if ((this.animals === null || this.animals === undefined) && newAnimals !== null) {
-        this.animals = []
-      }
-      if (this.animals !== null && this.animals !== undefined) {
-        const animals = this.animals;
-        animals.push(...newAnimals);
-        this.animals = animals;
-      }
-      this.hasMore = result.has_more;
-      return result;
-    })
+        const newAnimals = (result.payload !== null && result.payload.length === 0)
+          ? null : result.payload;
+        if ((this.animals === null || this.animals === undefined) && newAnimals !== null) {
+          this.animals = []
+        }
+        if (this.animals !== null && this.animals !== undefined) {
+          const animals = this.animals;
+          animals.push(...newAnimals);
+          this.animals = animals;
+        }
+        this.hasMore = result.has_more;
+        return result;
+      },
+      (error) => {
+        console.log(error);
+        this.animals = null;
+      })
   };
 }
 
