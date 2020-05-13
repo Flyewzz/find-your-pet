@@ -162,7 +162,26 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 
 	resultSet := searchManager.GetSet()
 	results := features.ConvertInterfaceElementsToFound((*resultSet).ToSlice())
-	return results, true, nil
+	countOfElements := len(results)
+	startIndex := (page - 1) * fc.pageCapacity
+
+	if startIndex >= countOfElements {
+		return nil, false, errs.IncorrectPageNumber
+	}
+
+	endIndex := (startIndex + fc.pageCapacity) - 1
+	var hasMore bool
+	// if a page is incomplete
+	if endIndex >= countOfElements {
+		endIndex = countOfElements - 1
+		// An incomplete page is the last page
+		hasMore = false
+		return results[startIndex:], hasMore, nil
+	}
+	// Check for exist of the next page
+	hasMore = (countOfElements > (page * fc.pageCapacity))
+	// Get a page of results
+	return results[startIndex:(endIndex + 1)], hasMore, nil
 }
 
 func (fc *FoundControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Found, error) {

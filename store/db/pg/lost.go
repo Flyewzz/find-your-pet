@@ -196,7 +196,6 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 	hasMore = (countOfElements > (page * lc.pageCapacity))
 	// Get a page of results
 	return results[startIndex:(endIndex + 1)], hasMore, nil
-	// return nil, false, errs.IncorrectPageNumber
 }
 
 func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Lost, error) {
