@@ -45,10 +45,7 @@ class App extends React.Component {
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
-    this.modalBack = (changed) => {
-      if (changed) {
-        this.lostFilterStore.animals = undefined;
-      }
+    this.modalBack = () => {
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
     this.userStore = new UserStore();

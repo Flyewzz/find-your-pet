@@ -25,6 +25,7 @@ const getActiveFilters = (store) => {
   if (store.fields.type !== '0') {
     const onClick = () => {
       store.fields.type = '0';
+      store.clearPage();
       store.fetch();
     };
     activeFilters.push(
@@ -35,6 +36,7 @@ const getActiveFilters = (store) => {
   if (store.fields.sex !== '0') {
     const onClick = () => {
       store.fields.sex = '0';
+      store.clearPage();
       store.fetch();
     };
     const sex = store.fields.sex;
@@ -44,6 +46,7 @@ const getActiveFilters = (store) => {
   if (store.fields.breed !== '') {
     const onClick = () => {
       store.fields.breed = '';
+      store.clearPage();
       store.fetch();
     };
     activeFilters.push(

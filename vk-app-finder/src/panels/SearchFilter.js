@@ -1,7 +1,6 @@
-import {ModalPage, ModalRoot, FormLayout, FormLayoutGroup, Radio, Input, Select} from "@vkontakte/vkui";
+import {ModalPage, ModalRoot, FormLayout, FormLayoutGroup, Input, Select} from "@vkontakte/vkui";
 import React from "react";
 import FilterHeader from "../components/forms/FilterHeader";
-import AddressInput from "../components/forms/AddressInput";
 import './SearchFilter.css'
 import FormLabel from "../components/forms/FormLabel";
 import {observer} from "mobx-react";
@@ -30,7 +29,6 @@ class SearchFilter extends React.Component {
   };
 
   onBreedChange = (e) => {
-    this.props.filterStore.fields.breed = e.target.value;
     this.breed = e.target.value;
     this.changed = true;
   };
@@ -58,7 +56,6 @@ class SearchFilter extends React.Component {
           onClose={props.onClose}
           header={<FilterHeader onDone={this.onAccept} onClose={props.onClose}/>}>
           <FormLayout>
-            {/*<AddressInput title={'Местро пропажи'} placeholder={'Место пропажи'}/>*/}
             <div className={'selects-wrapper'}>
               <FormLayoutGroup className={'half-width'}>
                 <FormLabel text={'Вид животного'}/>
@@ -83,7 +80,7 @@ class SearchFilter extends React.Component {
             </div>
             <FormLayoutGroup top={'Порода'}>
               <Input onChange={this.onBreedChange}
-                     value={this.props.filterStore.fields.breed}
+                     value={this.breed}
                      placeholder={'Введите породу'}/>
             </FormLayoutGroup>
           </FormLayout>
