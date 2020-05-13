@@ -1,6 +1,8 @@
 package features
 
 import (
+	"sort"
+
 	"github.com/Kotyarich/find-your-pet/models"
 )
 
@@ -18,6 +20,9 @@ func ConvertInterfaceElementsToLost(slice []interface{}) []models.Lost {
 		element := slice[i].(models.Lost)
 		result[i] = element
 	}
+	sort.SliceStable(result, func(i, j int) bool {
+		return result[i].Id > result[j].Id
+	})
 	return result
 }
 
