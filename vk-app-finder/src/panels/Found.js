@@ -77,6 +77,7 @@ class FoundPanel extends React.Component {
                       onChange={this.onSearchInput}
                       query={this.props.foundFilterStore.fields.query}
                       filterStore={this.props.foundFilterStore}
+                      filter={this.props.filter}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 

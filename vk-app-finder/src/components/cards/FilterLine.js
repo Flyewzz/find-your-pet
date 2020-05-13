@@ -19,12 +19,13 @@ const ActiveFilter = (props) => {
   );
 };
 
-const getActiveFilters = (store) => {
+const getActiveFilters = (store, filter) => {
   const activeFilters = [];
 
   if (store.fields.type !== '0') {
     const onClick = () => {
       store.fields.type = '0';
+      filter.fields.type = '0';
       store.clearPage();
       store.fetch();
     };
@@ -36,6 +37,7 @@ const getActiveFilters = (store) => {
   if (store.fields.sex !== '0') {
     const onClick = () => {
       store.fields.sex = '0';
+      filter.fields.sex = '0';
       store.clearPage();
       store.fetch();
     };
@@ -46,6 +48,7 @@ const getActiveFilters = (store) => {
   if (store.fields.breed !== '') {
     const onClick = () => {
       store.fields.breed = '';
+      filter.fields.breed = '';
       store.clearPage();
       store.fetch();
     };
@@ -60,6 +63,7 @@ const getActiveFilters = (store) => {
 
 const FilterLine = (props) => {
   const className = props.isMap ? 'checked' : '';
+  console.log(props.filter);
 
   return (
     <>
@@ -78,7 +82,7 @@ const FilterLine = (props) => {
         <Icon28SlidersOutline onClick={props.openFilters} className={'filter__button'}/>
       </Div>
       <Div style={{marginTop: 0, paddingTop: 0}}>
-        {getActiveFilters(props.filterStore)}
+        {getActiveFilters(props.filterStore, props.filter)}
       </Div>
     </>
   );

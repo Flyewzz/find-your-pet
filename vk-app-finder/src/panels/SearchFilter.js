@@ -11,34 +11,34 @@ const MODAL_PAGE_FILTERS = 'filters';
 class SearchFilter extends React.Component {
   constructor(props) {
     super(props);
-    this.sex = props.filterStore.fields.sex;
-    this.type = props.filterStore.fields.type;
-    this.breed = props.filterStore.fields.breed;
+    this.sex = props.filter.fields.sex;
+    this.type = props.filter.fields.type;
+    this.breed = props.filter.fields.breed;
   }
 
   changed = false;
 
   onSexChange = (e) => {
-    this.sex = e.target.value;
+    this.props.filter.fields.sex = e.target.value;
     this.changed = true;
   };
 
   onTypeChange = (e) => {
-    this.type = e.target.value;
+    this.props.filter.fields.type = e.target.value;
     this.changed = true;
   };
 
   onBreedChange = (e) => {
-    this.breed = e.target.value;
+    this.props.filter.fields.breed = e.target.value;
     this.changed = true;
   };
 
   onAccept = () => {
     if (this.changed) {
       const onFieldChange = this.props.filterStore.onFieldChange;
-      onFieldChange('sex', this.sex);
-      onFieldChange('type', this.type);
-      onFieldChange('breed', this.breed);
+      onFieldChange('sex', this.props.filter.fields.sex);
+      onFieldChange('type', this.props.filter.fields.type);
+      onFieldChange('breed', this.props.filter.fields.breed);
       this.props.filterStore.clearPage();
       this.props.filterStore.fetch();
     }
@@ -60,7 +60,7 @@ class SearchFilter extends React.Component {
               <FormLayoutGroup className={'half-width'}>
                 <FormLabel text={'Вид животного'}/>
                 <Select onChange={this.onTypeChange}
-                        value={this.props.filterStore.fields.type}>
+                        value={this.props.filter.fields.type}>
                   <option value={0}>Любой</option>
                   <option value={1}>Собака</option>
                   <option value={2}>Кошка</option>
@@ -70,7 +70,7 @@ class SearchFilter extends React.Component {
               <FormLayoutGroup className={'half-width'}>
                 <FormLabel text={'Пол животного'}/>
                 <Select onChange={this.onSexChange}
-                        value={this.props.filterStore.fields.sex}>
+                        value={this.props.filter.fields.sex}>
                   <option value={0}>Любой</option>
                   <option value={'n/a'}>Не определен</option>
                   <option value={'m'}>Мужской</option>
@@ -80,7 +80,7 @@ class SearchFilter extends React.Component {
             </div>
             <FormLayoutGroup top={'Порода'}>
               <Input onChange={this.onBreedChange}
-                     value={this.breed}
+                     value={this.props.filter.fields.breed}
                      placeholder={'Введите породу'}/>
             </FormLayoutGroup>
           </FormLayout>

@@ -80,6 +80,7 @@ class LostPanel extends React.Component {
                       onChange={this.onSearchInput}
                       query={this.props.lostFilterStore.fields.query}
                       filterStore={this.props.lostFilterStore}
+                      filter={this.props.filter}
                       changeView={this.changeView}
                       openFilters={this.props.openFilters}/>
 

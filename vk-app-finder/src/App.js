@@ -18,8 +18,10 @@ import UserStore from "./stores/UserStore";
 import ProfilePanel from "./panels/Profile";
 import {Alert} from "@vkontakte/vkui";
 import LostFilterStore from "./stores/LostFilterStore";
+import LostFilter from "./stores/LostFilter"
 import FoundPanel from "./panels/Found";
 import FoundFilterStore from "./stores/FoundFilterStore";
+import FoundFilter from "./stores/FoundFilter";
 import CreateFormFoundPanel from "./panels/CreateFormFoundPanel";
 import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 import FoundMapStore from "./stores/FoundMapStore";
@@ -52,7 +54,9 @@ class App extends React.Component {
     this.mapStore = new LostMapStore(this.userStore);
     this.foundMapStore = new FoundMapStore(this.userStore);
     this.lostFilterStore = new LostFilterStore();
+    this.lostFilter = new LostFilter();
     this.foundFilterStore = new FoundFilterStore();
+    this.foundFilter = new FoundFilter();
     this.openFilters = () => {
       this.setActiveModal('filters');
     };
@@ -255,11 +259,13 @@ class App extends React.Component {
         <View popout={this.state.popout} id="lost" activePanel={this.state.lostPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.lostFilterStore}
+                        filter={this.lostFilter}
                         onClose={this.modalBack}/>
         }>
           <Panel id="losts">
             <LostPanel toLost={this.toLost}
                        lostFilterStore={this.lostFilterStore}
+                       filter={this.lostFilter}
                        mapStore={this.mapStore}
                        openFilters={this.openFilters}/>
           </Panel>
@@ -273,20 +279,21 @@ class App extends React.Component {
         <View popout={this.state.popout} id="messages" activePanel={this.state.foundPanel} modal={
           <SearchFilter activeModal={this.state.activeModal}
                         filterStore={this.foundFilterStore}
+                        filter={this.foundFilter}
                         onClose={this.modalBack}/>
         }>
           <Panel id="messages">
             <FoundPanel toFound={this.toFound}
                         foundFilterStore={this.foundFilterStore}
+                        filter={this.foundFilter}
                         mapStore={this.foundMapStore}
-                        openFilters={this.openFilters}
-                        />
+                        openFilters={this.openFilters}/>
           </Panel>
           <Panel id="found">
             <FoundAnimalPanel userStore={this.userStore}
-                             openDestructive={this.openDestructive}
-                             goBack={this.toFoundList}
-                             id={this.state.id}/>
+                              openDestructive={this.openDestructive}
+                              goBack={this.toFoundList}
+                              id={this.state.id}/>
           </Panel>
         </View>
         <View popout={this.state.popout} id="more" activePanel={this.state.profilePanel}>
@@ -300,7 +307,7 @@ class App extends React.Component {
                           toMainFoundForm={this.toMainFoundForm}
                           toLost={this.toProfileLost}
                           toFound={this.toProfileFound}
-                          />
+            />
           </Panel>
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
@@ -310,9 +317,9 @@ class App extends React.Component {
           </Panel>
           <Panel id="found">
             <FoundAnimalPanel userStore={this.userStore}
-                             openDestructive={this.openDestructive}
-                             goBack={this.toProfileFoundTab}
-                             id={this.state.profileId}/>
+                              openDestructive={this.openDestructive}
+                              goBack={this.toProfileFoundTab}
+                              id={this.state.profileId}/>
           </Panel>
         </View>
       </Epic>
