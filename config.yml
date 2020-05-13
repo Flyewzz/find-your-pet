@@ -14,12 +14,12 @@ lost:
   close_id: 2
   page_capacity: 4
 found:
-  page_capacity: 12
   files:
     directory: ./files/found
     max_size: 10 # MB
   open_id: 1
   close_id: 2
+  page_capacity: 4
 profile:
   lost:
     page_capacity: 4
