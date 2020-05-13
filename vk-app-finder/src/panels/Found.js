@@ -90,7 +90,7 @@ class FoundPanel extends React.Component {
             <InfiniteScroll dataLength={animals.length}
                             hasMore={this.props.foundFilterStore.hasMore}
                             next={this.fetchNext}
-                            style={{overflow: 'hidden'}}
+                            style={{overflow: 'hidden', paddingBottom: '20px'}}
                             loader={<Spinner size="large"
                                              style={{
                                                marginTop: 20,

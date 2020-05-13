@@ -32,7 +32,7 @@ class FoundFilterStore {
 
   fetch = async () => {
     const {type, sex, breed, query} = this.fields;
-    return this.foundService.get(type, sex, breed, query, this.page++).then(result => {
+    return this.foundService.get(type, sex, breed, query, this.page).then(result => {
       const newAnimals = (result.payload !== null && result.payload.length === 0)
         ? null : result.payload;
       if ((this.animals === null || this.animals === undefined) && newAnimals !== null) {

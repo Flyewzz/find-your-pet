@@ -93,7 +93,7 @@ class LostPanel extends React.Component {
             <InfiniteScroll dataLength={animals.length}
                             hasMore={this.lostFilterStore.hasMore}
                             next={this.fetchNext}
-                            style={{overflow: 'hidden'}}
+                            style={{overflow: 'hidden', paddingBottom: '20px'}}
                             loader={<Spinner size="large"
                                              style={{
                                                marginTop: 20,
