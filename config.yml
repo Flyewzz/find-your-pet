@@ -12,8 +12,9 @@ lost:
     max_size: 10 # MB
   open_id: 1
   close_id: 2
+  page_capacity: 4
 found:
-  itemsPerPage: 9
+  page_capacity: 12
   files:
     directory: ./files/found
     max_size: 10 # MB
@@ -21,8 +22,8 @@ found:
   close_id: 2
 profile:
   lost:
-    itemsPerPage: 9
+    page_capacity: 4
   found:
-    itemsPerPage: 9
+    page_capacity: 4
 breed_srv:
   address: http://shumak.fail/breed

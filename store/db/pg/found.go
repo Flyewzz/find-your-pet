@@ -15,14 +15,14 @@ import (
 )
 
 type FoundControllerPg struct {
-	itemsPerPage        int
+	pageCapacity        int
 	db                  *sql.DB
 	searchRequiredQuery string
 }
 
-func NewFoundControllerPg(itemsPerPage int, db *sql.DB, query string) *FoundControllerPg {
+func NewFoundControllerPg(pageCapacity int, db *sql.DB, query string) *FoundControllerPg {
 	return &FoundControllerPg{
-		itemsPerPage:        itemsPerPage,
+		pageCapacity:        pageCapacity,
 		db:                  db,
 		searchRequiredQuery: query,
 	}
@@ -48,12 +48,6 @@ func (fc *FoundControllerPg) GetById(ctx context.Context, id int) (*models.Found
 	return &found, nil
 }
 
-/*
-typeId, authorId int,
-	sex, breed, description string,
-	statusId int,
-	date, place string
-*/
 func (fc *FoundControllerPg) Add(ctx context.Context, params *models.Found) (int, error) {
 	strTx := ctx.Value("tx")
 	if strTx == "" {
@@ -74,32 +68,31 @@ func (fc *FoundControllerPg) Add(ctx context.Context, params *models.Found) (int
 	return id, err
 }
 
-/*
-typeId int,
-	sex, breed, description string,
-	status int,
-	date, place string, typeId int,
-*/
-
-func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, query string) ([]models.Found, error) {
+func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, query string, page int) ([]models.Found, bool, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
 
 	// Get everything without parameters to search
 	if features.CheckEmptyFound(params, query) {
 		rows, err := fc.db.Query(fc.searchRequiredQuery+
-			"WHERE status_id != $1 ORDER BY date DESC",
-			ctxParams["close_id"].(int))
+			"WHERE status_id != $1 ORDER BY date DESC LIMIT $2 OFFSET $3",
+			ctxParams["close_id"].(int), fc.pageCapacity+1, (page-1)*fc.pageCapacity)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		found, err := db.ConvertRowsToFound(rows)
 		rows.Close()
-		return found, err
+		// The next page is exist if the database returns
+		hasMore := (len(found) == fc.pageCapacity+1)
+		if hasMore {
+			// Cut the last element to make a count of records = page capacity
+			found = found[:len(found)-1]
+		}
+		return found, hasMore, err
 	}
 
 	tx, err := fc.db.Begin()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	ctxParams["tx"] = tx
 	ctxParams["query"] = fc.searchRequiredQuery
@@ -120,9 +113,9 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 		result, err := fc.SearchByType(ctx, params.TypeId)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
@@ -130,9 +123,9 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 		result, err := fc.SearchBySex(ctx, params.Sex)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
@@ -140,9 +133,9 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 		result, err := fc.SearchByBreed(ctx, params.Breed)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
@@ -150,18 +143,18 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 		result, err := fc.SearchByTextQuery(ctx, query)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
 	err = tx.Commit()
 	if err != nil {
 		if rollErr := tx.Rollback(); rollErr != nil {
-			return nil, rollErr
+			return nil, false, rollErr
 		}
-		return nil, err
+		return nil, false, err
 	}
 
 	// Now we must intersect all the sets stored in
@@ -169,7 +162,7 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 
 	resultSet := searchManager.GetSet()
 	results := features.ConvertInterfaceElementsToFound((*resultSet).ToSlice())
-	return results, nil
+	return results, true, nil
 }
 
 func (fc *FoundControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Found, error) {
@@ -253,8 +246,8 @@ func (fc *FoundControllerPg) SearchByTextQuery(ctx context.Context, query string
 	return founds, err
 }
 
-func (fc *FoundControllerPg) GetItemsPerPageCount() int {
-	return fc.itemsPerPage
+func (fc *FoundControllerPg) GetPageCapacity() int {
+	return fc.pageCapacity
 }
 
 func (fc *FoundControllerPg) GetDbAdapter() *sql.DB {

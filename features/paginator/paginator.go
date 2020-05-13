@@ -13,6 +13,6 @@ func CalculatePageCount(itemsCount, itemsPerPage int) int {
 }
 
 type PaginatorData struct {
-	Pages   int             `json:"pages"`
+	HasMore bool            `json:"has_more"`
 	Payload json.RawMessage `json:"payload"`
 }

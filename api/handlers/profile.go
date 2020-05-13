@@ -34,15 +34,15 @@ func (hd *HandlerData) ProfileLostHandler(w http.ResponseWriter, r *http.Request
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
-	pagesCount := paginator.CalculatePageCount(len(lost),
-		hd.ProfileController.GetItemsPerPageCount())
+	// pagesCount := paginator.CalculatePageCount(len(lost),
+	// 	hd.ProfileController.GetItemsPerPageCount())
 	lostsEncoded, err := json.Marshal(lost)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	pagesData := paginator.PaginatorData{
-		Pages:   pagesCount,
+		HasMore: true,
 		Payload: lostsEncoded,
 	}
 	data, err := json.Marshal(pagesData)
@@ -112,15 +112,15 @@ func (hd *HandlerData) ProfileFoundHandler(w http.ResponseWriter, r *http.Reques
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
-	pagesCount := paginator.CalculatePageCount(len(found),
-		hd.ProfileController.GetItemsPerPageCount())
+	// pagesCount := paginator.CalculatePageCount(len(found),
+	// 	hd.ProfileController.GetItemsPerPageCount())
 	foundEncoded, err := json.Marshal(found)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	pagesData := paginator.PaginatorData{
-		Pages:   pagesCount,
+		HasMore: true,
 		Payload: foundEncoded,
 	}
 	data, err := json.Marshal(pagesData)

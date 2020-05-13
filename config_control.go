@@ -51,17 +51,17 @@ func PrepareHandlerData() *handlers.HandlerData {
 				   st_x(location) as latitude, st_y(location) as longitude, 
 				   picture_id, address FROM found `
 
-	lostController := pg.NewLostControllerPg(viper.GetInt("lost.itemsPerPage"), db, queryLost)
+	lostController := pg.NewLostControllerPg(viper.GetInt("lost.page_capacity"), db, queryLost)
 	FileController := pg.NewFileControllerPg(db)
 	lostAddingManager :=
 		managers.NewLostAddingManager(db, lostController, FileController)
 
-	foundController := pg.NewFoundControllerPg(viper.GetInt("found.itemsPerPage"), db, queryFound)
+	foundController := pg.NewFoundControllerPg(viper.GetInt("found.page_capacity"), db, queryFound)
 	foundAddingManager :=
 		managers.NewFoundAddingManager(db, foundController, FileController)
 
 	profileController := pg.NewProfileControllerPg(
-		viper.GetInt("profile.lost.itemsPerPage"),
+		viper.GetInt("profile.lost.page_capacity"),
 		db, queryLost, queryFound)
 	breedClassifier := http_breed_classifier.NewBreedClassifier(viper.GetString("breed_srv.address"))
 	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))

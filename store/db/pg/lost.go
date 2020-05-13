@@ -15,14 +15,15 @@ import (
 )
 
 type LostControllerPg struct {
-	itemsPerPage        int
+	pageCapacity        int
 	db                  *sql.DB
 	searchRequiredQuery string
 }
 
-func NewLostControllerPg(itemsPerPage int, db *sql.DB, query string) *LostControllerPg {
+func NewLostControllerPg(pageCapacity int, db *sql.DB,
+	query string) *LostControllerPg {
 	return &LostControllerPg{
-		itemsPerPage:        itemsPerPage,
+		pageCapacity:        pageCapacity,
 		db:                  db,
 		searchRequiredQuery: query,
 	}
@@ -81,24 +82,31 @@ typeId int,
 	date, place string, typeId int,
 */
 
-func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, query string) ([]models.Lost, error) {
+func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, query string, page int) ([]models.Lost, bool, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
 	// Get everything without parameters to search
 	if features.CheckEmptyLost(params, query) {
+		// lc.pageCapacity + 1 - check for an exist of the next page
 		rows, err := lc.db.Query(lc.searchRequiredQuery+
-			"WHERE status_id != $1 ORDER BY date DESC",
-			ctxParams["close_id"].(int))
+			"WHERE status_id != $1 ORDER BY date DESC LIMIT $2 OFFSET $3",
+			ctxParams["close_id"].(int), lc.pageCapacity+1, (page-1)*lc.pageCapacity)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		losts, err := db.ConvertRowsToLost(rows)
 		rows.Close()
-		return losts, err
+		// The next page is exist if the database returns
+		hasMore := (len(losts) == lc.pageCapacity+1)
+		if hasMore {
+			// Cut the last element to make a count of records = page capacity
+			losts = losts[:len(losts)-1]
+		}
+		return losts, hasMore, err
 	}
 
 	tx, err := lc.db.Begin()
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	ctxParams["tx"] = tx
 	ctxParams["query"] = lc.searchRequiredQuery
@@ -119,9 +127,9 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		result, err := lc.SearchByType(ctx, params.TypeId)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
@@ -129,9 +137,9 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		result, err := lc.SearchBySex(ctx, params.Sex)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
@@ -139,9 +147,9 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		result, err := lc.SearchByBreed(ctx, params.Breed)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
@@ -149,18 +157,18 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		result, err := lc.SearchByTextQuery(ctx, query)
 		if err != nil {
 			if rollErr := tx.Rollback(); rollErr != nil {
-				return nil, rollErr
+				return nil, false, rollErr
 			}
-			return nil, err
+			return nil, false, err
 		}
 		addResultToSearchManager(&result, searchManager)
 	}
 	err = tx.Commit()
 	if err != nil {
 		if rollErr := tx.Rollback(); rollErr != nil {
-			return nil, rollErr
+			return nil, false, rollErr
 		}
-		return nil, err
+		return nil, false, err
 	}
 
 	// Now we must intersect all the sets stored in
@@ -168,7 +176,7 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 
 	resultSet := searchManager.GetSet()
 	results := features.ConvertInterfaceElementsToLost((*resultSet).ToSlice())
-	return results, nil
+	return results, true, nil
 }
 
 func (lc *LostControllerPg) SearchByType(ctx context.Context, typeId int) ([]models.Lost, error) {
@@ -253,8 +261,8 @@ func (lc *LostControllerPg) SearchByTextQuery(ctx context.Context, query string)
 	return losts, err
 }
 
-func (lc *LostControllerPg) GetItemsPerPageCount() int {
-	return lc.itemsPerPage
+func (lc *LostControllerPg) GetPageCapacity() int {
+	return lc.pageCapacity
 }
 
 func (lc *LostControllerPg) GetDbAdapter() *sql.DB {

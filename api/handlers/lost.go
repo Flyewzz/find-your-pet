@@ -38,6 +38,12 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	breed := arguments.Get("breed")
 	address := arguments.Get("address")
 	description := arguments.Get("description")
+	strPage := arguments.Get("page")
+	page, err := strconv.Atoi(strPage)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
+		return
+	}
 	var latitude, longitude float64
 	strLatitude := arguments.Get("latitude")
 	if strLatitude != "" {
@@ -68,7 +74,7 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 	mapCloseId := make(map[string]interface{})
 	mapCloseId["close_id"] = viper.GetInt("lost.close_id")
 	ctx := context.WithValue(context.Background(), "params", mapCloseId)
-	losts, err := hd.LostController.Search(ctx, lost, query)
+	losts, hasMore, err := hd.LostController.Search(ctx, lost, query, page)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "Not found", http.StatusNotFound)
@@ -77,15 +83,15 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	pagesCount := paginator.CalculatePageCount(len(losts),
-		hd.LostController.GetItemsPerPageCount())
+	// pagesCount := paginator.CalculatePageCount(len(losts),
+	// 	hd.LostController.GetPageCapacity())
 	lostsEncoded, err := json.Marshal(losts)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
 	pagesData := paginator.PaginatorData{
-		Pages:   pagesCount,
+		HasMore: hasMore,
 		Payload: lostsEncoded,
 	}
 	data, err := json.Marshal(pagesData)
