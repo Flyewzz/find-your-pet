@@ -9,5 +9,5 @@ message Image {
 }
   
 message Breed {
-    string name = 1;
+    repeated string name = 1;
 }

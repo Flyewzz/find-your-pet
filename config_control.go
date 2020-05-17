@@ -7,8 +7,8 @@ import (
 
 	"github.com/Kotyarich/find-your-pet/api/handlers"
 	"github.com/Kotyarich/find-your-pet/db"
-	"github.com/Kotyarich/find-your-pet/http_breed_classifier"
 	"github.com/Kotyarich/find-your-pet/managers"
+	"github.com/Kotyarich/find-your-pet/srv/classifier"
 	"github.com/Kotyarich/find-your-pet/store/db/pg"
 	"github.com/spf13/viper"
 )
@@ -63,7 +63,8 @@ func PrepareHandlerData() *handlers.HandlerData {
 	profileController := pg.NewProfileControllerPg(
 		viper.GetInt("profile.lost.page_capacity"),
 		db, queryLost, queryFound)
-	breedClassifier := http_breed_classifier.NewBreedClassifier(viper.GetString("breed_srv.address"))
+	breedClassifier := classifier.NewBreedClassifier(viper.GetString("breed_srv.address"),
+		viper.GetInt("breed_srv.conn_timeout"), viper.GetInt("breed_srv.recognize_timeout"))
 	debug, err := strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
 		log.Fatalln(err)
