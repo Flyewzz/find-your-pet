@@ -13,13 +13,11 @@ app = Flask(__name__)
 @app.route('/breed', methods=['POST'])
 def index():
     img = request.json['picture']
-    async_breeds = pool.apply_async(classifier.Xception_predict_breed, (img,))
+    async_breeds = pool.apply_async(classifier.Xception_predict_breed, (img, True))
     breeds = async_breeds.get()
-    # breeds = classifier.Xception_predict_breed(img)
     print('breeds: %s' % breeds)
-    # Give a formatted breed (eng)
+    # Give a formatted breed (rus)
     breeds = [breed_format(breed) for breed in breeds]
-    # Only one breed right now (*TODO* FIX IT)
     return json.dumps(breeds, ensure_ascii=False).encode('utf8')
 
 

@@ -21,4 +21,5 @@ package-lock.json
 
 log.txt
 
-tenz
+env
+__pycache__
