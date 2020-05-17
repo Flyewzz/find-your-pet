@@ -9,18 +9,20 @@ from io import BytesIO
 import base64
 from PIL import Image
 
-DATA_PATH = '/home/gamma/projects/find-your-pet/breeds'
+from config import *
 
 # load list of dog names
 dog_names = [item[20:-1] for item in sorted(glob(DATA_PATH + "/train/*/"))]
 
 
-def path_to_tensor(img_path):
+def path_to_tensor(img_path, is_base64):
     # loads RGB image as PIL.Image.Image type
-    img = tf.keras.preprocessing.image.load_img(img_path,
+    img = None
+    if is_base64:
+        img = Image.open(BytesIO(base64.b64decode(img_path))).resize((224, 224))
+    else:
+        img = tf.keras.preprocessing.image.load_img(img_path,
                                                 target_size=(224, 224))
-    # img = tf.keras.preprocessing.image.load_img(BytesIO(base64.b64decode(img_path)),
-    #                                        target_size=(224, 224))
     # convert PIL.Image.Image type to 3D tensor with shape (224, 224, 3)
     x = tf.keras.preprocessing.image.img_to_array(img)
     # convert 3D tensor to 4D tensor with shape (1, 224, 224, 3) and return 4D tensor
@@ -49,10 +51,10 @@ def create_model():
     return Xception_model
 
 
-def Xception_predict_breed(img_path):
+def Xception_predict_breed(img_path, is_base64):
     model = create_model()
     # extract the bottle neck features
-    bottleneck_feature = extract_Xception(path_to_tensor(img_path))
+    bottleneck_feature = extract_Xception(path_to_tensor(img_path, is_base64))
     # get a vector of predicted values
     predicted_vector = model.predict(bottleneck_feature)
     top_predictions = np.argpartition(predicted_vector.flatten(), -4)[-3:]
