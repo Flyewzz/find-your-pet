@@ -21,8 +21,7 @@ def path_to_tensor(img_path, is_base64):
     # loads RGB image as PIL.Image.Image type
     img = None
     if is_base64:
-        img = tf.keras.preprocessing.image.load_img(BytesIO(base64.b64decode(img_path)),
-                                      target_size=(224, 224))
+        img = Image.open(BytesIO(base64.b64decode(img_path))).resize((224, 224))
     else:
         img = tf.keras.preprocessing.image.load_img(img_path,
                                                 target_size=(224, 224))
