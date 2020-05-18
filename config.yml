@@ -26,4 +26,6 @@ profile:
   found:
     page_capacity: 4
 breed_srv:
-  address: http://shumak.fail/breed
+  address: localhost:50051
+  conn_timeout: 10
+  recognize_timeout: 20
