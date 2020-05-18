@@ -253,3 +253,29 @@ func (fc *FoundControllerPg) GetPageCapacity() int {
 func (fc *FoundControllerPg) GetDbAdapter() *sql.DB {
 	return fc.db
 }
+
+func (lc *FoundControllerPg) RemoveById(ctx context.Context, id int) (int, error) {
+	strTx := ctx.Value("tx")
+	if strTx == "" {
+		return 0, errs.MissedTransaction
+	}
+	tx := strTx.(*sql.Tx)
+
+	var pictureId sql.NullInt32
+	err := tx.QueryRow("SELECT picture_id FROM found WHERE id = $1", id).Scan(&pictureId)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = tx.Exec("DELETE FROM found WHERE id = $1", id)
+	if err != nil {
+		return 0, err
+	}
+
+	// If a picture exists
+	if pictureId.Valid {
+		return int(pictureId.Int32), nil
+	}
+	// If the picture is null
+	return 0, nil
+}

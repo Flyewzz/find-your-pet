@@ -298,3 +298,17 @@ addFoundId:
 	// Send id to the client
 	w.Write([]byte(strconv.Itoa(foundId)))
 }
+
+func (hd *HandlerData) RemoveFoundHandler(w http.ResponseWriter, r *http.Request) {
+	strId := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
+		return
+	}
+	err = hd.FoundAddingManager.Remove(id)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
+}
