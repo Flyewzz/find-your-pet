@@ -83,8 +83,6 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// pagesCount := paginator.CalculatePageCount(len(losts),
-	// 	hd.LostController.GetPageCapacity())
 	lostsEncoded, err := json.Marshal(losts)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
@@ -298,4 +296,20 @@ addLostId:
 	}
 	// Send id to the client
 	w.Write([]byte(strconv.Itoa(lostId)))
+}
+
+func (hd *HandlerData) RemoveLostHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
+		return
+	}
+	params := r.FormValue
+	strId := params("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
+		return
+	}
+	hd.LostAddingManager.Remove(id)
 }
