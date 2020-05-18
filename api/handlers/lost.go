@@ -311,5 +311,9 @@ func (hd *HandlerData) RemoveLostHandler(w http.ResponseWriter, r *http.Request)
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	hd.LostAddingManager.Remove(id)
+	err = hd.LostAddingManager.Remove(id)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
 }

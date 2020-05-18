@@ -83,18 +83,38 @@ func (lam *LostAddingManager) Remove(id int) error {
 		return err
 	}
 	ctx := context.WithValue(context.Background(), "tx", tx)
-	hasPicture, err := lam.lostController.RemoveById(ctx, id)
+	pictureId, err := lam.lostController.RemoveById(ctx, id)
 	if err != nil {
 		if errRoll := tx.Rollback(); errRoll != nil {
 			return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
 		}
 		return err
 	}
-	if hasPicture {
+	if pictureId != 0 {
+		err = lam.FileController.Remove(ctx, pictureId)
+		if err != nil {
+			if errRoll := tx.Rollback(); errRoll != nil {
+				return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
+			}
+			return err
+		}
 		lostDirectoryPath := strconv.Itoa(id)
 		fullDirectoryPath := filepath.Join(lam.baseLostDirectoryPath,
 			lostDirectoryPath)
-		os.RemoveAll(fullDirectoryPath)
+		err = os.RemoveAll(fullDirectoryPath)
+		if err != nil {
+			if errRoll := tx.Rollback(); errRoll != nil {
+				return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
+			}
+			return err
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		if errRoll := tx.Rollback(); errRoll != nil {
+			return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
+		}
+		return err
 	}
 	return nil
 }

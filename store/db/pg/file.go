@@ -45,6 +45,16 @@ func (fc *FileControllerPg) AddToLost(ctx context.Context, file *models.File,
 	return fileId, err
 }
 
+func (fc *FileControllerPg) Remove(ctx context.Context, fileId int) error {
+	strTx := ctx.Value("tx")
+	if strTx == "" {
+		return errs.MissedTransaction
+	}
+	tx := strTx.(*sql.Tx)
+	_, err := tx.Exec("DELETE FROM files WHERE file_id = $1", fileId)
+	return err
+}
+
 func (fc *FileControllerPg) AddToFound(ctx context.Context, file *models.File,
 	foundId int) (int, error) {
 	strTx := ctx.Value("tx")
