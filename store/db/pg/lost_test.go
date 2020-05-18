@@ -1,197 +1,127 @@
 package pg
 
 import (
+	"context"
 	"database/sql"
-	"errors"
 	"reflect"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/Kotyarich/find-your-pet/mocks"
 	"github.com/Kotyarich/find-your-pet/models"
+	"github.com/bxcodec/faker"
+)
+
+var (
+	queryLost = "SELECT id, type_id, " +
+		"vk_id, sex, " +
+		"breed, description, status_id, " +
+		"date, st_x(location) as latitude, " +
+		"st_y(location) as longitude, picture_id, address FROM lost "
 )
 
 func TestNewLostControllerPg(t *testing.T) {
 	type args struct {
-		itemsPerPage int
+		pageCapacity int
 		db           *sql.DB
+		query        string
 	}
-	mockDb, _, _ := sqlmock.New()
 	tests := []struct {
 		name string
 		args args
+		want *LostControllerPg
 	}{
-		{
-			"First with nil",
-			args{
-				itemsPerPage: 5,
-				db:           nil,
-			},
-		},
-		{
-			"Second with nil",
-			args{
-				itemsPerPage: 10,
-				db:           nil,
-			},
-		},
-		{
-			"Third with mock",
-			args{
-				itemsPerPage: 999999,
-				db:           mockDb,
-			},
-		},
+		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewLostControllerPg(tt.args.itemsPerPage, tt.args.db)
-			currentItems := got.GetItemsPerPageCount()
-			if currentItems != tt.args.itemsPerPage {
-				t.Errorf("items per page must be %v, but got %v",
-					tt.args.itemsPerPage, currentItems)
-			}
-			currentDb := got.GetDbAdapter()
-			if currentDb != tt.args.db {
-				t.Errorf("db must be %v, but got %v",
-					tt.args.db, currentDb)
+			if got := NewLostControllerPg(tt.args.pageCapacity, tt.args.db, tt.args.query); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewLostControllerPg() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestLostControllerPg_GetById(t *testing.T) {
+
 	db, mock, err := sqlmock.New()
 	if err != nil {
-		panic(err)
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	type fields struct {
-		itemsPerPage int
-		db           *sql.DB
+	defer db.Close()
+	var losts []*models.Lost
+	for i := 0; i < 10; i++ {
+		lost := &models.Lost{}
+		faker.FakeData(lost)
+		lost.Id = (i + 1)
+		if i > 4 {
+			lost.StatusId = 2 // Closed
+		}
+		losts = append(losts, lost)
 	}
 	type args struct {
-		id int
+		ctx context.Context
+		id  int
 	}
-	realLost := mocks.Generate()
 	tests := []struct {
 		name    string
-		fields  fields
+		lc      *LostControllerPg
 		args    args
 		want    *models.Lost
 		wantErr bool
 	}{
 		{
-			"First",
-			fields{
-				itemsPerPage: 5,
-				db:           db,
+			name: "1",
+			lc:   NewLostControllerPg(4, db, queryLost),
+			args: args{
+				ctx: context.WithValue(context.Background(), "close_id", 2),
+				id:  3,
 			},
-			args{
-				id: 1,
-			},
-			&realLost[0],
-			false,
-		},
-		{
-			"Third",
-			fields{
-				itemsPerPage: 5,
-				db:           db,
-			},
-			args{
-				id: 3,
-			},
-			&realLost[2],
-			false,
-		},
-		{
-			"Last",
-			fields{
-				itemsPerPage: 5,
-				db:           db,
-			},
-			args{
-				id: 5,
-			},
-			&realLost[4],
-			false,
-		},
-		{
-			"Not exists",
-			fields{
-				itemsPerPage: 5,
-				db:           db,
-			},
-			args{
-				id: 45434543,
-			},
-			nil,
-			true,
+			want:    losts[2],
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lc := &LostControllerPg{
-				itemsPerPage: tt.fields.itemsPerPage,
-				db:           tt.fields.db,
-			}
-			rows := sqlmock.NewRows([]string{
-				"id",
-				"type_id",
-				"author_id",
-				"sex",
-				"breed",
-				"description",
-				"status_id",
-				"date",
-				"place",
-			})
-			id := tt.args.id
-			expectQuery := mock.ExpectQuery("SELECT (.+) FROM lost WHERE id = \\$1").
-				WithArgs(id)
-			if id >= 1 && id <= 5 {
-				lost := realLost[id-1]
-				rows.AddRow(lost.Id, lost.TypeId, lost.AuthorId, lost.Sex,
-					lost.Breed, lost.Description, lost.StatusId,
-					lost.Date, lost.Place)
-				expectQuery.WillReturnRows(rows)
-			} else {
-				expectQuery.WillReturnError(errors.New("Doesn't exist"))
-			}
-			got, err := lc.GetById(id)
+			i := tt.args.id - 1
+			rows := sqlmock.NewRows([]string{"id", "type_id",
+				"vk_id", "sex", "breed", "description", "status_id",
+				"date", "latitude", "longitude", "picture_id", "address"}).AddRow(losts[i].Id, losts[i].TypeId, losts[i].AuthorId,
+				losts[i].Sex, losts[i].Breed, losts[i].Description,
+				losts[i].StatusId, losts[i].Date,
+				losts[i].Latitude, losts[i].Longitude, losts[i].PictureId, losts[i].Address)
+			mock.ExpectQuery(`.*`).WithArgs(tt.args.id, 2).WillReturnRows(rows)
+			got, err := tt.lc.GetById(tt.args.ctx, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LostControllerPg.GetById() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("there were unfulfilled expectations: %s", err)
+			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LostControllerPg.GetById() = %v, want %v", got, tt.want)
+				t.Errorf("LostControllerPg.GetById() = %v, \nwant %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestLostControllerPg_Add(t *testing.T) {
-	type fields struct {
-		itemsPerPage int
-		db           *sql.DB
-	}
 	type args struct {
+		ctx    context.Context
 		params *models.Lost
 	}
 	tests := []struct {
 		name    string
-		fields  fields
+		lc      *LostControllerPg
 		args    args
 		want    int
 		wantErr bool
-	}{}
+	}{
+		// TODO: Add test cases.
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lc := &LostControllerPg{
-				itemsPerPage: tt.fields.itemsPerPage,
-				db:           tt.fields.db,
-			}
-			got, err := lc.Add(tt.args.params)
+			got, err := tt.lc.Add(tt.args.ctx, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LostControllerPg.Add() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -204,16 +134,47 @@ func TestLostControllerPg_Add(t *testing.T) {
 }
 
 func TestLostControllerPg_Search(t *testing.T) {
-	type fields struct {
-		itemsPerPage int
-		db           *sql.DB
-	}
 	type args struct {
+		ctx    context.Context
 		params *models.Lost
+		query  string
+		page   int
 	}
 	tests := []struct {
 		name    string
-		fields  fields
+		lc      *LostControllerPg
+		args    args
+		want    []models.Lost
+		want1   bool
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1, err := tt.lc.Search(tt.args.ctx, tt.args.params, tt.args.query, tt.args.page)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LostControllerPg.Search() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("LostControllerPg.Search() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("LostControllerPg.Search() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
+
+func TestLostControllerPg_SearchByType(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		typeId int
+	}
+	tests := []struct {
+		name    string
+		lc      *LostControllerPg
 		args    args
 		want    []models.Lost
 		wantErr bool
@@ -222,49 +183,132 @@ func TestLostControllerPg_Search(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lc := &LostControllerPg{
-				itemsPerPage: tt.fields.itemsPerPage,
-				db:           tt.fields.db,
-			}
-			got, err := lc.Search(tt.args.params)
+			got, err := tt.lc.SearchByType(tt.args.ctx, tt.args.typeId)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("LostControllerPg.Search() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("LostControllerPg.SearchByType() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LostControllerPg.Search() = %v, want %v", got, tt.want)
+				t.Errorf("LostControllerPg.SearchByType() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestLostControllerPg_GetItemsPerPageCount(t *testing.T) {
-	type fields struct {
-		itemsPerPage int
-		db           *sql.DB
+func TestLostControllerPg_SearchBySex(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		sex string
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   int
+		name    string
+		lc      *LostControllerPg
+		args    args
+		want    []models.Lost
+		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lc := &LostControllerPg{
-				itemsPerPage: tt.fields.itemsPerPage,
-				db:           tt.fields.db,
+			got, err := tt.lc.SearchBySex(tt.args.ctx, tt.args.sex)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LostControllerPg.SearchBySex() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-			if got := lc.GetItemsPerPageCount(); got != tt.want {
-				t.Errorf("LostControllerPg.GetItemsPerPageCount() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("LostControllerPg.SearchBySex() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-// for _, lost := range realLost {
-// 		rows.AddRow(lost.Id, lost.TypeId, lost.AuthorId, lost.Sex,
-// 			lost.Breed, lost.Description, lost.StatusId,
-// 			lost.Date, lost.Place)
-// 	}
+func TestLostControllerPg_SearchByBreed(t *testing.T) {
+	type args struct {
+		ctx   context.Context
+		breed string
+	}
+	tests := []struct {
+		name    string
+		lc      *LostControllerPg
+		args    args
+		want    []models.Lost
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.lc.SearchByBreed(tt.args.ctx, tt.args.breed)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LostControllerPg.SearchByBreed() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("LostControllerPg.SearchByBreed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLostControllerPg_SearchByTextQuery(t *testing.T) {
+	type args struct {
+		ctx   context.Context
+		query string
+	}
+	tests := []struct {
+		name    string
+		lc      *LostControllerPg
+		args    args
+		want    []models.Lost
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.lc.SearchByTextQuery(tt.args.ctx, tt.args.query)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LostControllerPg.SearchByTextQuery() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("LostControllerPg.SearchByTextQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLostControllerPg_GetPageCapacity(t *testing.T) {
+	tests := []struct {
+		name string
+		lc   *LostControllerPg
+		want int
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.lc.GetPageCapacity(); got != tt.want {
+				t.Errorf("LostControllerPg.GetPageCapacity() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLostControllerPg_GetDbAdapter(t *testing.T) {
+	tests := []struct {
+		name string
+		lc   *LostControllerPg
+		want *sql.DB
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.lc.GetDbAdapter(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("LostControllerPg.GetDbAdapter() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -232,26 +232,6 @@ func (lc *LostControllerPg) SearchByBreed(ctx context.Context, breed string) ([]
 	return losts, err
 }
 
-// A direction is needed to specify a date (must be less or greater or equal)
-func (lc *LostControllerPg) SearchByDate(ctx context.Context, date, direction string) ([]models.Lost, error) {
-	if direction != "<" && direction != ">" && direction != "=" {
-		return nil, errs.IncorrectDirection
-	}
-	params := ctx.Value("params").(map[string]interface{})
-	tx := params["tx"].(*sql.Tx)
-	searchRequiredQuery := params["query"].(string)
-	closeId := params["close_id"].(int)
-	sqlQuery := fmt.Sprintf(searchRequiredQuery+
-		"WHERE date %s $1 AND status_id != $2", direction)
-	rows, err := tx.Query(sqlQuery, date, closeId)
-	if err != nil {
-		return nil, err
-	}
-	losts, err := db.ConvertRowsToLost(rows)
-	rows.Close()
-	return losts, err
-}
-
 func (lc *LostControllerPg) SearchByTextQuery(ctx context.Context, query string) ([]models.Lost, error) {
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
