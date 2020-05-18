@@ -299,13 +299,7 @@ addLostId:
 }
 
 func (hd *HandlerData) RemoveLostHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
-		return
-	}
-	params := r.FormValue
-	strId := params("id")
+	strId := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
