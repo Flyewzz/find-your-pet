@@ -49,12 +49,6 @@ func (lc *LostControllerPg) GetById(ctx context.Context, id int) (*models.Lost, 
 	return &lost, nil
 }
 
-/*
-typeId, authorId int,
-	sex, breed, description string,
-	statusId int,
-	date, place string
-*/
 func (lc *LostControllerPg) Add(ctx context.Context, params *models.Lost) (int, error) {
 	strTx := ctx.Value("tx")
 	if strTx == "" {
@@ -74,13 +68,6 @@ func (lc *LostControllerPg) Add(ctx context.Context, params *models.Lost) (int, 
 		params.Breed, params.Description, params.Address).Scan(&id)
 	return id, err
 }
-
-/*
-typeId int,
-	sex, breed, description string,
-	status int,
-	date, place string, typeId int,
-*/
 
 func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, query string, page int) ([]models.Lost, bool, error) {
 	ctxParams := ctx.Value("params").(map[string]interface{})
