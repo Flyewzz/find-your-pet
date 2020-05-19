@@ -278,7 +278,7 @@ class App extends React.Component {
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
-                             goBack={() => {this.toLostList(false)}}
+                             goBack={this.toLostList}
                              id={this.state.id}/>
           </Panel>
         </View>
@@ -299,7 +299,7 @@ class App extends React.Component {
           <Panel id="found">
             <FoundAnimalPanel userStore={this.userStore}
                               openDestructive={this.openDestructive}
-                              goBack={() => {this.toFoundList(false)}}
+                              goBack={this.toFoundList}
                               id={this.state.id}/>
           </Panel>
         </View>

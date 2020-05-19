@@ -92,7 +92,7 @@ class FoundAnimalPanel extends React.Component {
     const vkId = this.props.userStore.id;
     this.profileService
       .closeFound(this.props.id, vkId)
-      .then(() => this.props.goBack());
+      .then(() => this.props.goBack(true));
   };
 
   render() {
@@ -106,7 +106,7 @@ class FoundAnimalPanel extends React.Component {
 
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack onClick={this.props.goBack}/>}>
+        <PanelHeader left={<PanelHeaderBack onClick={() => this.props.goBack(false)}/>}>
           Найденный питомец
         </PanelHeader>
         <Group separator="hide">

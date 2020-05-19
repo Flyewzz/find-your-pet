@@ -94,7 +94,7 @@ class LostAnimalPanel extends React.Component {
     const vkId = this.props.userStore.id;
     this.profileService
       .closeLost(this.props.id, vkId)
-      .then(() => this.props.goBack());
+      .then(() => this.props.goBack(true));
   };
 
   getHeader = () => {
@@ -145,7 +145,7 @@ class LostAnimalPanel extends React.Component {
 
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack onClick={this.props.goBack}/>}>
+        <PanelHeader left={<PanelHeaderBack onClick={() => this.props.goBack(false)}/>}>
           Потерянный питомец
         </PanelHeader>
         <Group separator="hide">
