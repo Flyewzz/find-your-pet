@@ -164,7 +164,7 @@ class LostAnimalPanel extends React.Component {
           <Group
             header={!this.isMine && <Header mode={"secondary"}>Автор</Header>}>
             {!this.isMine ? <>
-                <a href={this.getProfileLink()} style={{textDecoration: "none"}}>
+                <a target={'blank'} href={this.getProfileLink()} style={{textDecoration: "none"}}>
                   <Cell className={"author__info"} before={<Avatar src={this.author.photo_50}/>}>
                     {this.author.first_name + " " + this.author.last_name}
                   </Cell>
