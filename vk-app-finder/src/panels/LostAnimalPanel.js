@@ -145,7 +145,7 @@ class LostAnimalPanel extends React.Component {
 
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack onClick={() => this.props.goBack(false)}/>}>
+        <PanelHeader left={<PanelHeaderBack onClick={() => this.props.goBack(true)}/>}>
           Потерянный питомец
         </PanelHeader>
         <Group separator="hide">
