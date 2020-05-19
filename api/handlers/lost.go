@@ -72,7 +72,6 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		Address:     address,
 	}
 	mapCloseId := make(map[string]interface{})
-	mapCloseId["close_id"] = viper.GetInt("lost.close_id")
 	ctx := context.WithValue(context.Background(), "params", mapCloseId)
 	losts, hasMore, err := hd.LostController.Search(ctx, lost, query, page)
 	if err != nil {

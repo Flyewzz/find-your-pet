@@ -68,7 +68,6 @@ func (hd *HandlerData) FoundHandler(w http.ResponseWriter, r *http.Request) {
 		Address:     address,
 	}
 	mapCloseId := make(map[string]interface{})
-	mapCloseId["close_id"] = viper.GetInt("found.close_id")
 	ctx := context.WithValue(context.Background(), "params", mapCloseId)
 	founds, hasMore, err := hd.FoundController.Search(ctx, found, query, page)
 	if err != nil {
