@@ -18,15 +18,15 @@ class ProfileService {
   };
 
   closeLost = async (id, vkId) => {
-    const url = `${config.baseUrl}lost?vk_id=${vkId}&lost_id=${id}&opened=${0}`;
-    const options = {method: 'PUT'};
+    const url = `${config.baseUrl}lost?vk_id=${vkId}&id=${id}`;
+    const options = {method: 'DELETE'};
     const request = new Request(url, options);
     return await fetch(request);
   };
 
   closeFound = async (id, vkId) => {
-    const url = `${config.baseUrl}found?vk_id=${vkId}&found_id=${id}&opened=${0}`;
-    const options = {method: 'PUT'};
+    const url = `${config.baseUrl}found?vk_id=${vkId}&id=${id}`;
+    const options = {method: 'DELETE'};
     const request = new Request(url, options);
     return await fetch(request);
   };
