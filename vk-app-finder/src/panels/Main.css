@@ -1,37 +1,115 @@
 .main__wrapper {
-    background-image: url(../img/main.jpg);
-    background-position: right -85px bottom 40px;
     height: 100%;
     width: 100%;
+    padding-top: 40px;
+}
+
+.main__image-wrapper {
+    text-align: center;
+}
+
+.main__image {
+    width: 51%;
 }
 
 .main__welcome-text {
-    margin-top: 10pt;
-    font-size: xx-large;
-    font-weight: bold;
-    color: var(--dynamic_blue);
+    text-align: center;
+    font-family: Alegreya Sans, serif;
+    font-weight: 800;
+    font-size: 48px;
+}
+
+.main__button:first-child {
+    float: left;
+    margin-left: 24%;
+    min-width: 145px;
+}
+
+.main__button:last-child {
+    float: right;
+    margin-right: 24%;
+    min-width: 145px;
 }
 
 .main__button {
-    margin-top: 200pt;
-    margin-right: 10pt;
     min-width: 120px;
     box-shadow: -4px -4px;
 }
 
+.main__button__text {
+    font-family: Alegreya Sans, serif;
+    font-weight: 800;
+    font-size: 24px;
+}
+
+.main__subtext {
+    font-family: Alegreya Sans, serif;
+    font-weight: 800;
+    font-size: 36px;
+    text-align: center;
+}
+
 @media screen and (max-width: 550px) {
     .main__wrapper {
-        background-position: right -20px bottom 110px;
-        background-size: 198% 79%;
-        background-repeat: no-repeat;
+        padding-top: 10px;
+    }
+
+    .main__image {
+        width: 70%;
+    }
+
+    .main__button__text {
+        font-size: 22px;
+    }
+
+    .main__button:first-child {
+        margin-left: 5%;
+    }
+
+    .main__button:last-child {
+        margin-right: 5%;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .main__image {
+        width: 80%;
+    }
+
+    .main__subtext {
+        font-size: 33px;
     }
 
     .main__welcome-text {
-        font-size: x-large;
+        font-size: 40px;
     }
 
-    .main__buttons-group {
-        position: absolute;
-        bottom: 110px;
+    .main__button {
+        min-width: 0!important;
+        width: 45%;
+    }
+
+    .main__button__text {
+        font-size: 20px;
+    }
+
+    .main__button:first-child {
+        margin-left: 0;
+    }
+
+    .main__button:last-child {
+        margin-right: 0;
+    }
+}
+
+@media screen and (max-width: 550px) and (min-height: 640px) {
+    .main__image {
+        width: 90%;
+    }
+}
+
+@media screen and (max-width: 550px) and (min-height: 700px) {
+    .main__welcome-text {
+        margin-top: 40px;
     }
 }
