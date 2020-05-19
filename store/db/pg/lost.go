@@ -158,11 +158,14 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 	}
 
 	// Now we must intersect all the sets stored in
-	// the general slice called 'resultSets'
+	// the general slice called 'resultSet'
 
 	resultSet := searchManager.GetSet()
 	results := features.ConvertInterfaceElementsToLost((*resultSet).ToSlice())
 	countOfElements := len(results)
+	if countOfElements == 0 {
+		return []models.Lost{}, false, nil
+	}
 	startIndex := (page - 1) * lc.pageCapacity
 
 	if startIndex >= countOfElements {

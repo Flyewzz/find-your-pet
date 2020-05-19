@@ -162,6 +162,9 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 	resultSet := searchManager.GetSet()
 	results := features.ConvertInterfaceElementsToFound((*resultSet).ToSlice())
 	countOfElements := len(results)
+	if countOfElements == 0 {
+		return []models.Found{}, false, nil
+	}
 	startIndex := (page - 1) * fc.pageCapacity
 
 	if startIndex >= countOfElements {
