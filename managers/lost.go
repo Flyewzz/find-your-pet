@@ -3,6 +3,11 @@ package managers
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
 
 	"github.com/Kotyarich/find-your-pet/errs"
 	"github.com/Kotyarich/find-your-pet/interfaces"
@@ -10,17 +15,19 @@ import (
 )
 
 type LostAddingManager struct {
-	db             *sql.DB
-	lostController interfaces.LostController
-	FileController interfaces.FileController
+	db                    *sql.DB
+	lostController        interfaces.LostController
+	FileController        interfaces.FileController
+	baseLostDirectoryPath string
 }
 
 func NewLostAddingManager(db *sql.DB, lc interfaces.LostController,
-	lfc interfaces.FileController) *LostAddingManager {
+	lfc interfaces.FileController, lostPath string) *LostAddingManager {
 	return &LostAddingManager{
-		db:             db,
-		lostController: lc,
-		FileController: lfc,
+		db:                    db,
+		lostController:        lc,
+		FileController:        lfc,
+		baseLostDirectoryPath: lostPath,
 	}
 }
 
@@ -68,4 +75,46 @@ func (lam *LostAddingManager) Add(ctx context.Context, params *models.Lost,
 	}
 	err = tx.Commit()
 	errCh <- err
+}
+
+func (lam *LostAddingManager) Remove(id int) error {
+	tx, err := lam.db.Begin()
+	if err != nil {
+		return err
+	}
+	ctx := context.WithValue(context.Background(), "tx", tx)
+	pictureId, err := lam.lostController.RemoveById(ctx, id)
+	if err != nil {
+		if errRoll := tx.Rollback(); errRoll != nil {
+			return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
+		}
+		return err
+	}
+	if pictureId != 0 {
+		err = lam.FileController.Remove(ctx, pictureId)
+		if err != nil {
+			if errRoll := tx.Rollback(); errRoll != nil {
+				return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
+			}
+			return err
+		}
+		lostDirectoryPath := strconv.Itoa(id)
+		fullDirectoryPath := filepath.Join(lam.baseLostDirectoryPath,
+			lostDirectoryPath)
+		err = os.RemoveAll(fullDirectoryPath)
+		if err != nil {
+			if errRoll := tx.Rollback(); errRoll != nil {
+				return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
+			}
+			return err
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		if errRoll := tx.Rollback(); errRoll != nil {
+			return errors.New(fmt.Sprintf("err : %v\n rollback err: %v\n", err, errRoll))
+		}
+		return err
+	}
+	return nil
 }

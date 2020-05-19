@@ -3,3 +3,4 @@ files
 build
 db/backup/*
 .DS_Store
+nohup.out

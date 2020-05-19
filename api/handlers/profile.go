@@ -7,9 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Kotyarich/find-your-pet/errs"
-	"github.com/Kotyarich/find-your-pet/features"
 	"github.com/Kotyarich/find-your-pet/features/paginator"
-	"github.com/spf13/viper"
 )
 
 func (hd *HandlerData) ProfileLostHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,19 +21,11 @@ func (hd *HandlerData) ProfileLostHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 	}
-	closeId := viper.GetInt("lost.close_id")
-	ctx := context.WithValue(
-		context.Background(),
-		"close_id",
-		closeId,
-	)
-	lost, err := hd.ProfileController.GetLost(ctx, userId)
+	lost, err := hd.ProfileController.GetLost(context.Background(), userId)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
-	// pagesCount := paginator.CalculatePageCount(len(lost),
-	// 	hd.ProfileController.GetItemsPerPageCount())
 	lostsEncoded, err := json.Marshal(lost)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
@@ -61,25 +51,12 @@ func (hd *HandlerData) ProfileLostOpeningHandler(w http.ResponseWriter, r *http.
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	opened, err := strconv.ParseBool(params("opened"))
+	statusId, err := strconv.Atoi(params("status_id"))
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	ctx := context.WithValue(
-		context.Background(),
-		"params",
-		features.StatusIdParams{
-			OpenId:  viper.GetInt("lost.open_id"),
-			CloseId: viper.GetInt("lost.close_id"),
-		},
-	)
-	if err != nil {
-		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
-		return
-	}
-	viper.GetInt("lost.open_id")
-	err = hd.ProfileController.SetLostOpening(ctx, lostId, opened)
+	err = hd.ProfileController.SetLostOpening(context.Background(), lostId, statusId)
 	if err != nil {
 		if err == errs.LostNotFound {
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)
@@ -101,19 +78,11 @@ func (hd *HandlerData) ProfileFoundHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	}
-	closeId := viper.GetInt("found.close_id")
-	ctx := context.WithValue(
-		context.Background(),
-		"close_id",
-		closeId,
-	)
-	found, err := hd.ProfileController.GetFound(ctx, userId)
+	found, err := hd.ProfileController.GetFound(context.Background(), userId)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
-	// pagesCount := paginator.CalculatePageCount(len(found),
-	// 	hd.ProfileController.GetItemsPerPageCount())
 	foundEncoded, err := json.Marshal(found)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
@@ -139,25 +108,12 @@ func (hd *HandlerData) ProfileFoundOpeningHandler(w http.ResponseWriter, r *http
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	opened, err := strconv.ParseBool(params("opened"))
+	statusId, err := strconv.Atoi(params("status_id"))
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	ctx := context.WithValue(
-		context.Background(),
-		"params",
-		features.StatusIdParams{
-			OpenId:  viper.GetInt("found.open_id"),
-			CloseId: viper.GetInt("found.close_id"),
-		},
-	)
-	if err != nil {
-		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
-		return
-	}
-	viper.GetInt("found.open_id")
-	err = hd.ProfileController.SetFoundOpening(ctx, foundId, opened)
+	err = hd.ProfileController.SetFoundOpening(context.Background(), foundId, statusId)
 	if err != nil {
 		if err == errs.TheFoundNotFound {
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)

@@ -40,5 +40,8 @@ func ConvertInterfaceElementsToFound(slice []interface{}) []models.Found {
 		element := slice[i].(models.Found)
 		result[i] = element
 	}
+	sort.SliceStable(result, func(i, j int) bool {
+		return result[i].Id > result[j].Id
+	})
 	return result
 }
