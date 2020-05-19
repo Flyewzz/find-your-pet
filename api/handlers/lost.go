@@ -106,9 +106,7 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	closeId := viper.GetInt("lost.close_id")
-	ctx := context.WithValue(context.Background(), "close_id", closeId)
-	lost, err := hd.LostController.GetById(ctx, id)
+	lost, err := hd.LostController.GetById(context.Background(), id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)

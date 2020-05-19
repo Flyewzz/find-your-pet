@@ -10,15 +10,11 @@ lost:
   files:
     directory: ./files/lost
     max_size: 10 # MB
-  open_id: 1
-  close_id: 2
   page_capacity: 4
 found:
   files:
     directory: ./files/found
     max_size: 10 # MB
-  open_id: 1
-  close_id: 2
   page_capacity: 4
 profile:
   lost:
