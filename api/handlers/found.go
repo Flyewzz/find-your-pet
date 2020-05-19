@@ -68,7 +68,6 @@ func (hd *HandlerData) FoundHandler(w http.ResponseWriter, r *http.Request) {
 		Address:     address,
 	}
 	mapCloseId := make(map[string]interface{})
-	mapCloseId["close_id"] = viper.GetInt("found.close_id")
 	ctx := context.WithValue(context.Background(), "params", mapCloseId)
 	founds, hasMore, err := hd.FoundController.Search(ctx, found, query, page)
 	if err != nil {
@@ -106,9 +105,7 @@ func (hd *HandlerData) FoundByIdGetHandler(w http.ResponseWriter, r *http.Reques
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	closeId := viper.GetInt("found.close_id")
-	ctx := context.WithValue(context.Background(), "close_id", closeId)
-	found, err := hd.FoundController.GetById(ctx, id)
+	found, err := hd.FoundController.GetById(context.Background(), id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)
@@ -297,4 +294,18 @@ addFoundId:
 	}
 	// Send id to the client
 	w.Write([]byte(strconv.Itoa(foundId)))
+}
+
+func (hd *HandlerData) RemoveFoundHandler(w http.ResponseWriter, r *http.Request) {
+	strId := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
+		return
+	}
+	err = hd.FoundAddingManager.Remove(id)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
 }

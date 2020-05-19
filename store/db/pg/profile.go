@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/Kotyarich/find-your-pet/errs"
-	"github.com/Kotyarich/find-your-pet/features"
 	"github.com/Kotyarich/find-your-pet/features/db"
 	"github.com/Kotyarich/find-your-pet/models"
 )
@@ -27,10 +26,9 @@ func NewProfileControllerPg(pages int, db *sql.DB, queryLost, queryFound string)
 }
 
 func (pc *ProfileControllerPg) GetLost(ctx context.Context, userId int) ([]models.Lost, error) {
-	closeId := ctx.Value("close_id")
 	rows, err := pc.db.Query(
 		pc.queryLost+
-			"WHERE vk_id = $1 AND status_id != $2 ORDER BY date DESC", userId, closeId)
+			"WHERE vk_id = $1 ORDER BY date DESC", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -40,19 +38,12 @@ func (pc *ProfileControllerPg) GetLost(ctx context.Context, userId int) ([]model
 }
 
 func (pc *ProfileControllerPg) SetLostOpening(
-	ctx context.Context, lostId int, opened bool) error {
+	ctx context.Context, lostId int, statusId int) error {
 	var err error = nil
 	query := "UPDATE lost SET status_id = $1 " +
 		"WHERE id = $2"
 	var result sql.Result
-	params := ctx.Value("params").(features.StatusIdParams)
-	if opened {
-		// To open the announcement
-		result, err = pc.db.Exec(query, params.OpenId, lostId)
-	} else {
-		// To close the announcement
-		result, err = pc.db.Exec(query, params.CloseId, lostId)
-	}
+	result, err = pc.db.Exec(query, statusId, lostId)
 	if err == nil {
 		countAffected, errAff := result.RowsAffected()
 		if errAff != nil {
@@ -67,10 +58,9 @@ func (pc *ProfileControllerPg) SetLostOpening(
 }
 
 func (pc *ProfileControllerPg) GetFound(ctx context.Context, userId int) ([]models.Found, error) {
-	closeId := ctx.Value("close_id")
 	rows, err := pc.db.Query(
 		pc.queryFound+
-			"WHERE vk_id = $1 AND status_id != $2 ORDER BY date DESC", userId, closeId)
+			"WHERE vk_id = $1 ORDER BY date DESC", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -80,19 +70,12 @@ func (pc *ProfileControllerPg) GetFound(ctx context.Context, userId int) ([]mode
 }
 
 func (pc *ProfileControllerPg) SetFoundOpening(
-	ctx context.Context, foundId int, opened bool) error {
+	ctx context.Context, foundId int, statusId int) error {
 	var err error = nil
 	query := "UPDATE found SET status_id = $1 " +
 		"WHERE id = $2"
 	var result sql.Result
-	params := ctx.Value("params").(features.StatusIdParams)
-	if opened {
-		// To open the announcement
-		result, err = pc.db.Exec(query, params.OpenId, foundId)
-	} else {
-		// To close the announcement
-		result, err = pc.db.Exec(query, params.CloseId, foundId)
-	}
+	result, err = pc.db.Exec(query, statusId, foundId)
 	if err == nil {
 		countAffected, errAff := result.RowsAffected()
 		if errAff != nil {

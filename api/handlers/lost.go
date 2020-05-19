@@ -72,7 +72,6 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		Address:     address,
 	}
 	mapCloseId := make(map[string]interface{})
-	mapCloseId["close_id"] = viper.GetInt("lost.close_id")
 	ctx := context.WithValue(context.Background(), "params", mapCloseId)
 	losts, hasMore, err := hd.LostController.Search(ctx, lost, query, page)
 	if err != nil {
@@ -83,8 +82,6 @@ func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	// pagesCount := paginator.CalculatePageCount(len(losts),
-	// 	hd.LostController.GetPageCapacity())
 	lostsEncoded, err := json.Marshal(losts)
 	if err != nil {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
@@ -109,9 +106,7 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
-	closeId := viper.GetInt("lost.close_id")
-	ctx := context.WithValue(context.Background(), "close_id", closeId)
-	lost, err := hd.LostController.GetById(ctx, id)
+	lost, err := hd.LostController.GetById(context.Background(), id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			errs.ErrHandler(hd.DebugMode, err, &w, http.StatusNotFound)
@@ -298,4 +293,18 @@ addLostId:
 	}
 	// Send id to the client
 	w.Write([]byte(strconv.Itoa(lostId)))
+}
+
+func (hd *HandlerData) RemoveLostHandler(w http.ResponseWriter, r *http.Request) {
+	strId := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
+		return
+	}
+	err = hd.LostAddingManager.Remove(id)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
 }

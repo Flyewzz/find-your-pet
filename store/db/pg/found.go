@@ -29,11 +29,10 @@ func NewFoundControllerPg(pageCapacity int, db *sql.DB, query string) *FoundCont
 }
 
 func (fc *FoundControllerPg) GetById(ctx context.Context, id int) (*models.Found, error) {
-	closeId := ctx.Value("close_id").(int)
 	var found models.Found
 	var pictureId sql.NullInt32
 	err := fc.db.QueryRow(fc.searchRequiredQuery+
-		"WHERE id = $1 AND status_id != $2", id, closeId).
+		"WHERE id = $1", id).
 		Scan(&found.Id, &found.TypeId, &found.AuthorId,
 			&found.Sex, &found.Breed, &found.Description,
 			&found.StatusId, &found.Date,
@@ -74,8 +73,8 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 	// Get everything without parameters to search
 	if features.CheckEmptyFound(params, query) {
 		rows, err := fc.db.Query(fc.searchRequiredQuery+
-			"WHERE status_id != $1 ORDER BY date DESC LIMIT $2 OFFSET $3",
-			ctxParams["close_id"].(int), fc.pageCapacity+1, (page-1)*fc.pageCapacity)
+			"ORDER BY date DESC LIMIT $1 OFFSET $2",
+			fc.pageCapacity+1, (page-1)*fc.pageCapacity)
 		if err != nil {
 			return nil, false, err
 		}
@@ -188,8 +187,7 @@ func (fc *FoundControllerPg) SearchByType(ctx context.Context, typeId int) ([]mo
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
 	searchRequiredQuery := params["query"].(string)
-	closeId := params["close_id"].(int)
-	rows, err := tx.Query(searchRequiredQuery+"WHERE type_id = $1 AND status_id != $2", typeId, closeId)
+	rows, err := tx.Query(searchRequiredQuery+"WHERE type_id = $1", typeId)
 	if err != nil {
 		return nil, err
 	}
@@ -202,9 +200,8 @@ func (fc *FoundControllerPg) SearchBySex(ctx context.Context, sex string) ([]mod
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
 	searchRequiredQuery := params["query"].(string)
-	closeId := params["close_id"].(int)
 	rows, err := tx.Query(searchRequiredQuery+
-		"WHERE LOWER(sex) = $1 AND status_id != $2", strings.ToLower(sex), closeId)
+		"WHERE LOWER(sex) = $1", strings.ToLower(sex))
 	if err != nil {
 		return nil, err
 	}
@@ -217,30 +214,8 @@ func (fc *FoundControllerPg) SearchByBreed(ctx context.Context, breed string) ([
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
 	searchRequiredQuery := params["query"].(string)
-	closeId := params["close_id"].(int)
 	rows, err := tx.Query(searchRequiredQuery+
-		"WHERE LOWER(breed) LIKE '%' || $1 || '%' "+
-		"AND status_id != $2", strings.ToLower(breed), closeId)
-	if err != nil {
-		return nil, err
-	}
-	founds, err := db.ConvertRowsToFound(rows)
-	rows.Close()
-	return founds, err
-}
-
-// A direction is needed to specify a date (must be less or greater or equal)
-func (fc *FoundControllerPg) SearchByDate(ctx context.Context, date, direction string) ([]models.Found, error) {
-	if direction != "<" && direction != ">" && direction != "=" {
-		return nil, errs.IncorrectDirection
-	}
-	params := ctx.Value("params").(map[string]interface{})
-	tx := params["tx"].(*sql.Tx)
-	searchRequiredQuery := params["query"].(string)
-	closeId := params["close_id"].(int)
-	sqlQuery := fmt.Sprintf(searchRequiredQuery+
-		`WHERE date %s $1 AND status_id = $2`, direction)
-	rows, err := tx.Query(sqlQuery, date, closeId)
+		"WHERE LOWER(breed) LIKE '%' || $1 || '%' ", strings.ToLower(breed))
 	if err != nil {
 		return nil, err
 	}
@@ -253,10 +228,8 @@ func (fc *FoundControllerPg) SearchByTextQuery(ctx context.Context, query string
 	params := ctx.Value("params").(map[string]interface{})
 	tx := params["tx"].(*sql.Tx)
 	searchRequiredQuery := params["query"].(string)
-	closeId := params["close_id"].(int)
-	sqlQuery := searchRequiredQuery + `WHERE textsearchable_index_col @@ to_tsquery('russian', $1) 
-	AND status_id != $2`
-	rows, err := tx.Query(sqlQuery, query, closeId)
+	sqlQuery := searchRequiredQuery + `WHERE textsearchable_index_col @@ to_tsquery('russian', $1)`
+	rows, err := tx.Query(sqlQuery, query)
 	if err != nil {
 		return nil, err
 	}
@@ -271,4 +244,30 @@ func (fc *FoundControllerPg) GetPageCapacity() int {
 
 func (fc *FoundControllerPg) GetDbAdapter() *sql.DB {
 	return fc.db
+}
+
+func (lc *FoundControllerPg) RemoveById(ctx context.Context, id int) (int, error) {
+	strTx := ctx.Value("tx")
+	if strTx == "" {
+		return 0, errs.MissedTransaction
+	}
+	tx := strTx.(*sql.Tx)
+
+	var pictureId sql.NullInt32
+	err := tx.QueryRow("SELECT picture_id FROM found WHERE id = $1", id).Scan(&pictureId)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = tx.Exec("DELETE FROM found WHERE id = $1", id)
+	if err != nil {
+		return 0, err
+	}
+
+	// If a picture exists
+	if pictureId.Valid {
+		return int(pictureId.Int32), nil
+	}
+	// If the picture is null
+	return 0, nil
 }

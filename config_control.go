@@ -54,11 +54,13 @@ func PrepareHandlerData() *handlers.HandlerData {
 	lostController := pg.NewLostControllerPg(viper.GetInt("lost.page_capacity"), db, queryLost)
 	FileController := pg.NewFileControllerPg(db)
 	lostAddingManager :=
-		managers.NewLostAddingManager(db, lostController, FileController)
+		managers.NewLostAddingManager(db, lostController,
+			FileController, viper.GetString("lost.files.directory"))
 
 	foundController := pg.NewFoundControllerPg(viper.GetInt("found.page_capacity"), db, queryFound)
 	foundAddingManager :=
-		managers.NewFoundAddingManager(db, foundController, FileController)
+		managers.NewFoundAddingManager(db, foundController,
+			FileController, viper.GetString("found.files.directory"))
 
 	profileController := pg.NewProfileControllerPg(
 		viper.GetInt("profile.lost.page_capacity"),

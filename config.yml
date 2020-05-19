@@ -10,15 +10,11 @@ lost:
   files:
     directory: ./files/lost
     max_size: 10 # MB
-  open_id: 1
-  close_id: 2
   page_capacity: 4
 found:
   files:
     directory: ./files/found
     max_size: 10 # MB
-  open_id: 1
-  close_id: 2
   page_capacity: 4
 profile:
   lost:
@@ -26,6 +22,6 @@ profile:
   found:
     page_capacity: 4
 breed_srv:
-  address: localhost:50051
+  address: shumak.fail:80
   conn_timeout: 10
-  recognize_timeout: 20
+  recognize_timeout: 90
