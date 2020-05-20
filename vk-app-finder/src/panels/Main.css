@@ -60,15 +60,15 @@
     }
 
     .main__button__text {
-        font-size: 22px;
+        font-size: 21px;
     }
 
     .main__button:first-child {
-        margin-left: 5%;
+        margin-left: 3%;
     }
 
     .main__button:last-child {
-        margin-right: 5%;
+        margin-right: 3%;
     }
 }
 
