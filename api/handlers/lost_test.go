@@ -1,16 +1,20 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/Kotyarich/find-your-pet/managers"
+	"github.com/Kotyarich/find-your-pet/mocks"
 	"github.com/Kotyarich/find-your-pet/models"
 	"github.com/Kotyarich/find-your-pet/store/db/pg"
 	"github.com/brianvoe/gofakeit/v4"
 	"github.com/bxcodec/faker"
 	"github.com/gavv/httpexpect/v2"
+	"github.com/spf13/afero"
 )
 
 var (
@@ -128,16 +132,17 @@ func TestHandlerData_LostByIdGetHandler(t *testing.T) {
 }
 
 func TestHandlerData_AddLostHandler(t *testing.T) {
-	db, _, err := sqlmock.New()
+	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
-	// lc := pg.NewLostControllerPg(4, db, queryLost)
+	lc := pg.NewLostControllerPg(4, db, queryLost)
+	fc := mocks.NewFileController()
 	standardHandlerData := &HandlerData{
-		// LostController: lc,
-		FileMaxSize: 10,
-		// LostAddingManager: managers.
+		LostController:    lc,
+		FileMaxSize:       10,
+		LostAddingManager: managers.NewLostAddingManager(db, lc, fc, ".img/lost"),
 	}
 	server := httptest.NewServer(http.HandlerFunc(standardHandlerData.AddLostHandler))
 	e := httpexpect.New(t, server.URL)
@@ -170,11 +175,72 @@ func TestHandlerData_AddLostHandler(t *testing.T) {
 				Address:     gofakeit.Address().Address,
 			},
 		},
+		{
+			name: "2",
+			hd:   standardHandlerData,
+			form: &Form{
+				TypeId:      gofakeit.Number(1, 3),
+				AuthorId:    gofakeit.Number(1, 100),
+				Sex:         "f",
+				Breed:       gofakeit.AnimalType(),
+				Description: "Earum ea quia id ea nulla porro sequi voluptatem. Ut nemo eius non labore eaque. Suscipit numquam.",
+				Latitude:    gofakeit.Latitude(),
+				Longitude:   gofakeit.Longitude(),
+				Address:     gofakeit.Address().Address,
+			},
+		},
+		{
+			name: "3",
+			hd:   standardHandlerData,
+			form: &Form{
+				TypeId:      gofakeit.Number(1, 3),
+				AuthorId:    gofakeit.Number(1, 100),
+				Sex:         "n/a",
+				Breed:       gofakeit.AnimalType(),
+				Description: "Earum ea quia id ea nulla porro sequi voluptatem. Ut nemo eius non labore eaque. Suscipit numquam.",
+				Latitude:    gofakeit.Latitude(),
+				Longitude:   gofakeit.Longitude(),
+				Address:     gofakeit.Address().Address,
+			},
+		},
 	}
+	dbId := 1
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e.POST("/lost").WithMultipart().WithFile("picture", "./img.jpg").
+			fs := afero.NewMemMapFs()
+			afs := &afero.Afero{Fs: fs}
+
+			standardHandlerData.FileStoreController = mocks.NewFileStoreController(
+				"./lost",
+				"./found",
+				fs,
+			)
+			mock.ExpectBegin()
+			mock.ExpectQuery("(.+)").WillReturnRows(
+				sqlmock.NewRows([]string{"id"}).AddRow(dbId),
+			)
+			mock.ExpectCommit()
+			e.POST("/lost").WithMultipart().WithFile("picture", "./test_img.jpg").
 				WithForm(tt.form).Expect().Status(http.StatusOK)
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("there were unfulfilled expectations: %s", err)
+			}
+			dirPath := fmt.Sprintf("./lost/%d", dbId)
+			_, err := fs.Stat(dirPath)
+			if err != nil {
+				t.Errorf("Directory %s does not exist!", dirPath)
+			}
+			fileInfo, err := afs.ReadDir(dirPath)
+			if err != nil {
+				t.Errorf("Dir error: %s", dirPath)
+			}
+			for _, file := range fileInfo {
+				fmt.Println(file.Name())
+			}
+			if len(fileInfo) == 0 {
+				t.Errorf("Picture was not added")
+			}
+			dbId++
 		})
 	}
 }
