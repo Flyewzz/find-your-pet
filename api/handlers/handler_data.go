@@ -13,6 +13,7 @@ type HandlerData struct {
 	FoundAddingManager *managers.FoundAddingManager
 	ProfileController  interfaces.ProfileController
 	breedClassifier    interfaces.BreedClassifier
+	FileMaxSize        int64
 	DebugMode          bool
 }
 
@@ -20,7 +21,7 @@ func NewHandlerData(lc interfaces.LostController,
 	fc interfaces.FileController,
 	lam *managers.LostAddingManager, fnd interfaces.FoundController,
 	fam *managers.FoundAddingManager, pc interfaces.ProfileController,
-	bc interfaces.BreedClassifier, isDebug bool) *HandlerData {
+	bc interfaces.BreedClassifier, fileMaxSize int64, isDebug bool) *HandlerData {
 
 	return &HandlerData{
 		LostController:     lc,
@@ -30,6 +31,7 @@ func NewHandlerData(lc interfaces.LostController,
 		FoundAddingManager: fam,
 		ProfileController:  pc,
 		breedClassifier:    bc,
+		FileMaxSize:        fileMaxSize,
 		DebugMode:          isDebug,
 	}
 }

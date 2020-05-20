@@ -176,7 +176,7 @@ func (hd *HandlerData) AddFoundHandler(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 		extension = features.GetExtension(header.Filename)
 		// in MB
-		fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
+		fileMaxSize := hd.FileMaxSize * 1024 * 1024
 		if header.Size > fileMaxSize {
 			w.WriteHeader(http.StatusBadRequest)
 			type ErrStruct struct {

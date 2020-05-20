@@ -73,5 +73,5 @@ func PrepareHandlerData() *handlers.HandlerData {
 	}
 	return handlers.NewHandlerData(lostController, FileController,
 		lostAddingManager, foundController, foundAddingManager,
-		profileController, breedClassifier, debug)
+		profileController, breedClassifier, viper.GetInt64("file.max_size"), debug)
 }

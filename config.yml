@@ -5,16 +5,17 @@ db:
   password: postgres
   database: postgres
   max_connections: 50
+file:
+  max_size: 10 # MB  
 lost:
   itemsPerPage: 9
   files:
     directory: ./files/lost
-    max_size: 10 # MB
+    
   page_capacity: 4
 found:
   files:
     directory: ./files/found
-    max_size: 10 # MB
   page_capacity: 4
 profile:
   lost:

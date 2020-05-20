@@ -136,8 +136,8 @@ func TestHandlerData_AddLostHandler(t *testing.T) {
 	standardHandlerData := &HandlerData{
 		LostController: pg.NewLostControllerPg(4, db, queryLost),
 	}
-	// server := httptest.NewServer(http.HandlerFunc(standardHandlerData.AddLostHandler))
-	// e := httpexpect.New(t, server.URL)
+	server := httptest.NewServer(http.HandlerFunc(standardHandlerData.AddLostHandler))
+	e := httpexpect.New(t, server.URL)
 	type Form struct {
 		TypeId      int     `form:"type_id"`
 		AuthorId    int     `form:"vk_id"`
@@ -170,8 +170,8 @@ func TestHandlerData_AddLostHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// e.POST("/lost").WithMultipart().WithFile("picture", "../../mocks/img.jpg").
-			// 	WithForm(tt.form).Expect().Status(http.StatusOK)
+			e.POST("/lost").WithMultipart().WithFile("picture", "./img.jpg").
+				WithForm(tt.form).Expect().Status(http.StatusOK)
 		})
 	}
 }
