@@ -79,8 +79,11 @@ func (lc *LostControllerPg) Search(ctx context.Context, params *models.Lost, que
 		if err != nil {
 			return nil, false, err
 		}
+		defer rows.Close()
 		losts, err := db.ConvertRowsToLost(rows)
-		rows.Close()
+		if err != nil {
+			return nil, false, err
+		}
 		// The next page is exist if the database returns
 		hasMore := (len(losts) == lc.pageCapacity+1)
 		if hasMore {

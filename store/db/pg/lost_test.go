@@ -20,6 +20,11 @@ var (
 )
 
 func TestNewLostControllerPg(t *testing.T) {
+	db, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
 	type args struct {
 		pageCapacity int
 		db           *sql.DB
@@ -42,7 +47,6 @@ func TestNewLostControllerPg(t *testing.T) {
 }
 
 func TestLostControllerPg_GetById(t *testing.T) {
-
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
@@ -53,9 +57,7 @@ func TestLostControllerPg_GetById(t *testing.T) {
 		lost := &models.Lost{}
 		faker.FakeData(lost)
 		lost.Id = (i + 1)
-		if i > 4 {
-			lost.StatusId = 2 // Closed
-		}
+		lost.Location = ""
 		losts = append(losts, lost)
 	}
 	type args struct {
@@ -73,10 +75,10 @@ func TestLostControllerPg_GetById(t *testing.T) {
 			name: "1",
 			lc:   NewLostControllerPg(4, db, queryLost),
 			args: args{
-				ctx: context.WithValue(context.Background(), "close_id", 2),
-				id:  3,
+				ctx: context.Background(),
+				id:  1,
 			},
-			want:    losts[2],
+			want:    losts[0],
 			wantErr: false,
 		},
 	}
@@ -89,7 +91,7 @@ func TestLostControllerPg_GetById(t *testing.T) {
 				losts[i].Sex, losts[i].Breed, losts[i].Description,
 				losts[i].StatusId, losts[i].Date,
 				losts[i].Latitude, losts[i].Longitude, losts[i].PictureId, losts[i].Address)
-			mock.ExpectQuery(`.*`).WithArgs(tt.args.id, 2).WillReturnRows(rows)
+			mock.ExpectQuery(`.*`).WithArgs(tt.args.id).WillReturnRows(rows)
 			got, err := tt.lc.GetById(tt.args.ctx, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LostControllerPg.GetById() error = %v, wantErr %v", err, tt.wantErr)
@@ -149,6 +151,7 @@ func TestLostControllerPg_Search(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
+
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -280,12 +283,32 @@ func TestLostControllerPg_SearchByTextQuery(t *testing.T) {
 }
 
 func TestLostControllerPg_GetPageCapacity(t *testing.T) {
+	db, _, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
 	tests := []struct {
 		name string
 		lc   *LostControllerPg
 		want int
 	}{
 		// TODO: Add test cases.
+		{
+			name: "1",
+			lc:   NewLostControllerPg(1, nil, ""),
+			want: 1,
+		},
+		{
+			name: "4",
+			lc:   NewLostControllerPg(4, nil, ""),
+			want: 4,
+		},
+		{
+			name: "Mock db",
+			lc:   NewLostControllerPg(12, db, ""),
+			want: 12,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

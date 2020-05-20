@@ -78,8 +78,11 @@ func (fc *FoundControllerPg) Search(ctx context.Context, params *models.Found, q
 		if err != nil {
 			return nil, false, err
 		}
+		defer rows.Close()
 		found, err := db.ConvertRowsToFound(rows)
-		rows.Close()
+		if err != nil {
+			return nil, false, err
+		}
 		// The next page is exist if the database returns
 		hasMore := (len(found) == fc.pageCapacity+1)
 		if hasMore {

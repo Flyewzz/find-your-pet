@@ -120,6 +120,7 @@ func (hd *HandlerData) LostByIdGetHandler(w http.ResponseWriter, r *http.Request
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }
 
@@ -173,10 +174,10 @@ func (hd *HandlerData) AddLostHandler(w http.ResponseWriter, r *http.Request) {
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusBadRequest)
 		return
 	}
+	defer file.Close()
 	var extension string
 	if err != http.ErrMissingFile {
 		extension = features.GetExtension(header.Filename)
-		defer file.Close()
 		// in MB
 		fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
 		if header.Size > fileMaxSize {

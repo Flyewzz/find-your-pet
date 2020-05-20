@@ -205,35 +205,6 @@ func TestFoundControllerPg_SearchByBreed(t *testing.T) {
 	}
 }
 
-func TestFoundControllerPg_SearchByDate(t *testing.T) {
-	type args struct {
-		ctx       context.Context
-		date      string
-		direction string
-	}
-	tests := []struct {
-		name    string
-		fc      *FoundControllerPg
-		args    args
-		want    []models.Found
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.fc.SearchByDate(tt.args.ctx, tt.args.date, tt.args.direction)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("FoundControllerPg.SearchByDate() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FoundControllerPg.SearchByDate() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestFoundControllerPg_SearchByTextQuery(t *testing.T) {
 	type args struct {
 		ctx   context.Context

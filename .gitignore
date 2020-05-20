@@ -4,3 +4,4 @@ build
 db/backup/*
 .DS_Store
 nohup.out
+c.out

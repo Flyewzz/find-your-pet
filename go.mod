@@ -5,8 +5,10 @@ go 1.13
 require (
 	9fans.net/go v0.0.2 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/brianvoe/gofakeit/v4 v4.3.0
 	github.com/bxcodec/faker v2.0.1+incompatible
 	github.com/deckarep/golang-set v1.7.1
+	github.com/gavv/httpexpect/v2 v2.0.3
 	github.com/go-delve/delve v1.4.0 // indirect
 	github.com/golang/protobuf v1.3.1
 	github.com/gorilla/mux v1.7.4

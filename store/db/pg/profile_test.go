@@ -62,9 +62,9 @@ func TestProfileControllerPg_GetLost(t *testing.T) {
 
 func TestProfileControllerPg_SetLostOpening(t *testing.T) {
 	type args struct {
-		ctx    context.Context
-		lostId int
-		opened bool
+		ctx      context.Context
+		lostId   int
+		statusId int
 	}
 	tests := []struct {
 		name    string
@@ -76,7 +76,7 @@ func TestProfileControllerPg_SetLostOpening(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.pc.SetLostOpening(tt.args.ctx, tt.args.lostId, tt.args.opened); (err != nil) != tt.wantErr {
+			if err := tt.pc.SetLostOpening(tt.args.ctx, tt.args.lostId, tt.args.statusId); (err != nil) != tt.wantErr {
 				t.Errorf("ProfileControllerPg.SetLostOpening() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -113,9 +113,9 @@ func TestProfileControllerPg_GetFound(t *testing.T) {
 
 func TestProfileControllerPg_SetFoundOpening(t *testing.T) {
 	type args struct {
-		ctx     context.Context
-		foundId int
-		opened  bool
+		ctx      context.Context
+		foundId  int
+		statusId int
 	}
 	tests := []struct {
 		name    string
@@ -127,7 +127,7 @@ func TestProfileControllerPg_SetFoundOpening(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.pc.SetFoundOpening(tt.args.ctx, tt.args.foundId, tt.args.opened); (err != nil) != tt.wantErr {
+			if err := tt.pc.SetFoundOpening(tt.args.ctx, tt.args.foundId, tt.args.statusId); (err != nil) != tt.wantErr {
 				t.Errorf("ProfileControllerPg.SetFoundOpening() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
