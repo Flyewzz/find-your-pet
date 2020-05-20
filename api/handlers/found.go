@@ -172,8 +172,8 @@ func (hd *HandlerData) AddFoundHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var extension string
-	defer file.Close()
 	if err != http.ErrMissingFile {
+		defer file.Close()
 		extension = features.GetExtension(header.Filename)
 		// in MB
 		fileMaxSize := viper.GetInt64("lost.files.max_size") * 1024 * 1024
