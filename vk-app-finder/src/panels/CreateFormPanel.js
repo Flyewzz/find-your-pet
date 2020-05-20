@@ -144,7 +144,8 @@ class CreateFormPanel extends React.Component {
 
   submitSecond = () => {
     const image = this.lostStore.form.fields.picture.value;
-    if (image !== null) {
+    const animalType = this.lostStore.form.fields.typeId.value;
+    if (image !== null && animalType === 1)  {
       this.breeds = undefined;
       this.breedService.getBreeds(image).then(
         (result) => {
