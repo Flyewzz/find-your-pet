@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -19,7 +17,6 @@ import (
 	"github.com/Kotyarich/find-your-pet/features/paginator"
 	"github.com/Kotyarich/find-your-pet/models"
 	uuid "github.com/satori/go.uuid"
-	"github.com/spf13/viper"
 )
 
 func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
@@ -246,25 +243,11 @@ addLostId:
 		w.Write([]byte(strconv.Itoa(lostId)))
 		return
 	}
-	baseLostDirectoryPath := viper.GetString("lost.files.directory")
-	lostDirectoryPath := strconv.Itoa(lostId)
-	fullDirectoryPath := filepath.Join(baseLostDirectoryPath,
-		lostDirectoryPath)
-	err = os.MkdirAll(fullDirectoryPath,
-		os.ModePerm)
-	if err != nil {
-		cancel()
-		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
-		return
-	}
 	// Generate UUID key as a filename to store it into the temporary folder
 	// uuid will also contain a file extension
 	uuid := uuid.NewV4().String() + "." + extension
 	fileName := header.Filename
-	//Create a name with an extension for the file
-	dst, err := os.Create(filepath.Join(
-		fullDirectoryPath,
-		uuid))
+	lostDirectoryPath, err := hd.FileStoreController.Save(&file, lostId, "lost", uuid)
 	if err != nil {
 		cancel()
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
@@ -273,12 +256,6 @@ addLostId:
 	mFile := &models.File{
 		Name: fileName,
 		Path: filepath.Join(lostDirectoryPath, uuid),
-	}
-	_, err = io.Copy(dst, file)
-	if err != nil {
-		cancel()
-		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
-		return
 	}
 	select {
 	case err = <-errCh:

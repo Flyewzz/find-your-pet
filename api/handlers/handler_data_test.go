@@ -10,14 +10,15 @@ import (
 
 func TestNewHandlerData(t *testing.T) {
 	type args struct {
-		lc      interfaces.LostController
-		fc      interfaces.FileController
-		lam     *managers.LostAddingManager
-		fnd     interfaces.FoundController
-		fam     *managers.FoundAddingManager
-		pc      interfaces.ProfileController
-		bc      interfaces.BreedClassifier
-		isDebug bool
+		lc          interfaces.LostController
+		fc          interfaces.FileController
+		lam         *managers.LostAddingManager
+		fnd         interfaces.FoundController
+		fam         *managers.FoundAddingManager
+		pc          interfaces.ProfileController
+		bc          interfaces.BreedClassifier
+		fileMaxSize int64
+		isDebug     bool
 	}
 	tests := []struct {
 		name string
@@ -28,7 +29,7 @@ func TestNewHandlerData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewHandlerData(tt.args.lc, tt.args.fc, tt.args.lam, tt.args.fnd, tt.args.fam, tt.args.pc, tt.args.bc, tt.args.isDebug); !reflect.DeepEqual(got, tt.want) {
+			if got := NewHandlerData(tt.args.lc, tt.args.fc, tt.args.lam, tt.args.fnd, tt.args.fam, tt.args.pc, tt.args.bc, tt.args.fileMaxSize, tt.args.isDebug); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewHandlerData() = %v, want %v", got, tt.want)
 			}
 		})

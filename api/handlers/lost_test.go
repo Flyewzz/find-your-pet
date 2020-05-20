@@ -133,8 +133,11 @@ func TestHandlerData_AddLostHandler(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
+	// lc := pg.NewLostControllerPg(4, db, queryLost)
 	standardHandlerData := &HandlerData{
-		LostController: pg.NewLostControllerPg(4, db, queryLost),
+		// LostController: lc,
+		FileMaxSize: 10,
+		// LostAddingManager: managers.
 	}
 	server := httptest.NewServer(http.HandlerFunc(standardHandlerData.AddLostHandler))
 	e := httpexpect.New(t, server.URL)

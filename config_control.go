@@ -10,6 +10,7 @@ import (
 	"github.com/Kotyarich/find-your-pet/managers"
 	"github.com/Kotyarich/find-your-pet/srv/classifier"
 	"github.com/Kotyarich/find-your-pet/store/db/pg"
+	"github.com/Kotyarich/find-your-pet/store/os_repository"
 	"github.com/spf13/viper"
 )
 
@@ -71,7 +72,11 @@ func PrepareHandlerData() *handlers.HandlerData {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fileStoreController := os_repository.NewFileStoreController(
+		viper.GetString("lost.files.directory"),
+		viper.GetString("found.files.directory"),
+	)
 	return handlers.NewHandlerData(lostController, FileController,
 		lostAddingManager, foundController, foundAddingManager,
-		profileController, breedClassifier, viper.GetInt64("file.max_size"), debug)
+		profileController, breedClassifier, fileStoreController, viper.GetInt64("file.max_size"), debug)
 }
