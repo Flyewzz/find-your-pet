@@ -247,7 +247,7 @@ addLostId:
 	// uuid will also contain a file extension
 	uuid := uuid.NewV4().String() + "." + extension
 	fileName := header.Filename
-	lostDirectoryPath, err := hd.FileStoreController.Save(&file, lostId, "lost", uuid)
+	err = hd.FileStoreController.Save(&file, lostId, "lost", uuid)
 	if err != nil {
 		cancel()
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
@@ -255,7 +255,7 @@ addLostId:
 	}
 	mFile := &models.File{
 		Name: fileName,
-		Path: filepath.Join(lostDirectoryPath, uuid),
+		Path: filepath.Join(strconv.Itoa(lostId), uuid),
 	}
 	select {
 	case err = <-errCh:

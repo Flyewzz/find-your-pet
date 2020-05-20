@@ -26,7 +26,7 @@ func NewFileStoreController(lostPath, foundPath string, storage afero.Fs) *FileS
 	}
 }
 
-func (fsc *FileStoreController) Save(file *multipart.File, id int, recordType string, fileName string) (string, error) {
+func (fsc *FileStoreController) Save(file *multipart.File, id int, recordType string, fileName string) error {
 	idStr := strconv.Itoa(id)
 	var fullDirectoryPath string
 	if recordType == "lost" {
@@ -37,24 +37,24 @@ func (fsc *FileStoreController) Save(file *multipart.File, id int, recordType st
 		fullDirectoryPath = filepath.Join(fsc.BaseFoundDirectoryPath,
 			idStr)
 	} else {
-		return "", errors.New("Unknown type of recordType")
+		return errors.New("Unknown type of recordType")
 	}
 	err := fsc.Storage.MkdirAll(fullDirectoryPath,
 		os.ModePerm)
 	if err != nil {
-		return fullDirectoryPath, err
+		return err
 	}
 	//Create a name with an extension for the file
 	dst, err := fsc.Storage.Create(filepath.Join(
 		fullDirectoryPath,
 		fileName))
 	if err != nil {
-		return fullDirectoryPath, err
+		return err
 	}
 	_, err = io.Copy(dst, *file)
 	if err != nil {
-		return fullDirectoryPath, err
+		return err
 	}
-	return fullDirectoryPath, nil
+	return nil
 
 }
