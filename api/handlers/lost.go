@@ -20,6 +20,7 @@ import (
 )
 
 func (hd *HandlerData) LostHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	arguments := r.URL.Query()
 	strTypeId := arguments.Get("type_id")
 	var typeId int

@@ -27,22 +27,206 @@ var (
 )
 
 func TestHandlerData_LostHandler(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	GetLostRandom := func(count int) []models.Lost {
+		var losts []models.Lost
+		for i := 0; i < count; i++ {
+			lost := models.Lost{}
+			faker.FakeData(&lost)
+			lost.Id = (i + 1)
+			lost.Location = ""
+			losts = append(losts, lost)
+		}
+		return losts
+	}
+
+	lc := pg.NewLostControllerPg(4, db, queryLost)
+	standardHandlerData := &HandlerData{
+		LostController: lc,
+	}
+	server := httptest.NewServer(http.HandlerFunc(standardHandlerData.LostHandler))
+	e := httpexpect.New(t, server.URL)
+	type QueryObject struct {
+		TypeId      string `url:"type_id"`
+		AuthorId    string `url:"vk_id"`
+		Sex         string `url:"sex"`
+		Breed       string `url:"breed"`
+		Description string `url:"description"`
+		Latitude    string `url:"latitude"`
+		Longitude   string `url:"longitude"`
+		Address     string `url:"address"`
+		Query       string `url:"query"`
+		Page        int    `url:"page"`
+	}
+	// GetStandardQueryObject := func() *QueryObjet {
+	// 	return &QueryObjet{
+	// 		TypeId:      strconv.Itoa(gofakeit.Number(1, 3)),
+	// 		AuthorId:    strconv.Itoa(gofakeit.Number(1, 100)),
+	// 		Sex:         "m",
+	// 		Breed:       gofakeit.AnimalType(),
+	// 		Description: "Earum ea quia id ea nulla porro sequi voluptatem. Ut nemo eius non labore eaque. Suscipit numquam.",
+	// 		Latitude:    fmt.Sprintf("%f", gofakeit.Latitude()),
+	// 		Longitude:   fmt.Sprintf("%f", gofakeit.Longitude()),
+	// 		Address:     gofakeit.Address().Address,
+	// 	}
+	// }
+
+	samples := map[string]map[string][]models.Lost{
+		"has more 1": map[string][]models.Lost{
+			"all": GetLostRandom(5),
+		},
+		"has more 2": map[string][]models.Lost{
+			"all": GetLostRandom(5),
+		},
+		"4 items": map[string][]models.Lost{
+			"all": GetLostRandom(4),
+		},
+		"2 items": map[string][]models.Lost{
+			"all": GetLostRandom(2),
+		},
+		"0 items": map[string][]models.Lost{
+			"all": GetLostRandom(0),
+		},
+	}
 	type args struct {
-		w http.ResponseWriter
-		r *http.Request
+		startIndex int
+		endIndex   int
 	}
 	tests := []struct {
-		name string
-		hd   *HandlerData
-		args args
+		name        string
+		hd          *HandlerData
+		queryParams *QueryObject
+		testType    string
+		sample      map[string][]models.Lost
+		args        args
+		empty       bool
+		hasMore     bool
+		wantErr     bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "has more 1",
+			hd:   standardHandlerData,
+			queryParams: &QueryObject{
+				Page: 1,
+			},
+			testType: "usual",
+			args: args{
+				startIndex: 0,
+				endIndex:   3,
+			},
+			empty:   false,
+			hasMore: true,
+			wantErr: false,
+		},
+		{
+			name: "has more 2",
+			hd:   standardHandlerData,
+			queryParams: &QueryObject{
+				Page: 1,
+			},
+			testType: "usual",
+			args: args{
+				startIndex: 0,
+				endIndex:   3,
+			},
+			empty:   false,
+			hasMore: true,
+			wantErr: false,
+		},
+		{
+			name: "4 items",
+			hd:   standardHandlerData,
+			queryParams: &QueryObject{
+				Page: 1,
+			},
+			testType: "usual",
+			args: args{
+				startIndex: 0,
+				endIndex:   -1,
+			},
+			empty:   false,
+			hasMore: false,
+			wantErr: false,
+		},
+		{
+			name: "2 items",
+			hd:   standardHandlerData,
+			queryParams: &QueryObject{
+				Page: 1,
+			},
+			testType: "usual",
+			args: args{
+				startIndex: 0,
+				endIndex:   -1,
+			},
+			empty:   false,
+			hasMore: false,
+			wantErr: false,
+		},
+		{
+			name: "0 items",
+			hd:   standardHandlerData,
+			queryParams: &QueryObject{
+				Page: 1,
+			},
+			testType: "usual",
+			empty:    true,
+			hasMore:  false,
+			wantErr:  false,
+		},
 	}
+	fields := []string{"id", "type_id",
+		"vk_id", "sex", "breed", "description", "status_id",
+		"date", "latitude", "longitude", "picture_id", "address"}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.hd.LostHandler(tt.args.w, tt.args.r)
+			rows := sqlmock.NewRows(fields)
+			switch tt.testType {
+			case "usual":
+				for _, lost := range samples[tt.name]["all"] {
+					rows = rows.AddRow(lost.Id, lost.TypeId, lost.AuthorId,
+						lost.Sex, lost.Breed, lost.Description,
+						lost.StatusId, lost.Date,
+						lost.Latitude, lost.Longitude, lost.PictureId, lost.Address)
+				}
+				mock.ExpectQuery("(.+)").WithArgs(5, (tt.queryParams.Page-1)*
+					standardHandlerData.LostController.GetPageCapacity()).
+					WillReturnRows(rows)
+				resp := e.GET("/losts").WithQuery("page", tt.queryParams.Page).
+					Expect().
+					Status(http.StatusOK).JSON().Object()
+				if tt.empty {
+					resp.ContainsKey("payload").Value("payload").Null()
+				} else {
+					// The last element of an array
+					if tt.args.endIndex == -1 {
+						tt.args.endIndex = len(samples[tt.name]["all"]) - 1
+					}
+					result := samples[tt.name]["all"][tt.args.startIndex:(tt.args.endIndex + 1)]
+					resp.ContainsKey("payload").Value("payload").Array().Equal(result)
+				}
+				hasMore := resp.ContainsKey("has_more").Value("has_more").Boolean()
+				if tt.hasMore {
+					hasMore.True()
+				} else {
+					hasMore.False()
+				}
+				// fmt.Println(returnedLosts)
+			case "gender":
+
+			}
 		})
 	}
+	// rows := sqlmock.NewRows(fields).AddRow(losts[i].Id, losts[i].TypeId, losts[i].AuthorId,
+	// 	losts[i].Sex, losts[i].Breed, losts[i].Description,
+	// 	losts[i].StatusId, losts[i].Date,
+	// 	losts[i].Latitude, losts[i].Longitude, losts[i].PictureId, losts[i].Address)
+
 }
 
 func TestHandlerData_LostByIdGetHandler(t *testing.T) {
@@ -129,7 +313,6 @@ func TestHandlerData_LostByIdGetHandler(t *testing.T) {
 			Expect().Status(http.StatusBadRequest)
 	}
 
-	//
 }
 
 func TestHandlerData_AddLostHandler(t *testing.T) {
@@ -368,17 +551,19 @@ func TestHandlerData_AddLostHandler(t *testing.T) {
 }
 
 func TestHandlerData_RemoveLostHandler(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	GetStandardLost := func(count int) []models.Lost {
+		var losts []models.Lost
+		for i := 0; i < count; i++ {
+			lost := models.Lost{}
+			faker.FakeData(&lost)
+			lost.Id = (i + 1)
+			lost.Location = ""
+			losts = append(losts, lost)
+		}
+		return losts
 	}
-	defer db.Close()
-	lc := pg.NewLostControllerPg(4, db, queryLost)
-	fc := mocks.NewFileController()
 	standardHandlerData := &HandlerData{
-		LostController:    lc,
-		FileMaxSize:       10,
-		LostAddingManager: managers.NewLostAddingManager(db, lc, fc, ".img/lost"),
+		FileMaxSize: 10,
 	}
 	server := httptest.NewServer(http.HandlerFunc(standardHandlerData.RemoveLostHandler))
 	e := httpexpect.New(t, server.URL)
@@ -386,58 +571,106 @@ func TestHandlerData_RemoveLostHandler(t *testing.T) {
 	tests := []struct {
 		name     string
 		hd       *HandlerData
+		id       string
 		testType string
 	}{
 		{
 			name:     "1",
 			hd:       standardHandlerData,
+			id:       "1",
 			testType: "usual",
 		},
+		{
+			name:     "4",
+			hd:       standardHandlerData,
+			id:       "4",
+			testType: "usual",
+		},
+		{
+			name:     "6",
+			hd:       standardHandlerData,
+			id:       "6",
+			testType: "usual",
+		},
+		{
+			name:     "9",
+			hd:       standardHandlerData,
+			id:       "9",
+			testType: "usual",
+		},
+		{
+			name:     "10",
+			hd:       standardHandlerData,
+			id:       "10",
+			testType: "usual",
+		},
+		{
+			name:     "wrong id 1",
+			hd:       standardHandlerData,
+			id:       "wrooong",
+			testType: "wrong-id",
+		},
+		{
+			name:     "wrong id 2",
+			hd:       standardHandlerData,
+			id:       "",
+			testType: "wrong-id",
+		},
+		{
+			name:     "number + string",
+			hd:       standardHandlerData,
+			id:       "432klkwe",
+			testType: "wrong-id",
+		},
+		{
+			name:     "string + number",
+			hd:       standardHandlerData,
+			id:       "mlklmfew290994",
+			testType: "wrong-id",
+		},
+		{
+			name:     "too big id",
+			hd:       standardHandlerData,
+			id:       "156",
+			testType: "internal-error",
+		},
+		{
+			name:     "big id",
+			hd:       standardHandlerData,
+			id:       "11",
+			testType: "internal-error",
+		},
+		{
+			name:     "negative id a little bit",
+			hd:       standardHandlerData,
+			id:       "-1",
+			testType: "internal-error",
+		},
+		{
+			name:     "too small id",
+			hd:       standardHandlerData,
+			id:       "-135",
+			testType: "internal-error",
+		},
 	}
-
-	dbId := 1
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fs := afero.NewMemMapFs()
-			afs := &afero.Afero{Fs: fs}
-
-			tt.hd.FileMaxSize = 10
-
-			standardHandlerData.FileStoreController = mocks.NewFileStoreController(
-				"./lost",
-				"./found",
-				fs,
-			)
+			tt.hd.LostController = mocks.NewMockLostController(GetStandardLost(10))
+			tt.hd.LostAddingManager = mocks.MockLostAddingManager{
+				LostController: tt.hd.LostController,
+			}
+			// tt.hd.FileMaxSize = 10
+			var status int
 			switch tt.testType {
 			case "usual":
-				mock.ExpectBegin()
-				mock.ExpectQuery("(.+)").WithArgs(dbId).WillReturnRows(
-					sqlmock.NewRows([]string{"picture_id"}).AddRow(42),
-				)
-				mock.ExpectExec("(.+)").WithArgs(dbId)
-				mock.ExpectExec("(.+)").WithArgs(42)
-				mock.ExpectCommit()
-				e.DELETE("/lost").WithQuery("id", dbId).Expect().Status(http.StatusOK)
-				if err := mock.ExpectationsWereMet(); err != nil {
-					t.Fatalf("there were unfulfilled expectations: %s", err)
-				}
-				dirPath := fmt.Sprintf("./lost/%d", dbId)
-				_, err := fs.Stat(dirPath)
-				if err != nil {
-					t.Fatalf("Directory %s does not exist!", dirPath)
-				}
-				fileInfo, err := afs.ReadDir(dirPath)
-				if err != nil {
-					t.Errorf("Dir error: %s", dirPath)
-				}
-				for _, file := range fileInfo {
-					fmt.Println(file.Name())
-				}
-				if len(fileInfo) == 0 {
-					t.Errorf("Picture was not added")
-				}
+				status = http.StatusOK
+			case "wrong-id":
+				status = http.StatusBadRequest
+			case "internal-error":
+				status = http.StatusInternalServerError
 			}
-			dbId++
+			e.DELETE("/lost").WithQuery("id", tt.id).Expect().
+				Status(status)
 		})
 	}
 

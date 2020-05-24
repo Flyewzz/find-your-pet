@@ -335,3 +335,57 @@ func TestLostControllerPg_GetDbAdapter(t *testing.T) {
 		})
 	}
 }
+
+func TestLostControllerPg_RemoveById(t *testing.T) {
+	type fields struct {
+		pageCapacity        int
+		db                  *sql.DB
+		searchRequiredQuery string
+	}
+	type args struct {
+		ctx context.Context
+		id  int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    int
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lc := &LostControllerPg{
+				pageCapacity:        tt.fields.pageCapacity,
+				db:                  tt.fields.db,
+				searchRequiredQuery: tt.fields.searchRequiredQuery,
+			}
+			got, err := lc.RemoveById(tt.args.ctx, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LostControllerPg.RemoveById() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("LostControllerPg.RemoveById() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+
+	// dirPath := fmt.Sprintf("./lost/%d", dbId)
+	// 			_, err := fs.Stat(dirPath)
+	// 			if err != nil {
+	// 				t.Fatalf("Directory %s does not exist!", dirPath)
+	// 			}
+	// 			fileInfo, err := afs.ReadDir(dirPath)
+	// 			if err != nil {
+	// 				t.Errorf("Dir error: %s", dirPath)
+	// 			}
+	// 			for _, file := range fileInfo {
+	// 				fmt.Println(file.Name())
+	// 			}
+	// 			if len(fileInfo) == 0 {
+	// 				t.Errorf("Picture was not added")
+	// 			}
+}

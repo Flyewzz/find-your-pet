@@ -2,20 +2,22 @@ package mocks
 
 import (
 	"context"
-	"errors"
 
+	"github.com/Kotyarich/find-your-pet/interfaces"
 	"github.com/Kotyarich/find-your-pet/models"
 )
 
-type LostAddingManager struct {
+type MockLostAddingManager struct {
+	LostController interfaces.LostController
 }
 
-func (lam *LostAddingManager) Add(ctx context.Context, params *models.Lost,
+func (lam MockLostAddingManager) Add(ctx context.Context, params *models.Lost,
 	lostIdCh chan<- int,
 	fileCh <-chan *models.File, errCh chan<- error) {
-	//!PASS
+
 }
 
-func (lam *LostAddingManager) Remove(id int) error {
-	return errors.New("Directory is unavailable")
+func (lam MockLostAddingManager) Remove(id int) error {
+	_, err := lam.LostController.RemoveById(context.Background(), id)
+	return err
 }
