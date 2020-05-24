@@ -629,6 +629,12 @@ func TestHandlerData_RemoveLostHandler(t *testing.T) {
 			testType: "wrong-id",
 		},
 		{
+			name:     "text instead of id",
+			hd:       standardHandlerData,
+			id:       "Some textSome textSome textSome textSome textSome textSome textSome textSome textSome text",
+			testType: "wrong-id",
+		},
+		{
 			name:     "too big id",
 			hd:       standardHandlerData,
 			id:       "156",
@@ -647,9 +653,21 @@ func TestHandlerData_RemoveLostHandler(t *testing.T) {
 			testType: "internal-error",
 		},
 		{
-			name:     "too small id",
+			name:     "too little id",
 			hd:       standardHandlerData,
 			id:       "-135",
+			testType: "internal-error",
+		},
+		{
+			name:     "toooo big id",
+			hd:       standardHandlerData,
+			id:       "345465768798",
+			testType: "internal-error",
+		},
+		{
+			name:     "toooo little id",
+			hd:       standardHandlerData,
+			id:       "-345465768798",
 			testType: "internal-error",
 		},
 	}
