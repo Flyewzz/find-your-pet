@@ -40,6 +40,7 @@ func (hd *HandlerData) ProfileLostHandler(w http.ResponseWriter, r *http.Request
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }
 
@@ -97,6 +98,7 @@ func (hd *HandlerData) ProfileFoundHandler(w http.ResponseWriter, r *http.Reques
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }
 

@@ -551,17 +551,6 @@ func TestHandlerData_AddLostHandler(t *testing.T) {
 }
 
 func TestHandlerData_RemoveLostHandler(t *testing.T) {
-	GetStandardLost := func(count int) []models.Lost {
-		var losts []models.Lost
-		for i := 0; i < count; i++ {
-			lost := models.Lost{}
-			faker.FakeData(&lost)
-			lost.Id = (i + 1)
-			lost.Location = ""
-			losts = append(losts, lost)
-		}
-		return losts
-	}
 	standardHandlerData := &HandlerData{
 		FileMaxSize: 10,
 	}
