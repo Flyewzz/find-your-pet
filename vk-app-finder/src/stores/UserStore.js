@@ -6,13 +6,13 @@ class UserStore {
   constructor() {
     bridge.send("VKWebAppGetUserInfo", {}).then(
       result => {
-        // noinspection JSUnresolvedVariable
         this.id = result.id;
       }
     );
   }
 
   id = -1;
+
   getId = async () => {
     return bridge.send("VKWebAppGetUserInfo", {});
   };
@@ -22,14 +22,13 @@ class UserStore {
   };
 
   share(text) {
-    console.log(text);
     bridge.send("VKWebAppShowWallPostBox", {message: text}).then(
       result => console.log(result)
     );
   }
 
   getUserById = async (id) => {
-    return await bridge.send('VKWebAppCallAPIMethod', {
+    return bridge.send('VKWebAppCallAPIMethod', {
       method: 'users.get',
       request_id: 'user.get' + id,
       params: {

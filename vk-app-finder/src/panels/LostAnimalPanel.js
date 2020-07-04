@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  CellButton, Div, Group, Header, PanelHeader,
+  CellButton, Div, Group, Header, PanelHeader, UsersStack,
 } from "@vkontakte/vkui";
 import {Cell, PanelHeaderBack, Separator} from "@vkontakte/vkui/dist/es6";
 import LostService from "../services/LostService";
@@ -18,7 +18,6 @@ import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 import "./LostAnimalPanel.css";
 import ProfileService from "../services/ProfileService";
 import getDefaultAnimal from '../components/default_animals/DefaultAnimals';
-import UsersStack from "@vkontakte/vkui/src/components/UsersStack/UsersStack";
 
 
 class LostAnimalPanel extends React.Component {
@@ -31,6 +30,7 @@ class LostAnimalPanel extends React.Component {
   animal = {date: ""};
   // TODO add default avatar
   author = {first_name: "", last_name: "", photo_50: ""};
+  responders = [];
   isMine = false;
 
   componentDidMount() {
@@ -40,6 +40,9 @@ class LostAnimalPanel extends React.Component {
           runInAction(() => {
             this.animal = result;
             this.isMine = this.animal.vk_id === resultId.id;
+            this.getResponders([resultId.id, resultId.id]).then(
+              result => {this.responders = result;}
+            );
           });
           this.props.userStore.getUserById(this.animal.vk_id).then((result) => {
             runInAction(() => {
@@ -138,12 +141,38 @@ class LostAnimalPanel extends React.Component {
     }
   };
 
+  getResponders = async (ids) => {
+    const responders = [];
+    for (const id of ids) {
+      const responder = await this.props.userStore.getUserById(id);
+      responders.push(responder.response[0]);
+    }
+    return responders;
+  };
+
+  getRespondersDescription = responders => {
+    const firstNames = responders.map(responder => responder.first_name);
+    let namesString = firstNames[0];
+    if (firstNames.length === 2) {
+      namesString += ' и ' + firstNames[1];
+    } else if (firstNames.length > 2) {
+      namesString += ',' + firstNames[1] + ' и ' + firstNames[2];
+    }
+
+    if (responders.length <= 3) {
+      return namesString + ' отозвались'
+    } else {
+      return `${namesString} и еще ${responders.length - 3} отозвались`
+    }
+  };
+
   render() {
-    console.log(this.author);
     const {picture_id, type_id, description} = this.animal;
     const date = new Date(
       this.animal.date.replace(' ', 'T')
     ).toLocaleDateString();
+
+    console.log(this.responders.map(responder => responder.photo_50));
 
     return (
       <>
@@ -197,12 +226,13 @@ class LostAnimalPanel extends React.Component {
                   </CellButton>
                   <Group>
                       <UsersStack
-                          photos={[
-                              // getAvatarUrl('user_manzuk'),
-                              // getAvatarUrl('user_ji'),
-                          ]}
+                          photos={this.responders.map(responder => responder.photo_50)}
+                          count={3}
                           size="m">
-                          Настя и Jean пойдут на это мероприятие
+                        {this.responders.length > 0 ?
+                          this.getRespondersDescription(this.responders) :
+                          'На объявление пока никто не отозвался'
+                        }
                       </UsersStack>
                   </Group>
               </>
@@ -239,6 +269,7 @@ decorate(LostAnimalPanel, {
   animal: observable,
   author: observable,
   isMine: observable,
+  responders: observable,
 });
 
 export default observer(LostAnimalPanel);
