@@ -8,6 +8,7 @@ import Icon56InfoOutline from "@vkontakte/icons/dist/56/info_outline";
 import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder";
 import Button from "@vkontakte/vkui/dist/components/Button/Button";
 
+
 class FoundTab extends React.Component {
   constructor(props) {
     super(props);

@@ -18,6 +18,7 @@ import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 import "./LostAnimalPanel.css";
 import ProfileService from "../services/ProfileService";
 import getDefaultAnimal from '../components/default_animals/DefaultAnimals';
+import UsersStack from "@vkontakte/vkui/src/components/UsersStack/UsersStack";
 
 
 class LostAnimalPanel extends React.Component {
@@ -138,6 +139,7 @@ class LostAnimalPanel extends React.Component {
   };
 
   render() {
+    console.log(this.author);
     const {picture_id, type_id, description} = this.animal;
     const date = new Date(
       this.animal.date.replace(' ', 'T')
@@ -178,13 +180,32 @@ class LostAnimalPanel extends React.Component {
                     Написать
                   </CellButton>
                 </Cell>
+                  <Cell multiline={true}
+                        description={'Если вы что-то знаете об этом питомце, мы отправим хозяину уведомление'}>
+                    <CellButton before={<Icon24Done/>}
+                                className={"author__action-button"}>
+                      Отозваться
+                    </CellButton>
+                  </Cell>
               </> :
-              <CellButton
-                before={<Icon24Cancel/>}
-                onClick={() => this.props.openDestructive(this.onClose)}
-                mode={"danger"}>
-                Закрыть объявление
-              </CellButton>
+              <>
+                  <CellButton
+                    before={<Icon24Cancel/>}
+                    onClick={() => this.props.openDestructive(this.onClose)}
+                    mode={"danger"}>
+                    Закрыть объявление
+                  </CellButton>
+                  <Group>
+                      <UsersStack
+                          photos={[
+                              // getAvatarUrl('user_manzuk'),
+                              // getAvatarUrl('user_ji'),
+                          ]}
+                          size="m">
+                          Настя и Jean пойдут на это мероприятие
+                      </UsersStack>
+                  </Group>
+              </>
             }
           </Group>
           <Separator/>
