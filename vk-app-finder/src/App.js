@@ -27,11 +27,11 @@ import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 import FoundMapStore from "./stores/FoundMapStore";
 import {observer} from "mobx-react";
 import ScreenSpinner from "@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner";
+import bridge from "@vkontakte/vk-bridge";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       activeModal: null,
       modalHistory: [],
@@ -63,7 +63,47 @@ class App extends React.Component {
     this.openFilters = () => {
       this.setActiveModal('filters');
     };
+
+    bridge.subscribe(this.router);
   }
+
+  router = (event) => {
+    console.log(event);
+    if (event.detail.type === 'VKWebAppLocationChanged') {
+      const location = event.detail.data.location;
+      this.chooseRoute(location);
+    }
+  };
+
+  componentDidMount() {
+    this.chooseRoute(window.location.hash.slice(1));
+  }
+
+  chooseRoute = (location) => {
+    if (location === 'home') {
+      this.setState({activeStory: 'main', mainPanel: 'main'});
+    } else if (location === 'losts') {
+      this.setState({activeStory: 'lost', lostPanel: 'losts'});
+    } else if (location === 'founds') {
+      this.setState({activeStory: 'messages', foundPanel: 'messages'});
+    } else if (location === 'profile') {
+      this.setState({activeStory: 'more', profilePanel: 'more'});
+    } else if (location.slice(0, 5) === 'found') {
+      const id = location.slice(5);
+      this.setState({
+        activeStory: 'messages',
+        id: id,
+        foundPanel: 'found',
+      });
+    } else if (location.slice(0, 4) === 'lost') {
+      const id = location.slice(4);
+      this.setState({
+        activeStory: 'lost',
+        id: id,
+        lostPanel: 'lost',
+      });
+    }
+  };
 
   setActiveModal(activeModal) {
     activeModal = activeModal || null;
@@ -131,27 +171,21 @@ class App extends React.Component {
   };
   toLostList = (needFetch=true) => {
     this.setState({
-      lostPanel: 'losts',
-      needLostFetch: needFetch,
+      needFoundFetch: needFetch,
     });
+    this.userStore.changeLocation(`losts`);
   };
   toLost = (id) => {
-    this.setState({
-      id: id,
-      lostPanel: 'lost',
-    });
+    this.userStore.changeLocation(`lost${id}`);
   };
   toFoundList = (needFetch=true) => {
     this.setState({
-      foundPanel: 'messages',
       needFoundFetch: needFetch,
     });
+    this.userStore.changeLocation(`founds`);
   };
   toFound = (id) => {
-    this.setState({
-      id: id,
-      foundPanel: 'found',
-    });
+    this.userStore.changeLocation(`found${id}`);
   };
   toProfileLostTab = () => {
     this.setState({
@@ -201,36 +235,32 @@ class App extends React.Component {
       <Epic activeStory={this.state.activeStory} tabbar={
         <Tabbar>
           <TabbarItem
-            onClick={(e) => {
-              this.setState({mainPanel: 'main'});
-              this.onStoryChange(e);
+            onClick={() => {
+              this.userStore.changeLocation('home');
             }}
             selected={this.state.activeStory === 'main'}
             data-story="main"
             text="Главная"
           ><Icon28HomeOutline/></TabbarItem>
           <TabbarItem
-            onClick={(e) => {
-              this.setState({lostPanel: 'losts'});
-              this.onStoryChange(e);
+            onClick={() => {
+              this.userStore.changeLocation('losts');
             }}
             selected={this.state.activeStory === 'lost'}
             data-story="lost"
             text="Потерялись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
-            onClick={(e) => {
-              this.setState({foundPanel: 'messages'});
-              this.onStoryChange(e);
+            onClick={() => {
+              this.userStore.changeLocation('founds');
             }}
             selected={this.state.activeStory === 'messages'}
             data-story="messages"
             text="Нашлись"
           ><Icon28ListCheckOutline/></TabbarItem>
           <TabbarItem
-            onClick={(e) => {
-              this.setState({profilePanel: 'more'});
-              this.onStoryChange(e);
+            onClick={() => {
+              this.userStore.changeLocation('profile');
             }}
             selected={this.state.activeStory === 'more'}
             data-story="more"
@@ -335,4 +365,3 @@ class App extends React.Component {
 }
 
 export default observer(App);
-

@@ -9,7 +9,6 @@ import List from "@vkontakte/vkui/dist/components/List/List";
 import InfoRow from "@vkontakte/vkui/dist/components/InfoRow/InfoRow";
 import Avatar from "@vkontakte/vkui/dist/components/Avatar/Avatar";
 import Icon24Write from "@vkontakte/icons/dist/24/write";
-import Icon24Done from "@vkontakte/icons/dist/24/done";
 import Icon24Share from "@vkontakte/icons/dist/24/share";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 import "./FoundAnimalPanel.css";
@@ -80,7 +79,7 @@ class FoundAnimalPanel extends React.Component {
       this.animal.breed === "" ? "Порода не указана" : this.animal.breed;
     return (
       `Найден питомец: ${config.types[type_id - 1]}, ${breed}. ` +
-      `Адрес: ${this.animal.address}. ${config.appUrl}`
+      `Адрес: ${this.animal.address}. ${config.appUrl}${this.animal.id}`
     );
   };
 

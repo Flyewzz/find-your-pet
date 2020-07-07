@@ -39,6 +39,12 @@ class UserStore {
       },
     })
   };
+
+  changeLocation = (location) => {
+    return bridge.send('VKWebAppSetLocation', {
+      'location': location
+    });
+  }
 }
 
 decorate(UserStore, {
