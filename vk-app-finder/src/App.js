@@ -27,7 +27,7 @@ import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 import FoundMapStore from "./stores/FoundMapStore";
 import {observer} from "mobx-react";
 import ScreenSpinner from "@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner";
-import bridge from "@vkontakte/vk-bridge";
+// import bridge from "@vkontakte/vk-bridge";
 
 class App extends React.Component {
   constructor(props) {
@@ -63,17 +63,7 @@ class App extends React.Component {
     this.openFilters = () => {
       this.setActiveModal('filters');
     };
-
-    bridge.subscribe(this.router);
   }
-
-  router = (event) => {
-    console.log(event);
-    if (event.detail.type === 'VKWebAppLocationChanged') {
-      const location = event.detail.data.location;
-      this.chooseRoute(location);
-    }
-  };
 
   componentDidMount() {
     this.chooseRoute(window.location.hash.slice(1));
@@ -174,18 +164,22 @@ class App extends React.Component {
       needFoundFetch: needFetch,
     });
     this.userStore.changeLocation(`losts`);
+    this.chooseRoute('losts');
   };
   toLost = (id) => {
     this.userStore.changeLocation(`lost${id}`);
+    this.chooseRoute(`lost${id}`);
   };
   toFoundList = (needFetch=true) => {
+    this.userStore.changeLocation(`founds`);
     this.setState({
       needFoundFetch: needFetch,
     });
-    this.userStore.changeLocation(`founds`);
+    this.chooseRoute('founds');
   };
   toFound = (id) => {
     this.userStore.changeLocation(`found${id}`);
+    this.chooseRoute(`found${id}`)
   };
   toProfileLostTab = () => {
     this.setState({
@@ -237,6 +231,7 @@ class App extends React.Component {
           <TabbarItem
             onClick={() => {
               this.userStore.changeLocation('home');
+              this.chooseRoute('home');
             }}
             selected={this.state.activeStory === 'main'}
             data-story="main"
@@ -245,6 +240,7 @@ class App extends React.Component {
           <TabbarItem
             onClick={() => {
               this.userStore.changeLocation('losts');
+              this.chooseRoute('losts');
             }}
             selected={this.state.activeStory === 'lost'}
             data-story="lost"
@@ -253,6 +249,7 @@ class App extends React.Component {
           <TabbarItem
             onClick={() => {
               this.userStore.changeLocation('founds');
+              this.chooseRoute('founds');
             }}
             selected={this.state.activeStory === 'messages'}
             data-story="messages"
@@ -261,6 +258,7 @@ class App extends React.Component {
           <TabbarItem
             onClick={() => {
               this.userStore.changeLocation('profile');
+              this.chooseRoute('profile');
             }}
             selected={this.state.activeStory === 'more'}
             data-story="more"
