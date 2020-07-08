@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewFoundControllerPg(t *testing.T) {
+	t.Skip()
 	type args struct {
 		pageCapacity int
 		db           *sql.DB
@@ -32,6 +33,7 @@ func TestNewFoundControllerPg(t *testing.T) {
 }
 
 func TestFoundControllerPg_GetById(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx context.Context
 		id  int
@@ -60,6 +62,7 @@ func TestFoundControllerPg_GetById(t *testing.T) {
 }
 
 func TestFoundControllerPg_Add(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx    context.Context
 		params *models.Found
@@ -88,6 +91,7 @@ func TestFoundControllerPg_Add(t *testing.T) {
 }
 
 func TestFoundControllerPg_Search(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx    context.Context
 		params *models.Found
@@ -122,6 +126,7 @@ func TestFoundControllerPg_Search(t *testing.T) {
 }
 
 func TestFoundControllerPg_SearchByType(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx    context.Context
 		typeId int
@@ -150,6 +155,7 @@ func TestFoundControllerPg_SearchByType(t *testing.T) {
 }
 
 func TestFoundControllerPg_SearchBySex(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx context.Context
 		sex string
@@ -178,6 +184,7 @@ func TestFoundControllerPg_SearchBySex(t *testing.T) {
 }
 
 func TestFoundControllerPg_SearchByBreed(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx   context.Context
 		breed string
@@ -206,6 +213,7 @@ func TestFoundControllerPg_SearchByBreed(t *testing.T) {
 }
 
 func TestFoundControllerPg_SearchByTextQuery(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx   context.Context
 		query string
@@ -234,6 +242,7 @@ func TestFoundControllerPg_SearchByTextQuery(t *testing.T) {
 }
 
 func TestFoundControllerPg_GetPageCapacity(t *testing.T) {
+	t.Skip()
 	tests := []struct {
 		name string
 		fc   *FoundControllerPg
@@ -251,6 +260,7 @@ func TestFoundControllerPg_GetPageCapacity(t *testing.T) {
 }
 
 func TestFoundControllerPg_GetDbAdapter(t *testing.T) {
+	t.Skip()
 	tests := []struct {
 		name string
 		fc   *FoundControllerPg

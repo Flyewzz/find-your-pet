@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewProfileControllerPg(t *testing.T) {
+	t.Skip()
 	type args struct {
 		pages      int
 		db         *sql.DB
@@ -33,6 +34,7 @@ func TestNewProfileControllerPg(t *testing.T) {
 }
 
 func TestProfileControllerPg_GetLost(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx    context.Context
 		userId int
@@ -61,6 +63,7 @@ func TestProfileControllerPg_GetLost(t *testing.T) {
 }
 
 func TestProfileControllerPg_SetLostOpening(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx      context.Context
 		lostId   int
@@ -84,6 +87,7 @@ func TestProfileControllerPg_SetLostOpening(t *testing.T) {
 }
 
 func TestProfileControllerPg_GetFound(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx    context.Context
 		userId int
@@ -112,6 +116,7 @@ func TestProfileControllerPg_GetFound(t *testing.T) {
 }
 
 func TestProfileControllerPg_SetFoundOpening(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx      context.Context
 		foundId  int
@@ -135,6 +140,7 @@ func TestProfileControllerPg_SetFoundOpening(t *testing.T) {
 }
 
 func TestProfileControllerPg_GetItemsPerPageCount(t *testing.T) {
+	t.Skip()
 	tests := []struct {
 		name string
 		pc   *ProfileControllerPg

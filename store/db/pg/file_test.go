@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewFileControllerPg(t *testing.T) {
+	t.Skip()
 	type args struct {
 		db *sql.DB
 	}
@@ -30,6 +31,7 @@ func TestNewFileControllerPg(t *testing.T) {
 }
 
 func TestFileControllerPg_GetById(t *testing.T) {
+	t.Skip()
 	type args struct {
 		id int
 	}
@@ -57,6 +59,7 @@ func TestFileControllerPg_GetById(t *testing.T) {
 }
 
 func TestFileControllerPg_AddToLost(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx    context.Context
 		file   *models.File
@@ -86,6 +89,7 @@ func TestFileControllerPg_AddToLost(t *testing.T) {
 }
 
 func TestFileControllerPg_AddToFound(t *testing.T) {
+	t.Skip()
 	type args struct {
 		ctx     context.Context
 		file    *models.File
