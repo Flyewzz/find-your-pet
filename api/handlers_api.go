@@ -11,6 +11,7 @@ func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 	r.HandleFunc("/lost", hd.LostByIdGetHandler).Methods("GET")
 	r.HandleFunc("/lost", hd.AddLostHandler).Methods("POST")
 	r.HandleFunc("/lost", hd.RemoveLostHandler).Methods("DELETE")
+	r.HandleFunc("/lost/notification", hd.LostNotifyHandler).Methods("GET")
 
 	// LostFile
 	r.HandleFunc("/lost/img", hd.LostImageHandler).Methods("GET")
@@ -20,6 +21,7 @@ func ConfigureHandlers(r *mux.Router, hd *handlers.HandlerData) {
 	r.HandleFunc("/found", hd.FoundByIdGetHandler).Methods("GET")
 	r.HandleFunc("/found", hd.AddFoundHandler).Methods("POST")
 	r.HandleFunc("/found", hd.RemoveFoundHandler).Methods("DELETE")
+	r.HandleFunc("/found/notification", hd.FoundNotifyHandler).Methods("GET")
 
 	// FoundFile
 	r.HandleFunc("/found/img", hd.FoundImageHandler).Methods("GET")

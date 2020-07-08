@@ -285,3 +285,39 @@ func (hd *HandlerData) RemoveFoundHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 }
+
+func (hd *HandlerData) FoundNotifyHandler(w http.ResponseWriter, r *http.Request) {
+	founds, err := hd.FoundController.GetAll()
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
+	type Notify struct {
+		AuthorId int              `json:"vk_id"`
+		Similars []models.Similar `json:"similars"`
+	}
+	var notifyCollection []Notify
+	for _, found := range founds {
+		similars, err := hd.LostController.GetSimilars(&found)
+		if err != nil {
+			continue
+		}
+		if similars == nil {
+			continue
+		}
+		notifyCollection = append(
+			notifyCollection,
+			Notify{
+				AuthorId: found.AuthorId,
+				Similars: similars,
+			},
+		)
+	}
+	data, err := json.Marshal(notifyCollection)
+	if err != nil {
+		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}

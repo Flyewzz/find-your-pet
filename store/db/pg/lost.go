@@ -279,3 +279,49 @@ func (lc *LostControllerPg) RemoveById(ctx context.Context, id int) (int, error)
 	// If the picture is null
 	return 0, nil
 }
+
+func (lc *LostControllerPg) GetAll() ([]models.Lost, error) {
+	rows, err := lc.db.Query(lc.searchRequiredQuery)
+	if err != nil {
+		return []models.Lost{}, err
+	}
+	defer rows.Close()
+	lost, err := db.ConvertRowsToLost(rows)
+	return lost, nil
+}
+
+func (lc *LostControllerPg) GetSimilars(found *models.Found) ([]models.Similar, error) {
+	query := `SELECT id, 
+		(SELECT floor(st_distance_sphere(
+					location,
+					st_GeomFromText('point(%f %f)', 4326)
+			) / 1000))
+	FROM lost
+	WHERE (lower(breed) = lower($1))
+			AND (((EXTRACT(EPOCH FROM current_timestamp) - EXTRACT(EPOCH FROM $2::timestamp)) / 3600 > 24
+				AND (EXTRACT(EPOCH FROM current_timestamp) - EXTRACT(EPOCH FROM date)) / 3600 <= 24)
+						OR
+					(EXTRACT(EPOCH FROM current_timestamp) - EXTRACT(EPOCH FROM $2::timestamp)) / 3600 <= 24)
+			AND (
+			SELECT st_distance_sphere(
+					location,
+					st_GeomFromText('point(%f %f)', 4326)
+			) / 1000 <= 100);`
+	rows, err := lc.db.Query(fmt.Sprintf(query, found.Latitude, found.Longitude,
+		found.Latitude, found.Longitude),
+		found.Breed, found.Date)
+	if err != nil {
+		return []models.Similar{}, err
+	}
+	defer rows.Close()
+	var similars []models.Similar
+	for rows.Next() {
+		var similar models.Similar
+		err = rows.Scan(&similar.Id, &similar.Distance)
+		if err != nil {
+			continue
+		}
+		similars = append(similars, similar)
+	}
+	return similars, nil
+}

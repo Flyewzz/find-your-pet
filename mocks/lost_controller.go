@@ -57,3 +57,11 @@ func (lc *MockLostController) RemoveById(ctx context.Context, id int) (int, erro
 func (lc *MockLostController) GetPageCapacity() int {
 	return 0
 }
+
+func (lc *MockLostController) GetAll() ([]models.Lost, error) {
+	return []models.Lost{}, nil
+}
+
+func (lc *MockLostController) GetSimilars(found *models.Found) ([]models.Similar, error) {
+	return []models.Similar{}, nil
+}
