@@ -292,7 +292,7 @@ func (lc *LostControllerPg) GetAll() ([]models.Lost, error) {
 
 func (lc *LostControllerPg) GetSimilars(found *models.Found) ([]models.Similar, error) {
 	query := `SELECT id, 
-		(SELECT floor(st_distance_sphere(
+		(SELECT floor(ST_DistanceSphere(
 					location,
 					st_GeomFromText('point(%f %f)', 4326)
 			) / 1000))
@@ -303,7 +303,7 @@ func (lc *LostControllerPg) GetSimilars(found *models.Found) ([]models.Similar, 
 						OR
 					(EXTRACT(EPOCH FROM current_timestamp) - EXTRACT(EPOCH FROM $2::timestamp)) / 3600 <= 24)
 			AND (
-			SELECT st_distance_sphere(
+			SELECT ST_DistanceSphere(
 					location,
 					st_GeomFromText('point(%f %f)', 4326)
 			) / 1000 <= 100);`
