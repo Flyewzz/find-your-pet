@@ -9,6 +9,7 @@ class UserStore {
         this.id = result.id;
       }
     );
+    bridge.send('VKWebAppAllowNotifications', {});
   }
 
   id = -1;
@@ -22,9 +23,7 @@ class UserStore {
   };
 
   share(text) {
-    bridge.send("VKWebAppShowWallPostBox", {message: text}).then(
-      result => console.log(result)
-    );
+    bridge.send("VKWebAppShowWallPostBox", {message: text});
   }
 
   getUserById = async (id) => {

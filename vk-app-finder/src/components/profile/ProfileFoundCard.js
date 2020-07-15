@@ -34,7 +34,10 @@ const ProfileFoundCard = (props) => {
         <Group className={"profile__card__details"}>
           <List className={"profile__attributes_list"}>
             <Icon24DismissDark
-              onClick={() => props.cancel(animal.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                props.cancel(animal.id);
+              }}
               className={"profile__cancel-icon"}
             />
             <div className={"profile__card__cells"}>

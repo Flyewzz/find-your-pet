@@ -58,7 +58,6 @@ class CreateFormFoundPanel extends React.Component {
     this.lostStore = new FoundStore(props.userStore);
     this.geocodingService = new GeocodingService();
     this.breedService = new BreedService();
-    this.state = {stage: 0}
   }
 
   breeds = undefined;
@@ -121,9 +120,13 @@ class CreateFormFoundPanel extends React.Component {
     this.lostStore.form.fields.description.value = description.target.value;
   };
 
+  changeStage = (stage) => {
+    this.props.router.navigate('create_found', {stage})
+  };
+
   back = () => {
-    if (this.state.stage > 0) {
-      this.setState({stage: this.state.stage - 1});
+    if (this.props.stage > 0) {
+      this.changeStage(this.props.stage - 1);
     } else {
       this.props.toMain();
     }
@@ -137,7 +140,7 @@ class CreateFormFoundPanel extends React.Component {
     } else {
       form.meta.error = '';
       form.meta.isValid = true;
-      this.setState({stage: 1});
+      this.changeStage(1);
     }
   };
 
@@ -157,7 +160,7 @@ class CreateFormFoundPanel extends React.Component {
     } else {
       this.breeds = null;
     }
-    this.setState({stage: 2});
+    this.changeStage(2);
   };
 
   render() {
@@ -169,18 +172,18 @@ class CreateFormFoundPanel extends React.Component {
           Я нашел
         </PanelHeader>
         <FormLayout separator="hide">
-          {this.state.stage === 0 && !this.lostStore.form.meta.isValid &&
+          {this.props.stage === 0 && !this.lostStore.form.meta.isValid &&
           <FormStatus mode={'error'}>
             {this.lostStore.form.meta.error}
           </FormStatus>}
-          {this.state.stage === 0 && this.addressLoading &&
+          {this.props.stage === 0 && this.addressLoading &&
           <FormStatus>
             <Spinner/>
             <div style={{width: '100%', textAlign: 'center'}}>
               Не уходите, мы проверяем адрес
             </div>
           </FormStatus>}
-          {this.state.stage === 0
+          {this.props.stage === 0
           && <FirstFormPanel onTypeChange={this.onTypeChange}
                              fields={fields}
                              address={fields.address.value}
@@ -189,7 +192,7 @@ class CreateFormFoundPanel extends React.Component {
                              onSexChange={this.onSexChange}
                              onAddressChange={this.onAddressChange}/>}
 
-          {this.state.stage === 1 && <>
+          {this.props.stage === 1 && <>
             <ImageLoader onPictureSet={this.onPictureSet}/>
             <Div style={{paddingLeft: 0}}>
               <Button onClick={this.submitSecond} size={'l'}>
@@ -198,17 +201,17 @@ class CreateFormFoundPanel extends React.Component {
             </Div>
           </>}
 
-          {this.state.stage === 2 && this.breeds === 'error' &&
+          {this.props.stage === 2 && this.breeds === 'error' &&
           <FormStatus>
             {'Нам не удалось распознать породу животного'}
           </FormStatus>}
 
-          {this.state.stage === 2 && this.breeds !== 'error' && !this.lostStore.form.meta.isValid &&
+          {this.props.stage === 2 && this.breeds !== 'error' && !this.lostStore.form.meta.isValid &&
           <FormStatus mode={'error'}>
             {this.lostStore.form.meta.error}
           </FormStatus>}
 
-          {this.state.stage === 2 && this.breeds === undefined &&
+          {this.props.stage === 2 && this.breeds === undefined &&
           <FormStatus>
             <Spinner/>
             <div style={{textAlign: 'center', width: '100%'}}>
@@ -216,7 +219,7 @@ class CreateFormFoundPanel extends React.Component {
             </div>
           </FormStatus>}
 
-          {this.state.stage === 2 && <>
+          {this.props.stage === 2 && <>
             <BreedDescriptionPanel onBreedChange={this.onBreedChange}
                                    onBreedChoose={this.onBreedChoose}
                                    onDescriptionChange={this.onDescriptionChange}

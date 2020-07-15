@@ -47,7 +47,7 @@ class LostTab extends React.Component {
   animalsToCards = () => {
     return this.animals.map((animal) => (
       <ProfileLostCard
-        onClick={() => {
+        open={() => {
           this.props.toLost(animal.id);
         }}
         cancel={() => {

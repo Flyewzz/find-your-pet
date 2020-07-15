@@ -67,7 +67,7 @@ class LostStore extends GenericFormStore {
     const {description, picture} = this.form.fields;
     this.form.meta.isValid = !(description.value === '' && picture.value === null);
     this.form.meta.error = 'Вы не загрузили фото и не добавили описание.' +
-      ' Как другим узнать найденного Вами питомца?';
+      ' Как другим узнать Вашего питомца?';
     return this.form.meta.isValid;
   };
 

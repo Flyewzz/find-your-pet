@@ -16,7 +16,7 @@ const ProfileLostCard = (props) => {
 
   return (
     <Card
-      onClick={() => props.onClick(animal.id)}
+      onClick={() => props.open(animal.id)}
       className={"profile__card"}
       size="l"
       mode="shadow">
@@ -25,20 +25,21 @@ const ProfileLostCard = (props) => {
           <div className={"profile__card__photo__corner"}>
             <div className={"profile__card__photo__breed"}>{breed}</div>
           </div>
-          <img
-            className={"profile__card__photo"}
-            src={
-              animal.picture_id
-                ? config.baseUrl + `lost/img?id=${animal.picture_id}`
-                : getDefaultAnimal(animal.type_id)
-            }
-            alt={""}
-          />
+          <img className={"profile__card__photo"}
+               src={
+                 animal.picture_id
+                   ? config.baseUrl + `lost/img?id=${animal.picture_id}`
+                   : getDefaultAnimal(animal.type_id)
+               }
+               alt={""}/>
         </div>
         <Group className={"profile__card__details"}>
           <List className={"profile__attributes_list"}>
             <Icon24DismissDark
-              onClick={() => props.cancel(animal.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                props.cancel(animal.id)
+              }}
               className={"profile__cancel-icon"}
             />
             <div className={"profile__card__cells"}>
@@ -54,14 +55,14 @@ const ProfileLostCard = (props) => {
 
               <div className={"profile__card__info_cell"}>
                 <span style={{fontWeight: "bold"}}>Описание: </span>
-                  <LinesEllipsis
-                    text={animal.description}
-                    maxLine='2'
-                    ellipsis='...'
-                    trimRight
-                    basedOn='letters'
-                    componenr={<span/>}
-                  />
+                <LinesEllipsis
+                  text={animal.description}
+                  maxLine='2'
+                  ellipsis='...'
+                  trimRight
+                  basedOn='letters'
+                  componenr={<span/>}
+                />
               </div>
             </div>
           </List>

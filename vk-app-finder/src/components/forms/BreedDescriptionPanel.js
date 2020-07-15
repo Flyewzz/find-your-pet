@@ -43,7 +43,7 @@ class BreedDescriptionPanel extends React.Component {
                   onChange={props.onDescriptionChange}
                   defaultValue={props.fields.description.value === '' ?
                     undefined : props.fields.description.value}
-                  placeholder="Напишите все, что может помочь узнать вашего питомца"/>
+                  placeholder="Напишите все, что может помочь узнать питомца"/>
         <Div style={{paddingLeft: 0}}>
           <Button onClick={props.onSubmit} style={{ cursor: 'pointer' }} className={'create-form__submit'} size={'l'}>
             Завершить

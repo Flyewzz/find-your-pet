@@ -27,7 +27,7 @@ import FoundAnimalPanel from "./panels/FoundAnimalPanel";
 import FoundMapStore from "./stores/FoundMapStore";
 import {observer} from "mobx-react";
 import ScreenSpinner from "@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner";
-// import bridge from "@vkontakte/vk-bridge";
+import {RouteNode} from "react-router5";
 
 class App extends React.Component {
   constructor(props) {
@@ -45,12 +45,16 @@ class App extends React.Component {
       needLostFetch: true,
       needFoundFetch: true,
 
+      createLostStage: 0,
+      createFoundStage: 0,
+
       popout: null,
       formPopout: null,
     };
     this.onStoryChange = this.onStoryChange.bind(this);
 
     this.modalBack = () => {
+      window.history.back();
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
     this.userStore = new UserStore();
@@ -61,23 +65,60 @@ class App extends React.Component {
     this.foundFilterStore = new FoundFilterStore();
     this.foundFilter = new FoundFilter();
     this.openFilters = () => {
+      this.props.router.navigate('filters');
       this.setActiveModal('filters');
     };
+
+    props.router.subscribe(this.routeChange);
   }
+
+  routeChange = (value) => {
+    this.setState({popout: null});
+    this.setActiveModal(null);
+
+    let name = value.route.name;
+    if (name === 'lost' || name === 'found' || name === 'my_lost' || name === 'my_found') {
+      name += value.route.params.id;
+    }
+
+    this.chooseRoute(name, value.route.params);
+  };
 
   componentDidMount() {
     this.chooseRoute(window.location.hash.slice(1));
   }
 
-  chooseRoute = (location) => {
+  chooseRoute = (location, params) => {
+    console.log('LOC:', location);
+
     if (location === 'home') {
       this.setState({activeStory: 'main', mainPanel: 'main'});
+    } else if (location === 'create_lost') {
+      this.setState({
+        activeStory: 'main',
+        mainPanel: 'new_lost',
+        createLostStage: params.stage
+      });
+    } else if (location === 'create_found') {
+      this.setState({
+        activeStory: 'main',
+        mainPanel: 'new_found',
+        createFoundStage: params.stage,
+      });
     } else if (location === 'losts') {
       this.setState({activeStory: 'lost', lostPanel: 'losts'});
     } else if (location === 'founds') {
       this.setState({activeStory: 'messages', foundPanel: 'messages'});
     } else if (location === 'profile') {
       this.setState({activeStory: 'more', profilePanel: 'more'});
+    } else if (location === 'profile_lost') {
+      this.setState(
+        {activeStory: 'more', profilePanel: 'more', profileTab: 'lost'}
+      );
+    } else if (location === 'profile_found') {
+      this.setState(
+        {activeStory: 'more', profilePanel: 'more', profileTab: 'found'}
+      );
     } else if (location.slice(0, 5) === 'found') {
       const id = location.slice(5);
       this.setState({
@@ -91,6 +132,20 @@ class App extends React.Component {
         activeStory: 'lost',
         id: id,
         lostPanel: 'lost',
+      });
+    } else if (location.slice(0, 7) === 'my_lost') {
+      const id = location.slice(7);
+      this.setState({
+        activeStory: 'more',
+        profilePanel: 'lost',
+        profileId: id,
+      });
+    } else if (location.slice(0, 8) === 'my_found') {
+      const id = location.slice(8);
+      this.setState({
+        activeStory: 'more',
+        profilePanel: 'found',
+        profileId: id,
       });
     }
   };
@@ -118,6 +173,8 @@ class App extends React.Component {
   }
 
   openDestructive = (onAccept) => {
+    this.props.router.navigate('destructive');
+
     this.setState({
       popout:
         <Alert
@@ -140,126 +197,110 @@ class App extends React.Component {
   };
 
   closePopout = () => {
+    window.history.back();
     this.setState({popout: null});
   };
 
   openScreenSpinner = () => {
     this.setState({formPopout: <ScreenSpinner/>})
   };
+
   closeScreenSpinner = () => {
     this.setState({formPopout: null})
   };
 
   toCreateLostForm = () => {
-    this.setState({mainPanel: 'new_lost'});
+    this.props.router.navigate('create_lost',
+      {stage: this.state.createLostStage}
+    );
   };
+
   toCreateFoundForm = () => {
-    this.setState({mainPanel: 'new_found'});
+    this.props.router.navigate('create_found',
+      {stage: this.state.createFoundStage}
+    );
   };
+
   toMain = () => {
-    this.setState({mainPanel: 'main'});
+    this.props.router.navigate('home');
   };
-  toLostList = (needFetch=true) => {
+
+  toLostList = (needFetch = true) => {
     this.setState({
-      needFoundFetch: needFetch,
+      needLostFetch: needFetch,
     });
-    this.userStore.changeLocation(`losts`);
-    this.chooseRoute('losts');
+    this.props.router.navigate('losts');
   };
+
   toLost = (id) => {
-    this.userStore.changeLocation(`lost${id}`);
-    this.chooseRoute(`lost${id}`);
+    this.props.router.navigate('lost', {id});
   };
-  toFoundList = (needFetch=true) => {
-    this.userStore.changeLocation(`founds`);
+
+  toFoundList = (needFetch = true) => {
     this.setState({
       needFoundFetch: needFetch,
     });
-    this.chooseRoute('founds');
+    this.props.router.navigate('founds');
   };
+
   toFound = (id) => {
-    this.userStore.changeLocation(`found${id}`);
-    this.chooseRoute(`found${id}`)
+    this.props.router.navigate('found', {id});
   };
+
   toProfileLostTab = () => {
-    this.setState({
-      profilePanel: 'more',
-      profileTab: 'lost',
-    });
+    this.props.router.navigate('profile_lost')
   };
+
   toProfileFoundTab = () => {
-    this.setState({
-      profilePanel: 'more',
-      profileTab: 'found',
-    });
+    this.props.router.navigate('profile_found');
   };
+
   toProfileLost = (id) => {
-    this.setState({
-      profilePanel: 'lost',
-      profileId: id,
-    });
+    this.props.router.navigate('my_lost', {id});
   };
+
   toProfileFound = (id) => {
-    this.setState({
-      profilePanel: 'found',
-      profileId: id,
-    });
+    this.props.router.navigate('my_found', {id});
   };
+
   toMainForm = () => {
-    this.setState({
-      activeStory: 'main',
-      mainPanel: 'new_lost',
-    })
+    this.props.router.navigate('create_lost');
   };
+
   toMainFoundForm = () => {
-    this.setState({
-      activeStory: 'main',
-      mainPanel: 'new_found',
-    })
+    this.props.router.navigate('create_found');
   };
+
   toProfileMain = () => {
-    this.setState({
-      activeStory: 'more',
-      profilePanel: 'more',
-    });
+    this.props.router.navigate('profile')
   };
 
   render() {
+    let {router} = this.props;
+
     return (
       <Epic activeStory={this.state.activeStory} tabbar={
         <Tabbar>
           <TabbarItem
-            onClick={() => {
-              this.userStore.changeLocation('home');
-              this.chooseRoute('home');
-            }}
+            onClick={() => this.props.router.navigate('home')}
             selected={this.state.activeStory === 'main'}
             data-story="main"
             text="Главная"
           ><Icon28HomeOutline/></TabbarItem>
           <TabbarItem
-            onClick={() => {
-              this.userStore.changeLocation('losts');
-              this.chooseRoute('losts');
-            }}
+            onClick={() => this.props.router.navigate('losts')}
             selected={this.state.activeStory === 'lost'}
             data-story="lost"
             text="Потерялись"
           ><Icon28Menu/></TabbarItem>
           <TabbarItem
-            onClick={() => {
-              this.userStore.changeLocation('founds');
-              this.chooseRoute('founds');
-            }}
+            onClick={() => this.props.router.navigate('founds')}
             selected={this.state.activeStory === 'messages'}
             data-story="messages"
             text="Нашлись"
           ><Icon28ListCheckOutline/></TabbarItem>
           <TabbarItem
-            onClick={() => {
-              this.userStore.changeLocation('profile');
-              this.chooseRoute('profile');
-            }}
+            onClick={() => this.props.router.navigate('profile')}
             selected={this.state.activeStory === 'more'}
             data-story="more"
             text="Профиль"
@@ -276,16 +317,17 @@ class App extends React.Component {
                              toProfile={this.toProfileMain}
                              openPopout={this.openScreenSpinner}
                              closePopout={this.closeScreenSpinner}
+                             stage={this.state.createLostStage}
+                             router={router}
                              toMain={this.toMain}/>
           </Panel>
           <Panel id="new_found">
             <CreateFormFoundPanel userStore={this.userStore}
-                                  toProfile={() => {
-                                    this.toProfileFoundTab();
-                                    this.toProfileMain();
-                                  }}
+                                  toProfile={this.toProfileFoundTab}
                                   openPopout={this.openScreenSpinner}
                                   closePopout={this.closeScreenSpinner}
+                                  stage={this.state.createFoundStage}
+                                  router={router}
                                   toMain={this.toMain}/>
           </Panel>
         </View>
@@ -306,7 +348,7 @@ class App extends React.Component {
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
-                             goBack={this.toLostList}
+                             goBack={() => this.toLostList(false)}
                              id={this.state.id}/>
           </Panel>
         </View>
@@ -327,7 +369,7 @@ class App extends React.Component {
           <Panel id="found">
             <FoundAnimalPanel userStore={this.userStore}
                               openDestructive={this.openDestructive}
-                              goBack={this.toFoundList}
+                              goBack={() => this.toFoundList(false)}
                               id={this.state.id}/>
           </Panel>
         </View>
@@ -362,4 +404,8 @@ class App extends React.Component {
   }
 }
 
-export default observer(App);
+export default observer((props) => (
+  <RouteNode>
+    {({route}) => <App route={route} {...props}/>}
+  </RouteNode>
+));
