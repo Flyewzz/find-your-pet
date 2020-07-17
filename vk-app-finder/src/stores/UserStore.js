@@ -12,13 +12,12 @@ class UserStore {
 
     const urlParams = new URLSearchParams(search);
     const areNotificationsEnabled = urlParams.get('vk_are_notifications_enabled');
-    console.log('not', areNotificationsEnabled);
     if (!areNotificationsEnabled) {
       bridge.send('VKWebAppAllowNotifications', {});
     }
 
     bridge.subscribe((e) => {
-      if (e.type === 'VKWebAppEvent') {
+      if (e.detail.type === 'VKWebAppUpdateConfig') {
         let schemeAttribute = document.createAttribute('scheme');
         schemeAttribute.value = e.detail.data.scheme ? e.detail.data.scheme : 'bright_light';
         document.body.attributes.setNamedItem(schemeAttribute);
