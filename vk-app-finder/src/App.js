@@ -57,7 +57,7 @@ class App extends React.Component {
       window.history.back();
       this.setActiveModal(this.state.modalHistory[this.state.modalHistory.length - 2]);
     };
-    this.userStore = new UserStore();
+    this.userStore = new UserStore(props.search);
     this.mapStore = new LostMapStore(this.userStore);
     this.foundMapStore = new FoundMapStore(this.userStore);
     this.lostFilterStore = new LostFilterStore();
@@ -89,8 +89,6 @@ class App extends React.Component {
   }
 
   chooseRoute = (location, params) => {
-    console.log('LOC:', location);
-
     if (location === 'home') {
       this.setState({activeStory: 'main', mainPanel: 'main'});
     } else if (location === 'create_lost') {
