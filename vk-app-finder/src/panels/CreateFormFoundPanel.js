@@ -96,6 +96,14 @@ class CreateFormFoundPanel extends React.Component {
     this.lostStore.form.fields.picture.value = picture;
   };
 
+  onImageChange = image => {
+    this.lostStore.form.fields.loadingImage.value = image;
+  };
+
+  onCropChange = crop => {
+    this.lostStore.form.fields.crop.value = crop;
+  };
+
   onTypeChange = (type) => {
     this.lostStore.form.fields.typeId.value = type.target.value;
   };
@@ -193,7 +201,11 @@ class CreateFormFoundPanel extends React.Component {
                              onAddressChange={this.onAddressChange}/>}
 
           {this.props.stage === 1 && <>
-            <ImageLoader onPictureSet={this.onPictureSet}/>
+            <ImageLoader image={this.lostStore.form.fields.loadingImage.value}
+                         crop={this.lostStore.form.fields.crop.value}
+                         onPictureSet={this.onPictureSet}
+                         onCropChange={this.onCropChange}
+                         onImageChange={this.onImageChange}/>
             <Div style={{paddingLeft: 0}}>
               <Button onClick={this.submitSecond} size={'l'}>
                 Далее

@@ -7,20 +7,17 @@ import FormStatus from "@vkontakte/vkui/dist/components/FormStatus/FormStatus";
 
 class ImageLoader extends PureComponent {
   state = {
-    src: null,
-    crop: {
-      unit: '%',
-      width: 60,
-      aspect: 5 / 3,
-    },
+    src: this.props.image,
+    crop: this.props.crop,
   };
 
   onSelectFile = e => {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
-      reader.addEventListener('load', () =>
-        this.setState({src: reader.result})
-      );
+      reader.addEventListener('load', () => {
+        this.setState({src: reader.result});
+        this.props.onImageChange(reader.result);
+      });
       reader.readAsDataURL(e.target.files[0]);
     }
   };
@@ -35,6 +32,7 @@ class ImageLoader extends PureComponent {
   };
 
   onCropChange = (crop, percentCrop) => {
+    this.props.onCropChange(crop);
     // You could also use percentCrop:
     // this.setState({ crop: percentCrop });
     this.setState({crop});
@@ -88,7 +86,7 @@ class ImageLoader extends PureComponent {
   }
 
   render() {
-    const {crop, croppedImageUrl, src} = this.state;
+    const {croppedImageUrl} = this.state;
     const imageWrapperStyles = {
       marginLeft: 'auto',
       marginRight: 'auto',
@@ -101,9 +99,9 @@ class ImageLoader extends PureComponent {
         <FormStatus header="Фотография животного">
           Фотография поможет другим узнать животное, а мы попробуем подсказать его породу.
         </FormStatus>
-        {src && <Div>
-          <ReactCrop src={src}
-                     crop={crop}
+        {this.props.image && <Div>
+          <ReactCrop src={this.props.image}
+                     crop={this.props.crop}
                      ruleOfThirds
                      keepSelection
                      style={imageWrapperStyles}
@@ -123,9 +121,9 @@ class ImageLoader extends PureComponent {
           Выберите изображение
         </File>
 
-        {false && (
-          <img alt="Crop" style={{maxWidth: '100%'}} src={croppedImageUrl}/>
-        )}
+        {/*{false && (*/}
+          {/*<img alt="Crop" style={{maxWidth: '100%'}} src={croppedImageUrl}/>*/}
+        {/*)}*/}
       </FormLayoutGroup>
     );
   }

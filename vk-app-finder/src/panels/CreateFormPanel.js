@@ -97,6 +97,14 @@ class CreateFormPanel extends React.Component {
     this.lostStore.form.fields.picture.value = picture;
   };
 
+  onImageChange = image => {
+    this.lostStore.form.fields.loadingImage.value = image;
+  };
+
+  onCropChange = crop => {
+    this.lostStore.form.fields.crop.value = crop;
+  };
+
   onTypeChange = (type) => {
     this.lostStore.form.fields.typeId.value = type.target.value;
   };
@@ -148,7 +156,7 @@ class CreateFormPanel extends React.Component {
   submitSecond = () => {
     const image = this.lostStore.form.fields.picture.value;
     const animalType = this.lostStore.form.fields.typeId.value;
-    if (image !== null && animalType === 1)  {
+    if (image !== null && animalType === 1) {
       this.breeds = undefined;
       this.breedService.getBreeds(image).then(
         (result) => {
@@ -194,7 +202,11 @@ class CreateFormPanel extends React.Component {
                              onAddressChange={this.onAddressChange}/>}
 
           {this.props.stage === 1 && <>
-            <ImageLoader onPictureSet={this.onPictureSet}/>
+            <ImageLoader image={this.lostStore.form.fields.loadingImage.value}
+                         crop={this.lostStore.form.fields.crop.value}
+                         onPictureSet={this.onPictureSet}
+                         onCropChange={this.onCropChange}
+                         onImageChange={this.onImageChange}/>
             <Div style={{paddingLeft: 0}}>
               <Button onClick={this.submitSecond} size={'l'}>
                 Далее

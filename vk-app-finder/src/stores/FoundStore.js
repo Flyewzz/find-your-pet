@@ -56,6 +56,16 @@ class FoundStore extends GenericFormStore {
         error: null,
         rule: 'required'
       },
+      loadingImage: {
+        value: null,
+      },
+      crop: {
+        value: {
+          unit: '%',
+          width: 60,
+          aspect: 5 / 3,
+        },
+      }
     },
     meta: {
       isValid: true,
