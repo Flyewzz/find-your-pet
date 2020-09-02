@@ -17,6 +17,9 @@ found:
   files:
     directory: ./files/found
   page_capacity: 4
+zoosearch:
+  files:
+    path: https://zoosearch.ru/image/y/300/300
 profile:
   lost:
     page_capacity: 4
