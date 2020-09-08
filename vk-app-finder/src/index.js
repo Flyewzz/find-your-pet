@@ -9,11 +9,12 @@ import createRouter from './create-router';
 
 bridge.send("VKWebAppInit");
 const search = window.location.search;
+const hash = window.location.hash;
 const router = createRouter().start();
 
 ReactDOM.render((
   <RouterProvider router={router}>
-    <App router={router} search={search}/>
+    <App router={router} hash={hash} search={search}/>
   </RouterProvider>
   ), document.getElementById("root")
 );

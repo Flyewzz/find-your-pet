@@ -31,6 +31,7 @@ import {RouteNode} from "react-router5";
 
 class App extends React.Component {
   constructor(props) {
+    console.log('MOUNT: ' + window.location);
     super(props);
     this.state = {
       activeModal: null,
@@ -85,7 +86,14 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    this.chooseRoute(window.location.hash.slice(1));
+    const hash = this.props.hash.slice(1);
+    if (hash.startsWith('lost') && hash !== 'losts') {
+      const id = hash.slice(4);
+      this.props.router.navigate('lost', {id});
+    } else if (hash.startsWith('found') && hash !== 'founds') {
+      const id = hash.slice(5);
+      this.props.router.navigate('found', {id});
+    }
   }
 
   chooseRoute = (location, params) => {
