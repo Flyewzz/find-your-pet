@@ -31,7 +31,6 @@ import {RouteNode} from "react-router5";
 
 class App extends React.Component {
   constructor(props) {
-    console.log('MOUNT: ' + window.location);
     super(props);
     this.state = {
       activeModal: null,
@@ -43,6 +42,7 @@ class App extends React.Component {
       profilePanel: 'more',
       profileTab: 'lost',
 
+      wasEverFetched: true,
       needLostFetch: true,
       needFoundFetch: true,
 
@@ -88,9 +88,11 @@ class App extends React.Component {
   componentDidMount() {
     const hash = this.props.hash.slice(1);
     if (hash.startsWith('lost') && hash !== 'losts') {
+      this.setState({wasEverFetched: false});
       const id = hash.slice(4);
       this.props.router.navigate('lost', {id});
     } else if (hash.startsWith('found') && hash !== 'founds') {
+      this.setState({wasEverFetched: false});
       const id = hash.slice(5);
       this.props.router.navigate('found', {id});
     }
@@ -234,6 +236,7 @@ class App extends React.Component {
   toLostList = (needFetch = true) => {
     this.setState({
       needLostFetch: needFetch,
+      wasEverFetched: true,
     });
     this.props.router.navigate('losts');
   };
@@ -245,6 +248,7 @@ class App extends React.Component {
   toFoundList = (needFetch = true) => {
     this.setState({
       needFoundFetch: needFetch,
+      wasEverFetched: true,
     });
     this.props.router.navigate('founds');
   };
@@ -354,7 +358,8 @@ class App extends React.Component {
           <Panel id="lost">
             <LostAnimalPanel userStore={this.userStore}
                              openDestructive={this.openDestructive}
-                             goBack={() => this.toLostList(false)}
+                             wasEverFetched={this.state.wasEverFetched}
+                             goBack={(needFetch) => this.toLostList(needFetch)}
                              id={this.state.id}/>
           </Panel>
         </View>
@@ -375,7 +380,8 @@ class App extends React.Component {
           <Panel id="found">
             <FoundAnimalPanel userStore={this.userStore}
                               openDestructive={this.openDestructive}
-                              goBack={() => this.toFoundList(false)}
+                              wasEverFetched={this.state.wasEverFetched}
+                              goBack={(needFetch) => this.toFoundList(needFetch)}
                               id={this.state.id}/>
           </Panel>
         </View>

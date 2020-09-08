@@ -105,7 +105,7 @@ class FoundAnimalPanel extends React.Component {
 
     return (
       <>
-        <PanelHeader left={<PanelHeaderBack onClick={() => this.props.goBack(true)}/>}>
+        <PanelHeader left={<PanelHeaderBack onClick={() => this.props.goBack(!this.props.wasEverFetched)}/>}>
           Найденный питомец
         </PanelHeader>
         <Group separator="hide">
