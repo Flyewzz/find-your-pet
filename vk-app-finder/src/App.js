@@ -262,11 +262,11 @@ class App extends React.Component {
   };
 
   toMainForm = () => {
-    this.props.router.navigate('create_lost');
+    this.props.router.navigate('create_lost', {stage: 0});
   };
 
   toMainFoundForm = () => {
-    this.props.router.navigate('create_found');
+    this.props.router.navigate('create_found', {stage: 0});
   };
 
   toProfileMain = () => {
