@@ -4,7 +4,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import bridge from "@vkontakte/vk-bridge";
 import App from "./App";
-import './fonts/stylesheet.css'
 import { RouterProvider } from 'react-router5';
 import createRouter from './create-router';
 
