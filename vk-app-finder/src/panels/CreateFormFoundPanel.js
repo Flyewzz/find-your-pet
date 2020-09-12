@@ -73,6 +73,7 @@ class CreateFormFoundPanel extends React.Component {
       (result) => {
         console.log('res:' + result);
         this.props.toProfile();
+        this.props.changeStage(0);
         this.props.closePopout();
       })
   };

@@ -114,9 +114,13 @@ class App extends React.Component {
         createFoundStage: params.stage,
       });
     } else if (location === 'losts') {
-      this.setState({activeStory: 'lost', lostPanel: 'losts'});
+      this.setState(
+        {activeStory: 'lost', lostPanel: 'losts', needLostFetch: true}
+      );
     } else if (location === 'founds') {
-      this.setState({activeStory: 'messages', foundPanel: 'messages'});
+      this.setState(
+        {activeStory: 'messages', foundPanel: 'messages', needFoundFetch: true}
+      );
     } else if (location === 'profile') {
       this.setState({activeStory: 'more', profilePanel: 'more'});
     } else if (location === 'profile_lost') {
@@ -229,6 +233,14 @@ class App extends React.Component {
     );
   };
 
+  changeLostStage = (stage) => {
+    this.setState({createLostStage: stage});
+  };
+
+  changeFoundStage = (stage) => {
+    this.setState({createFoundStage: stage});
+  };
+
   toMain = () => {
     this.props.router.navigate('home');
   };
@@ -328,6 +340,7 @@ class App extends React.Component {
                              openPopout={this.openScreenSpinner}
                              closePopout={this.closeScreenSpinner}
                              stage={this.state.createLostStage}
+                             changeStage={this.changeLostStage}
                              router={router}
                              toMain={this.toMain}/>
           </Panel>
@@ -337,6 +350,7 @@ class App extends React.Component {
                                   openPopout={this.openScreenSpinner}
                                   closePopout={this.closeScreenSpinner}
                                   stage={this.state.createFoundStage}
+                                  changeStage={this.changeFoundStage}
                                   router={router}
                                   toMain={this.toMain}/>
           </Panel>

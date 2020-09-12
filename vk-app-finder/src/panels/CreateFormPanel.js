@@ -74,6 +74,7 @@ class CreateFormPanel extends React.Component {
       (result) => {
         console.log('res:' + result);
         this.props.toProfile();
+        this.props.changeStage(0);
         this.props.closePopout();
       })
   };
@@ -127,6 +128,11 @@ class CreateFormPanel extends React.Component {
 
   onDescriptionChange = (description) => {
     this.lostStore.form.fields.description.value = description.target.value;
+  };
+
+  onTermsAcceptedChange = () => {
+    const oldValue = this.lostStore.form.fields.termsAccepted.value;
+    this.lostStore.form.fields.termsAccepted.value = !oldValue;
   };
 
   changeStage = (stage) => {
@@ -235,6 +241,7 @@ class CreateFormPanel extends React.Component {
             <BreedDescriptionPanel onBreedChange={this.onBreedChange}
                                    onBreedChoose={this.onBreedChoose}
                                    onDescriptionChange={this.onDescriptionChange}
+                                   onTermsAcceptanceChange={this.onTermsAcceptedChange}
                                    onSubmit={this.onSubmit}
                                    breeds={this.breeds}
                                    fields={fields}/>
