@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"io"
@@ -37,6 +38,12 @@ func (hd *HandlerData) LostImageHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 		errs.ErrHandler(hd.DebugMode, err, &w, http.StatusInternalServerError)
+		return
+	}
+	if file.IsZoosearch {
+		ctx := context.WithValue(context.Background(), "file", file)
+		http.HandlerFunc(hd.ImageZoosearchHandler).
+			ServeHTTP(w, r.WithContext(ctx))
 		return
 	}
 	baseLostFileDirectory := viper.GetString("lost.files.directory")

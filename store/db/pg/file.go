@@ -19,10 +19,10 @@ func NewFileControllerPg(db *sql.DB) *FileControllerPg {
 }
 
 func (fc *FileControllerPg) GetById(id int) (*models.File, error) {
-	row := fc.db.QueryRow("SELECT file_id, name, path from files "+
+	row := fc.db.QueryRow("SELECT file_id, name, path, is_zoosearch from files "+
 		"WHERE file_id = $1", id)
 	var f models.File
-	err := row.Scan(&f.Id, &f.Name, &f.Path)
+	err := row.Scan(&f.Id, &f.Name, &f.Path, &f.IsZoosearch)
 	return &f, err
 }
 
@@ -34,8 +34,8 @@ func (fc *FileControllerPg) AddToLost(ctx context.Context, file *models.File,
 	}
 	var fileId int
 	tx := strTx.(*sql.Tx)
-	err := tx.QueryRow("INSERT INTO files (name, path) "+
-		"VALUES ($1, $2) RETURNING file_id", file.Name, file.Path).
+	err := tx.QueryRow("INSERT INTO files (name, path, is_zoosearch) "+
+		"VALUES ($1, $2, false) RETURNING file_id", file.Name, file.Path).
 		Scan(&fileId)
 	if err != nil {
 		return 0, err
@@ -63,8 +63,8 @@ func (fc *FileControllerPg) AddToFound(ctx context.Context, file *models.File,
 	}
 	var fileId int
 	tx := strTx.(*sql.Tx)
-	err := tx.QueryRow("INSERT INTO files (name, path) "+
-		"VALUES ($1, $2) RETURNING file_id", file.Name, file.Path).
+	err := tx.QueryRow("INSERT INTO files (name, path, is_zoosearch) "+
+		"VALUES ($1, $2, false) RETURNING file_id", file.Name, file.Path).
 		Scan(&fileId)
 	if err != nil {
 		return 0, err
