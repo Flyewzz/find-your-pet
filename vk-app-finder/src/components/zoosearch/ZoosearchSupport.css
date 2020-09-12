@@ -1,0 +1,23 @@
+.zoosearch {
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.zoosearch__line {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.zoosearch__text {
+    margin-right: 2pt;
+    margin-top: 4pt;
+    font-size: smaller;
+    font-weight: bolder;
+    color: dimgrey;
+}
+
+.zoosearch__logo {
+    width: 14%;
+}

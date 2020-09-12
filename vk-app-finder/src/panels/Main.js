@@ -1,6 +1,7 @@
 import React from 'react';
 import {Button, Div, PanelHeader} from "@vkontakte/vkui";
 import {FixedLayout} from "@vkontakte/vkui/dist/es6";
+import ZoosearchSupport from '../components/zoosearch/ZoosearchSupport';
 import './Main.css';
 
 const MainPanel = (props) => {
@@ -8,6 +9,7 @@ const MainPanel = (props) => {
     <>
       <PanelHeader>Главная</PanelHeader>
       <FixedLayout className={'main__wrapper'}>
+        <ZoosearchSupport/>
         <Div className={'main__welcome-text'}>
           Find your pet
         </Div>
