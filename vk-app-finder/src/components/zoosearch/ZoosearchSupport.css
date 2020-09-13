@@ -1,7 +1,8 @@
 .zoosearch {
     margin-top: 0;
     margin-bottom: 0;
-    width: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .zoosearch__line {
@@ -10,14 +11,22 @@
     justify-content: flex-end;
 }
 
+.zoosearch__link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: max-content;
+}
+
 .zoosearch__text {
     margin-right: 2pt;
     margin-top: 4pt;
     font-size: smaller;
     font-weight: bolder;
     color: dimgrey;
+    text-decoration: underline;
 }
 
 .zoosearch__logo {
-    width: 14%;
+    height: 2em;
 }

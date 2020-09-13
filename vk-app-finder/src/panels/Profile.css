@@ -1,3 +1,9 @@
 #map {
     height: 490px;
 }
+
+.zoosearch__footer {
+    position: absolute;
+    right: 0;
+    bottom: calc(var(--safe-area-inset-bottom) + var(--tabbar_height) + 5px);
+}

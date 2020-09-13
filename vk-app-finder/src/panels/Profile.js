@@ -7,6 +7,7 @@ import {TabsItem} from '@vkontakte/vkui'
 import LostTab from '../components/profile/LostTab';
 import './Profile.css';
 import FoundTab from "../components/profile/FoundTab";
+import ZoosearchSupport from '../components/zoosearch/ZoosearchSupport';
 
 class ProfilePanel extends React.Component {
   constructor(props) {
@@ -62,6 +63,9 @@ class ProfilePanel extends React.Component {
                        goBack={this.props.goBackFound}
                        toFound={this.props.toFound}/>}
         </Group>
+        <div className={'zoosearch__footer'}>
+          <ZoosearchSupport/>
+        </div>
       </>
     );
   }

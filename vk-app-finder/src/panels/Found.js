@@ -9,6 +9,7 @@ import Placeholder from "@vkontakte/vkui/dist/components/Placeholder/Placeholder
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
 import Icon28CancelOutline from "@vkontakte/icons/dist/28/cancel_outline";
 import InfiniteScroll from 'react-infinite-scroll-component';
+import ZoosearchSupport from "../components/zoosearch/ZoosearchSupport";
 
 
 class FoundPanel extends React.Component {
@@ -76,6 +77,9 @@ class FoundPanel extends React.Component {
       <>
         <PanelHeader>Нашлись</PanelHeader>
         <Group separator="hide">
+          <div style={{padding: 0, marginTop: 0, marginBottom: 0}}>
+            <ZoosearchSupport/>
+          </div>
           <FilterLine isMap={this.state.mapView}
                       onChange={this.onSearchInput}
                       query={this.props.foundFilterStore.fields.query}
