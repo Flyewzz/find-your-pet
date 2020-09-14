@@ -5,6 +5,7 @@ import config from "../../config";
 import {Div} from "@vkontakte/vkui";
 import getDefaultAnimal from '../default_animals/DefaultAnimals';
 import getGenderInfo from '../gender/Genders';
+import LinesEllipsis from 'react-lines-ellipsis'
 
 const AnimalCard = (props) => {
   const animal = props.animal;
@@ -35,12 +36,21 @@ const AnimalCard = (props) => {
         />
       </div>
       <Div className={"animal-card__data"}>
-        <p className={"animal-card__address"}>{animal.address}</p>
+        <p className={"animal-card__address"}>
+          <LinesEllipsis
+            text={animal.address}
+            maxLine='3'
+            ellipsis='...'
+            trimRight
+            basedOn='letters'
+            componenr={<span/>}
+          />
+        </p>
         <p className={"animal-card__date"}>Дата: {date}</p>
         <p className={"animal-card__gender"}>Пол: {gender.name}
           {gender.picture &&
-            <img className={"animal-card__gender__picture"}
-                src={gender.picture} width='32' height='32' alt={''}/>
+          <img className={"animal-card__gender__picture"}
+               src={gender.picture} width='32' height='32' alt={''}/>
           }
         </p>
       </Div>

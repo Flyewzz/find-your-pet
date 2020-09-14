@@ -19,13 +19,13 @@
 
 .main__button:first-child {
     float: left;
-    margin-left: 24%;
+    margin-left: 23%;
     min-width: 145px;
 }
 
 .main__button:last-child {
     float: right;
-    margin-right: 24%;
+    margin-right: 23%;
     min-width: 145px;
 }
 
