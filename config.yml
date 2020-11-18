@@ -1,0 +1,31 @@
+port: 8080
+db:
+  host: localhost
+  user: postgres
+  password: postgres
+  database: postgres
+  max_connections: 50
+file:
+  max_size: 10 # MB  
+lost:
+  itemsPerPage: 9
+  files:
+    directory: ./files/lost
+    
+  page_capacity: 4
+found:
+  files:
+    directory: ./files/found
+  page_capacity: 4
+zoosearch:
+  files:
+    path: https://zoosearch.ru/image/y/300/300
+profile:
+  lost:
+    page_capacity: 4
+  found:
+    page_capacity: 4
+breed_srv:
+  address: shumak.fail:80
+  conn_timeout: 10
+  recognize_timeout: 90
